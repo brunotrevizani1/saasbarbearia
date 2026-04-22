@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Agendamento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="area-agendamento">
+      <div class="container">
+        <div id="tela-data">
+          <h1>Escolha o dia</h1>
+
+          <div class="calendario-header">
+            <button onclick="mesAnterior()">←</button>
+            <span id="mesAno"></span>
+            <button onclick="proximoMes()">→</button>
+          </div>
+
+          <div class="dias-semana">
+            <div>DOM</div>
+            <div>SEG</div>
+            <div>TER</div>
+            <div>QUA</div>
+            <div>QUI</div>
+            <div>SEX</div>
+            <div>SAB</div>
+          </div>
+
+          <div id="calendario"></div>
+        </div>
+
+        <div id="tela-horarios">
+          <h1>Horários disponíveis</h1>
+
+          <div id="listaHorarios"></div>
+
+          <p id="semHorarios">
+            Todos os horários para esse dia foram esgotados
+          </p>
+
+          <button class="btn-voltar" onclick="voltarParaData()">Voltar</button>
+        </div>
+
+        <div id="tela-confirmar">
+          <h1>Confirmar agendamento</h1>
+
+          <input type="text" id="nome" placeholder="Seu nome" />
+          <input type="text" id="telefone" placeholder="Telefone" />
+
+          <button class="btn-principal" onclick="confirmar()">Agendar</button>
+
+          <button class="btn-voltar" onclick="voltarParaHorarios()">
+            Voltar
+          </button>
+
+          <p id="mensagem"></p>
+        </div>
+
+        <div id="tela-sucesso">
+          <h1>Agendamento confirmado!</h1>
+
+          <div id="resumo"></div>
+
+          <div id="codigoCancelamentoBox" class="codigo-cancelamento-box"></div>
+
+          <button class="btn-principal" onclick="novoAgendamento()">
+            Voltar ao início
+          </button>
+        </div>
+
+        <div id="tela-localizacao">
+          <h1>Localização da barbearia</h1>
+
+          <p id="textoLocalizacao"></p>
+
+          <button class="btn-voltar" onclick="voltarDaLocalizacao()">
+            Voltar
+          </button>
+        </div>
+
+        <div id="tela-cancelar">
+          <h1>Cancelar agendamento</h1>
+
+          <input
+            type="text"
+            id="cancelarCodigo"
+            placeholder="Digite seu código de cancelamento"
+            maxlength="6"
+          />
+
+          <button
+            class="btn-principal"
+            onclick="buscarAgendamentoParaCancelar()"
+          >
+            Buscar agendamento
+          </button>
+
+          <div
+            id="agendamentoCancelamentoInfo"
+            class="agendamento-cancelamento-info"
+          ></div>
+
+          <p id="mensagemCancelamento"></p>
+
+          <button class="btn-voltar" onclick="voltarDaTelaCancelar()">
+            Voltar
+          </button>
+        </div>
+      </div>
+
+      <button
+        class="btn-localizacao"
+        onclick="abrirTelaLocalizacao()"
+        aria-label="Ver localização"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle
+            cx="12"
+            cy="10"
+            r="2.2"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+        </svg>
+      </button>
+
+      <button
+        class="btn-cancelar"
+        onclick="abrirTelaCancelamento()"
+        aria-label="Cancelar agendamento"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M18 6L6 18M6 6l12 12"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

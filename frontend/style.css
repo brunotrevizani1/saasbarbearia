@@ -1,0 +1,501 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(180deg, #dde5ee 0%, #edf2f7 100%);
+  color: #1f2937;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.area-agendamento {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 470px;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  border: 1px solid #d9e2ec;
+  border-radius: 30px;
+  padding: 30px;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.06);
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 14px;
+  }
+
+  .container {
+    width: 100%;
+    padding: 22px;
+    border-radius: 24px;
+  }
+}
+
+h1 {
+  font-size: 28px;
+  margin: 0 0 20px;
+  color: #0f172a;
+  text-align: center;
+}
+
+/* TELAS */
+
+#tela-data,
+#tela-horarios,
+#tela-confirmar,
+#tela-sucesso,
+#tela-localizacao,
+#tela-cancelar {
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.tela-ativa {
+  display: flex !important;
+  animation: fadeSubida 0.28s ease;
+}
+
+@keyframes fadeSubida {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* HEADER CALENDÁRIO */
+
+.calendario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.calendario-header span {
+  font-size: 17px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.calendario-header button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.calendario-header button:hover:not(:disabled) {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+#calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.dia {
+  min-height: 48px;
+  padding: 12px 6px;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: 0.2s ease;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #0f172a;
+}
+
+.dia:hover {
+  background: #eef4fb;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.dia.vazio {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.dia.passado {
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.dia.lotado {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #334155;
+}
+
+.dia.selecionado {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  border-color: #2563eb;
+}
+
+/* HORÁRIOS */
+
+#listaHorarios {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#listaHorarios.duas-colunas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.horario {
+  padding: 13px;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  text-align: center;
+  transition: 0.2s ease;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.horario:hover {
+  background: #eef4fb;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+#semHorarios {
+  margin-top: 14px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.5;
+  display: none;
+}
+
+#semHorarios.mostrar {
+  display: block;
+}
+
+/* INPUTS */
+
+input {
+  padding: 14px;
+  margin-top: 14px;
+  border-radius: 16px;
+  border: 1px solid #d9e2ec;
+  background: #f8fafc;
+  color: #0f172a;
+  outline: none;
+  transition: 0.2s ease;
+  font-size: 15px;
+}
+
+input:focus {
+  border-color: #60a5fa;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.14);
+}
+
+/* BOTÕES */
+
+.btn-principal,
+.btn-voltar {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.btn-principal {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+}
+
+.btn-principal:hover {
+  transform: translateY(-2px);
+}
+
+.btn-voltar {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #d9e2ec;
+}
+
+.btn-voltar:hover {
+  transform: translateY(-2px);
+  background: #e2e8f0;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-principal.loading {
+  opacity: 0.7;
+  cursor: wait;
+  pointer-events: none;
+}
+
+/* RESUMO FINAL */
+
+#resumo {
+  margin: 18px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.item-resumo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334155;
+  font-size: 15px;
+}
+
+.item-resumo svg {
+  width: 18px;
+  height: 18px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.texto-sucesso {
+  margin-top: 8px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* CÓDIGO DE CANCELAMENTO */
+
+.codigo-cancelamento-box {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.codigo-cancelamento-box strong {
+  display: block;
+  font-size: 24px;
+  letter-spacing: 2px;
+  margin-top: 8px;
+  color: #2563eb;
+}
+
+/* LOCALIZAÇÃO */
+
+#textoLocalizacao {
+  margin: 10px 0 0;
+  color: #334155;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.topo-agendamento {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.badge-cancelado {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid #fecaca;
+}
+
+.card-agendamento.cancelado {
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+  border: 1px solid #fda4af;
+}
+
+.card-agendamento.cancelado .linha-info svg {
+  color: #dc2626;
+}
+
+.card-agendamento.cancelado strong {
+  color: #991b1b;
+}
+
+/* TELA DE CANCELAMENTO */
+
+#mensagemCancelamento,
+#mensagem {
+  margin-top: 14px;
+  text-align: center;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.agendamento-cancelamento-info {
+  margin-top: 18px;
+}
+
+.card-cancelamento {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-cancelamento h3 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  text-align: center;
+}
+
+.item-cancelamento {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #334155;
+  font-size: 15px;
+}
+
+.item-cancelamento svg {
+  width: 18px;
+  height: 18px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.btn-confirmar-cancelamento {
+  margin-top: 14px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-weight: 700;
+  font-size: 14px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 12px 24px rgba(239, 68, 68, 0.2);
+}
+
+.btn-confirmar-cancelamento:hover {
+  transform: translateY(-2px);
+}
+
+/* BOTÕES FLUTUANTES */
+
+.btn-localizacao,
+.btn-cancelar {
+  position: absolute;
+  right: -70px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.btn-localizacao svg,
+.btn-cancelar svg {
+  width: 24px;
+  height: 24px;
+}
+
+.btn-localizacao {
+  bottom: 18px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+}
+
+.btn-localizacao:hover {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.05);
+}
+
+.btn-cancelar {
+  bottom: 82px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.28);
+}
+
+.btn-cancelar:hover {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.05);
+}
+
+@media (max-width: 700px) {
+  .btn-localizacao {
+    right: 8px;
+    bottom: -66px;
+  }
+
+  .btn-cancelar {
+    right: 8px;
+    bottom: -2px;
+  }
+}

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configurações da Agenda</title>
+    <link rel="stylesheet" href="configuracoes.css" />
+  </head>
+  <body>
+    <div class="pagina-config">
+      <div class="painel-config">
+        <div class="topo-config">
+          <div>
+            <span class="eyebrow">Painel do barbeiro</span>
+            <h1>Configurações da agenda</h1>
+            <p>
+              Ajuste bloqueios, dias sem atendimento e horários disponíveis para
+              os clientes.
+            </p>
+          </div>
+
+          <a href="barbeiro.html" class="btn-voltar">Voltar ao painel</a>
+        </div>
+
+        <div class="abas-config">
+          <button
+            id="abaBloqueioBtn"
+            class="aba-config ativa"
+            onclick="abrirAba('bloqueio')"
+          >
+            Bloquear dia
+          </button>
+
+          <button
+            id="abaHorarioBtn"
+            class="aba-config"
+            onclick="abrirAba('horario')"
+          >
+            Horários de atendimento
+          </button>
+        </div>
+
+        <div id="abaBloqueio" class="conteudo-aba ativa">
+          <div class="grid-bloqueio">
+            <section class="card-config card-form">
+              <div class="card-header">
+                <h2>Bloquear um dia específico</h2>
+                <p>
+                  Escolha uma data e, se quiser, escreva uma mensagem para o
+                  cliente.
+                </p>
+              </div>
+
+              <div class="form-config">
+                <label class="campo">
+                  <span>Data</span>
+                  <input type="date" id="dataBloqueio" />
+                </label>
+
+                <label class="campo">
+                  <span>Motivo</span>
+                  <textarea
+                    id="motivoBloqueio"
+                    placeholder="Ex: Não haverá atendimento neste dia."
+                  ></textarea>
+                </label>
+
+                <button class="btn-principal" onclick="bloquearDia()">
+                  Bloquear dia
+                </button>
+
+                <p id="mensagemBloqueio" class="mensagem"></p>
+              </div>
+            </section>
+
+            <section class="card-config card-lista">
+              <div class="card-header">
+                <h2>Dias bloqueados</h2>
+                <p>Veja e remova rapidamente os bloqueios já cadastrados.</p>
+              </div>
+
+              <div id="listaBloqueios" class="lista-bloqueios"></div>
+              <p id="semBloqueios" class="texto-vazio" style="display: none">
+                Nenhum dia bloqueado.
+              </p>
+            </section>
+          </div>
+
+          <section class="card-config card-auto">
+            <div class="card-header">
+              <h2>Bloqueios automáticos</h2>
+              <p>Defina dias da semana em que a barbearia não atende.</p>
+            </div>
+
+            <div class="opcoes-semana">
+              <label class="opcao-semana">
+                <input type="checkbox" id="bloquearSabado" />
+                <div>
+                  <strong>Sábado</strong>
+                  <span
+                    >Bloquear todos os sábados no calendário do cliente.</span
+                  >
+                </div>
+              </label>
+
+              <label class="opcao-semana">
+                <input type="checkbox" id="bloquearDomingo" />
+                <div>
+                  <strong>Domingo</strong>
+                  <span
+                    >Bloquear todos os domingos no calendário do cliente.</span
+                  >
+                </div>
+              </label>
+            </div>
+
+            <button class="btn-principal" onclick="salvarConfiguracaoAgenda()">
+              Salvar bloqueios automáticos
+            </button>
+
+            <p id="mensagemConfiguracao" class="mensagem"></p>
+          </section>
+        </div>
+
+        <div id="abaHorario" class="conteudo-aba">
+          <section class="card-config">
+            <div class="card-header">
+              <h2>Horários de atendimento</h2>
+              <p>Defina o início, fim e intervalo dos horários disponíveis.</p>
+            </div>
+
+            <div class="linha-horarios">
+              <label class="campo">
+                <span>Hora inicial</span>
+                <input type="time" id="horaInicio" />
+              </label>
+
+              <label class="campo">
+                <span>Hora final</span>
+                <input type="time" id="horaFim" />
+              </label>
+
+              <label class="campo">
+                <span>Intervalo</span>
+                <select id="intervalo">
+                  <option value="15">15 minutos</option>
+                  <option value="20">20 minutos</option>
+                  <option value="30">30 minutos</option>
+                  <option value="40">40 minutos</option>
+                  <option value="45">45 minutos</option>
+                  <option value="60">60 minutos</option>
+                </select>
+              </label>
+            </div>
+
+            <button class="btn-principal" onclick="salvarConfiguracaoAgenda()">
+              Salvar horários
+            </button>
+
+            <p id="mensagemConfiguracaoHorario" class="mensagem"></p>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script src="configuracoes.js"></script>
+  </body>
+</html>
