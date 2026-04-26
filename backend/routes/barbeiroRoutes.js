@@ -17,6 +17,10 @@ const {
 
   buscarConfiguracaoAgenda,
   salvarConfiguracaoAgenda,
+
+  // 🔥 NOVO (localização da barbearia)
+  buscarLocalizacaoBarbearia,
+  salvarLocalizacaoBarbearia,
 } = require("../controllers/barbeiroController");
 
 router.get("/barbeiros", listarBarbeiros);
@@ -34,5 +38,9 @@ router.delete("/dias-bloqueados/:id", desbloquearDia);
 
 router.get("/configuracao-agenda", buscarConfiguracaoAgenda);
 router.post("/configuracao-agenda", salvarConfiguracaoAgenda);
+
+// 🔥 NOVAS ROTAS DE LOCALIZAÇÃO
+router.get("/localizacao", buscarLocalizacaoBarbearia);
+router.put("/localizacao", salvarLocalizacaoBarbearia);
 
 module.exports = router;

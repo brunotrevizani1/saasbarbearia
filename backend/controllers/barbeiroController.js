@@ -72,14 +72,10 @@ const criarBarbeiro = (req, res) => {
         almoco_fim,
         bloquear_sabado,
         bloquear_domingo,
-        rua,
-        numero,
-        bairro,
-        cidade,
         barbearia_id,
         barbeiro_id
       )
-      VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, NULL, NULL, NULL, NULL, ?, ?)
+      VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, ?, ?)
     `;
 
     db.query(configSql, [barbearia_id, barbeiro_id], (errConfig) => {
@@ -504,14 +500,10 @@ const buscarConfiguracaoAgenda = (req, res) => {
           almoco_fim,
           bloquear_sabado,
           bloquear_domingo,
-          rua,
-          numero,
-          bairro,
-          cidade,
           barbearia_id,
           barbeiro_id
         )
-        VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, NULL, NULL, NULL, NULL, ?, ?)
+        VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, ?, ?)
       `;
 
       db.query(insertSql, [barbearia_id, barbeiro_id], (errInsert) => {
@@ -529,10 +521,6 @@ const buscarConfiguracaoAgenda = (req, res) => {
           almoco_fim: null,
           bloquear_sabado: 0,
           bloquear_domingo: 1,
-          rua: null,
-          numero: null,
-          bairro: null,
-          cidade: null,
           barbearia_id,
           barbeiro_id,
         });
@@ -560,10 +548,6 @@ const salvarConfiguracaoAgenda = (req, res) => {
     bloquear_sexta,
     bloquear_sabado,
     bloquear_domingo,
-    rua,
-    numero,
-    bairro,
-    cidade,
   } = req.body;
 
   const barbearia_id = pegarBarbeariaId(req);
@@ -598,28 +582,24 @@ const salvarConfiguracaoAgenda = (req, res) => {
 
     if (result.length === 0) {
       const insertSql = `
-  INSERT INTO configuracoes_agenda (
-    hora_inicio,
-    hora_fim,
-    intervalo,
-    almoco_inicio,
-    almoco_fim,
-    bloquear_segunda,
-    bloquear_terca,
-    bloquear_quarta,
-    bloquear_quinta,
-    bloquear_sexta,
-    bloquear_sabado,
-    bloquear_domingo,
-    rua,
-    numero,
-    bairro,
-    cidade,
-    barbearia_id,
-    barbeiro_id
-  )
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`;
+        INSERT INTO configuracoes_agenda (
+          hora_inicio,
+          hora_fim,
+          intervalo,
+          almoco_inicio,
+          almoco_fim,
+          bloquear_segunda,
+          bloquear_terca,
+          bloquear_quarta,
+          bloquear_quinta,
+          bloquear_sexta,
+          bloquear_sabado,
+          bloquear_domingo,
+          barbearia_id,
+          barbeiro_id
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
 
       db.query(
         insertSql,
@@ -636,10 +616,6 @@ const salvarConfiguracaoAgenda = (req, res) => {
           bloquear_sexta ? 1 : 0,
           bloquear_sabado ? 1 : 0,
           bloquear_domingo ? 1 : 0,
-          rua || null,
-          numero || null,
-          bairro || null,
-          cidade || null,
           barbearia_id,
           barbeiro_id,
         ],
@@ -654,6 +630,7 @@ const salvarConfiguracaoAgenda = (req, res) => {
           res.json({ sucesso: true });
         },
       );
+
       return;
     }
 
@@ -670,11 +647,7 @@ const salvarConfiguracaoAgenda = (req, res) => {
           bloquear_quinta = ?,
           bloquear_sexta = ?,
           bloquear_sabado = ?,
-          bloquear_domingo = ?,
-          rua = ?,
-          numero = ?,
-          bairro = ?,
-          cidade = ?
+          bloquear_domingo = ?
       WHERE id = ?
       AND barbearia_id = ?
       AND barbeiro_id = ?
@@ -695,10 +668,6 @@ const salvarConfiguracaoAgenda = (req, res) => {
         bloquear_sexta ? 1 : 0,
         bloquear_sabado ? 1 : 0,
         bloquear_domingo ? 1 : 0,
-        rua || null,
-        numero || null,
-        bairro || null,
-        cidade || null,
         result[0].id,
         barbearia_id,
         barbeiro_id,
@@ -717,6 +686,62 @@ const salvarConfiguracaoAgenda = (req, res) => {
   });
 };
 
+const buscarLocalizacaoBarbearia = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  const sql = `
+    SELECT rua, numero, bairro, cidade
+    FROM barbearias
+    WHERE id = ?
+    LIMIT 1
+  `;
+
+  db.query(sql, [barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar localização:", err);
+      return res.status(500).json({ erro: "Erro ao buscar localização." });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ erro: "Barbearia não encontrada." });
+    }
+
+    res.json(result[0]);
+  });
+};
+
+const salvarLocalizacaoBarbearia = (req, res) => {
+  const { rua, numero, bairro, cidade } = req.body;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  const sql = `
+    UPDATE barbearias
+    SET rua = ?, numero = ?, bairro = ?, cidade = ?
+    WHERE id = ?
+  `;
+
+  db.query(
+    sql,
+    [rua || null, numero || null, bairro || null, cidade || null, barbearia_id],
+    (err) => {
+      if (err) {
+        console.error("Erro ao salvar localização:", err);
+        return res.status(500).json({ erro: "Erro ao salvar localização." });
+      }
+
+      res.json({ sucesso: true });
+    },
+  );
+};
+
 module.exports = {
   listarBarbeiros,
   criarBarbeiro,
@@ -733,4 +758,7 @@ module.exports = {
 
   buscarConfiguracaoAgenda,
   salvarConfiguracaoAgenda,
+
+  buscarLocalizacaoBarbearia,
+  salvarLocalizacaoBarbearia,
 };
