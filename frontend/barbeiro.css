@@ -18,7 +18,8 @@ body {
 
 /* MENU ESQUERDO */
 
-.sidebar {
+.sidebar,
+.menu-lateral {
   width: 270px;
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(10px);
@@ -29,7 +30,8 @@ body {
   height: fit-content;
 }
 
-.sidebar-topo {
+.sidebar-topo,
+.logo-area {
   margin-bottom: 24px;
 }
 
@@ -56,14 +58,17 @@ body {
   height: 27px;
 }
 
-.logo-box h1 {
+.logo-box h1,
+.logo-area h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 20px;
+  font-size: 24px;
 }
 
-.logo-box p {
-  margin: 3px 0 0;
+.logo-box p,
+.logo-area p,
+#nomeBarbearia {
+  margin: 8px 0 0;
   color: #64748b;
   font-size: 14px;
 }
@@ -89,6 +94,7 @@ body {
   font-size: 15px;
   font-weight: 700;
   transition: 0.2s ease;
+  margin-bottom: 8px;
 }
 
 .menu-item:hover {
@@ -102,6 +108,13 @@ body {
   box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
 }
 
+.menu-item svg,
+.menu-icone svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
 .menu-icone {
   width: 22px;
   height: 22px;
@@ -110,9 +123,14 @@ body {
   justify-content: center;
 }
 
-.menu-icone svg {
-  width: 22px;
-  height: 22px;
+.menu-item.sair {
+  margin-top: 12px;
+  color: #334155;
+}
+
+.menu-item.sair:hover {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 /* ÁREA DA DIREITA */
@@ -141,6 +159,11 @@ body {
 
 .topo-secao {
   margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 
 .eyebrow {
@@ -151,7 +174,7 @@ body {
   background: #dbeafe;
   padding: 6px 10px;
   border-radius: 999px;
-  margin-bottom: 12px;
+  margin: 0 0 12px;
 }
 
 .topo-secao h2 {
@@ -168,7 +191,9 @@ body {
 
 /* CARDS GERAIS */
 
-.card {
+.card,
+.card-config,
+.bloco-config {
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid #e2e8f0;
   border-radius: 24px;
@@ -176,13 +201,19 @@ body {
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
 }
 
+.bloco-config {
+  margin-top: 22px;
+}
+
 .card-header {
   margin-bottom: 18px;
 }
 
-.card-header h3 {
-  margin: 0 0 8px;
-  font-size: 22px;
+.card-header h3,
+.card-config h3,
+.bloco-config h3 {
+  margin: 0 0 14px;
+  font-size: 20px;
   color: #0f172a;
 }
 
@@ -193,6 +224,11 @@ body {
 }
 
 /* DASHBOARD */
+
+#filtroBarbeiroAgendamentos {
+  min-width: 260px;
+  max-width: 360px;
+}
 
 .lista-agendamentos {
   display: flex;
@@ -238,6 +274,13 @@ body {
   color: #0f172a;
 }
 
+.topo-agendamento {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .linha-info {
   display: flex;
   align-items: center;
@@ -262,7 +305,8 @@ body {
 .btn-concluir,
 .btn-excluir,
 .btn-principal,
-.btn-desbloquear {
+.btn-desbloquear,
+.btn-bloquear {
   border: none;
   border-radius: 16px;
   padding: 13px 16px;
@@ -285,24 +329,74 @@ body {
 }
 
 .btn-excluir,
-.btn-desbloquear {
+.btn-desbloquear,
+.btn-bloquear {
   background: #ef4444;
   color: white;
   box-shadow: 0 12px 24px rgba(239, 68, 68, 0.13);
 }
 
 .btn-excluir:hover,
-.btn-desbloquear:hover {
+.btn-desbloquear:hover,
+.btn-bloquear:hover {
   transform: translateY(-2px);
 }
 
-.texto-vazio {
+.texto-vazio,
+.mensagem-vazia {
   margin-top: 16px;
   color: #64748b;
   font-size: 15px;
 }
 
+.badge-cancelado {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid #fecaca;
+}
+
+.card-agendamento.cancelado {
+  background: linear-gradient(180deg, #fff1f2 0%, #ffe4e6 100%);
+  border: 1px solid #fd2a43;
+}
+
+.card-agendamento.cancelado .linha-info svg {
+  color: #dc2626;
+}
+
+.card-agendamento.cancelado strong {
+  color: #991b1b;
+}
+
 /* CONFIGURAÇÕES */
+
+.lista-barbeiros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.linha-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.linha-form input {
+  flex: 1;
+}
+
+.area-config-barbeiro {
+  margin-top: 24px;
+}
 
 .abas-config {
   display: flex;
@@ -311,7 +405,8 @@ body {
   flex-wrap: wrap;
 }
 
-.aba-config {
+.aba-config,
+.aba {
   border: 1px solid #d6e0ea;
   background: rgba(255, 255, 255, 0.85);
   color: #475569;
@@ -322,12 +417,14 @@ body {
   transition: 0.2s ease;
 }
 
-.aba-config:hover {
+.aba-config:hover,
+.aba:hover {
   border-color: #93c5fd;
   color: #2563eb;
 }
 
-.aba-config.ativa {
+.aba-config.ativa,
+.aba.ativa {
   background: #2563eb;
   color: white;
   border-color: #2563eb;
@@ -342,11 +439,16 @@ body {
   display: block;
 }
 
-.grid-bloqueio {
+.grid-bloqueio,
+.grid-config {
   display: grid;
   grid-template-columns: 1.05fr 1fr;
   gap: 20px;
   margin-bottom: 20px;
+}
+
+.card-lista {
+  grid-column: span 2;
 }
 
 .form-config {
@@ -359,6 +461,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 14px;
 }
 
 .campo span {
@@ -432,6 +535,27 @@ textarea {
   line-height: 1.4;
 }
 
+.item-barbeiro {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.item-barbeiro strong {
+  color: #0f172a;
+}
+
+.item-barbeiro span {
+  color: #64748b;
+  font-size: 14px;
+}
+
 .opcoes-semana {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -439,7 +563,8 @@ textarea {
   margin-bottom: 18px;
 }
 
-.opcao-semana {
+.opcao-semana,
+.check-card {
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -450,19 +575,28 @@ textarea {
   cursor: pointer;
 }
 
-.opcao-semana input {
+.check-card {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.opcao-semana input,
+.check-card input {
   width: auto;
   margin-top: 3px;
   transform: scale(1.15);
 }
 
-.opcao-semana strong {
+.opcao-semana strong,
+.check-card strong {
   display: block;
   margin-bottom: 4px;
   color: #0f172a;
 }
 
-.opcao-semana span {
+.opcao-semana span,
+.check-card span {
   color: #64748b;
   font-size: 14px;
   line-height: 1.4;
@@ -475,10 +609,260 @@ textarea {
   margin-bottom: 18px;
 }
 
+.linha-horarios + .linha-horarios {
+  grid-template-columns: 1fr 1fr;
+}
+
 .mensagem {
   margin: 14px 0 0;
   color: #475569;
   font-size: 14px;
+}
+
+/* LOCALIZAÇÃO */
+
+#secaoLocalizacao .card-config {
+  max-width: 760px;
+}
+
+/* ===== LOGIN CENTRALIZADO ===== */
+
+.login-layout {
+  min-height: 100vh !important;
+  height: 100vh !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(180deg, #e2e8f0 0%, #f8fafc 100%);
+}
+
+.login-conteudo {
+  width: 100%;
+  height: auto !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  max-width: 360px !important;
+  width: 100% !important;
+  height: auto !important;
+  padding: 32px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.painel-principal.login-card {
+  height: auto !important;
+  min-height: unset !important;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #d9e2ec;
+  background: #f8fafc;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.login-card input:focus {
+  border-color: #2563eb;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.login-card .btn-principal {
+  margin-top: 10px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-card .btn-principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+}
+
+.login-card h2 {
+  text-align: center;
+}
+
+.login-card .descricao-secao {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.login-card .mensagem {
+  text-align: center;
+  margin-top: 10px;
+  color: #dc2626;
+}
+
+/* OLHO SENHA */
+
+.input-senha {
+  position: relative;
+  width: 100%;
+}
+
+.input-senha input {
+  width: 100%;
+  padding-right: 46px !important;
+}
+
+.btn-olho {
+  position: absolute !important;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible !important;
+}
+
+.btn-olho:hover {
+  background: transparent !important;
+  transform: translateY(-50%) scale(1.05);
+}
+
+.btn-olho svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  overflow: visible;
+}
+
+.topo-lista-equipe {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.topo-lista-equipe h3 {
+  margin: 0;
+}
+
+.btn-add-barbeiro {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.18);
+  transition: 0.2s ease;
+}
+
+.btn-add-barbeiro:hover {
+  transform: translateY(-2px);
+}
+
+.btn-add-barbeiro svg {
+  width: 25px;
+  height: 25px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 999;
+}
+
+.modal-overlay.ativo {
+  display: flex;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 24px;
+  padding: 26px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+  border: 1px solid #e2e8f0;
+}
+
+.modal-card h3 {
+  margin: 0 0 18px;
+  font-size: 22px;
+  color: #0f172a;
+}
+
+.modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn-secundario {
+  border: 1px solid #d9e2ec;
+  background: #f8fafc;
+  color: #475569;
+  border-radius: 14px;
+  padding: 13px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* BLOQUEIOS AUTOMÁTICOS - DIAS DA SEMANA */
+.grade-dias-semana {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 10px 0 20px;
+}
+
+.check-dia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #d9e2ec;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.check-dia input {
+  width: auto;
+  margin: 0;
+  transform: scale(1.1);
 }
 
 /* RESPONSIVO */
@@ -488,7 +872,8 @@ textarea {
     flex-direction: column;
   }
 
-  .sidebar {
+  .sidebar,
+  .menu-lateral {
     width: 100%;
   }
 
@@ -501,16 +886,26 @@ textarea {
     width: auto;
   }
 
-  .grid-bloqueio {
+  .grid-bloqueio,
+  .grid-config {
     grid-template-columns: 1fr;
+  }
+
+  .card-lista {
+    grid-column: span 1;
   }
 
   .opcoes-semana {
     grid-template-columns: 1fr;
   }
 
-  .linha-horarios {
+  .linha-horarios,
+  .linha-horarios + .linha-horarios {
     grid-template-columns: 1fr;
+  }
+
+  .linha-form {
+    flex-direction: column;
   }
 
   .lista-agendamentos {
@@ -538,7 +933,9 @@ textarea {
   }
 
   .card,
-  .card-agendamento {
+  .card-config,
+  .card-agendamento,
+  .bloco-config {
     padding: 18px;
     border-radius: 20px;
   }
@@ -547,7 +944,8 @@ textarea {
     flex-direction: column;
   }
 
-  .aba-config {
+  .aba-config,
+  .aba {
     width: 100%;
   }
 
@@ -558,5 +956,10 @@ textarea {
   .btn-concluir,
   .btn-excluir {
     flex: 1;
+  }
+
+  #filtroBarbeiroAgendamentos {
+    max-width: 100%;
+    min-width: 100%;
   }
 }

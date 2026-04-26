@@ -2,15 +2,27 @@ const express = require("express");
 const router = express.Router();
 
 const {
+  listarBarbeiros,
+  criarBarbeiro,
+  atualizarBarbeiro,
+  deletarBarbeiro,
+
   listarAgendamentos,
   concluirAgendamento,
   deletarAgendamento,
+
   listarDiasBloqueados,
   bloquearDia,
   desbloquearDia,
+
   buscarConfiguracaoAgenda,
   salvarConfiguracaoAgenda,
 } = require("../controllers/barbeiroController");
+
+router.get("/barbeiros", listarBarbeiros);
+router.post("/barbeiros", criarBarbeiro);
+router.put("/barbeiros/:id", atualizarBarbeiro);
+router.delete("/barbeiros/:id", deletarBarbeiro);
 
 router.get("/agendamentos", listarAgendamentos);
 router.put("/agendamentos/:id/concluir", concluirAgendamento);

@@ -2,168 +2,178 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Painel do Barbeiro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="barbeiro.css" />
   </head>
   <body>
     <div class="layout">
-      <aside class="sidebar">
-        <div class="sidebar-topo">
-          <div class="logo-box">
-            <div class="logo-icon">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M7 3h10v4H7V3Zm-2 7h14v9a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-9Zm3 3v5m4-5v5m4-5v5"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </div>
-
-            <div>
-              <h1>Painel</h1>
-              <p>Barbearia</p>
-            </div>
-          </div>
+      <aside class="menu-lateral">
+        <div class="logo-area">
+          <h1>Painel</h1>
+          <p id="nomeBarbearia">Barbearia</p>
         </div>
 
-        <nav class="menu">
-          <button
-            class="menu-item ativo"
-            id="menuDashboard"
-            onclick="abrirSecao('dashboard')"
-          >
-            <span class="menu-icone">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-            <span>Dashboard</span>
-          </button>
+        <button
+          id="menuDashboard"
+          class="menu-item ativo"
+          onclick="abrirSecao('dashboard')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 13h6V4H4v9ZM14 20h6V4h-6v16ZM4 20h6v-3H4v3Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+          Dashboard
+        </button>
 
-          <button
-            class="menu-item"
-            id="menuConfiguracoes"
-            onclick="abrirSecao('configuracoes')"
-          >
-            <span class="menu-icone">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 8.5A3.5 3.5 0 1 0 12 15.5 3.5 3.5 0 1 0 12 8.5Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
-                <path
-                  d="M19.4 15a1.6 1.6 0 0 0 .32 1.76l.06.06a2 2 0 1 1-2.82 2.82l-.06-.06A1.6 1.6 0 0 0 15 19.4a1.6 1.6 0 0 0-1 .92 1.6 1.6 0 0 1-3 0 1.6 1.6 0 0 0-1-.92 1.6 1.6 0 0 0-1.76.32l-.06.06a2 2 0 1 1-2.82-2.82l.06-.06A1.6 1.6 0 0 0 4.6 15a1.6 1.6 0 0 0-.92-1 1.6 1.6 0 0 1 0-3 1.6 1.6 0 0 0 .92-1 1.6 1.6 0 0 0-.32-1.76l-.06-.06a2 2 0 1 1 2.82-2.82l.06.06A1.6 1.6 0 0 0 9 4.6a1.6 1.6 0 0 0 1-.92 1.6 1.6 0 0 1 3 0 1.6 1.6 0 0 0 1 .92 1.6 1.6 0 0 0 1.76-.32l.06-.06a2 2 0 1 1 2.82 2.82l-.06.06A1.6 1.6 0 0 0 19.4 9c.1.38.38.7.74.86a1.6 1.6 0 0 1 0 2.98c-.36.16-.64.48-.74.86Z"
-                  stroke="currentColor"
-                  stroke-width="1.4"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-            <span>Configurações da agenda</span>
-          </button>
+        <button
+          id="menuConfiguracoes"
+          class="menu-item"
+          onclick="abrirSecao('configuracoes')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M8 2v4M16 2v4M3 10h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Agenda
+        </button>
 
-          <button
-            class="menu-item"
-            id="menuLocalizacao"
-            onclick="abrirSecao('localizacao')"
-          >
-            <span class="menu-icone">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <circle
-                  cx="12"
-                  cy="10"
-                  r="2.2"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                />
-              </svg>
-            </span>
-            <span>Localização</span>
-          </button>
-        </nav>
+        <button
+          id="menuLocalizacao"
+          class="menu-item"
+          onclick="abrirSecao('localizacao')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <circle
+              cx="12"
+              cy="10"
+              r="2.2"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+          </svg>
+          Localização
+        </button>
+
+        <button
+          id="menuEquipe"
+          class="menu-item"
+          onclick="abrirSecao('equipe')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <circle
+              cx="9"
+              cy="7"
+              r="4"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Configurações
+        </button>
+
+        <button class="menu-item sair" onclick="sair()">Sair</button>
       </aside>
 
       <main class="conteudo">
-        <div class="painel-principal">
-          <section id="secaoDashboard" class="secao ativa">
+        <section id="secaoDashboard" class="secao ativa">
+          <div class="painel-principal">
             <div class="topo-secao">
               <div>
-                <p class="eyebrow">Visão geral</p>
-                <h2>Agendamentos Ativos</h2>
-                <p class="descricao-secao">
-                  Veja rapidamente os atendimentos marcados e finalize quando
-                  precisar.
-                </p>
+                <p class="eyebrow">Dashboard</p>
+                <h2>Agendamentos ativos</h2>
               </div>
+
+              <select
+                id="filtroBarbeiroAgendamentos"
+                onchange="trocarBarbeiroDashboard()"
+              >
+                <option value="">Todos os barbeiros</option>
+              </select>
             </div>
 
             <div id="listaAgendamentos" class="lista-agendamentos"></div>
-
-            <p id="semAgendamentos" class="texto-vazio" style="display: none">
-              Nenhum agendamento ativo no momento.
+            <p id="semAgendamentos" class="mensagem-vazia">
+              Nenhum agendamento ativo.
             </p>
-          </section>
+          </div>
+        </section>
 
-          <section id="secaoConfiguracoes" class="secao">
+        <section id="secaoConfiguracoes" class="secao">
+          <div class="painel-principal">
             <div class="topo-secao">
               <div>
-                <p class="eyebrow">Personalização</p>
-                <h2>Configurações da Agenda</h2>
+                <p class="eyebrow">Agenda</p>
+                <h2>Agenda dos barbeiros</h2>
                 <p class="descricao-secao">
-                  Ajuste bloqueios, dias sem atendimento e os horários
-                  disponíveis para os clientes.
+                  Escolha um barbeiro para configurar horários, bloqueios e dias
+                  de atendimento.
                 </p>
               </div>
             </div>
 
-            <div class="abas-config">
-              <button
-                class="aba-config ativa"
-                id="abaBloqueioBtn"
-                onclick="abrirAbaConfig('bloqueio')"
-              >
-                Bloquear dia
-              </button>
+            <div class="bloco-config">
+              <h3>Editar agenda de</h3>
 
-              <button
-                class="aba-config"
-                id="abaHorarioBtn"
-                onclick="abrirAbaConfig('horario')"
+              <select
+                id="selectBarbeiroConfig"
+                onchange="trocarBarbeiroConfiguracao()"
               >
-                Horários de atendimento
-              </button>
+                <option value="">Selecione um barbeiro</option>
+              </select>
             </div>
 
-            <div id="abaBloqueio" class="conteudo-aba ativa">
-              <div class="grid-bloqueio">
-                <section class="card">
-                  <div class="card-header">
-                    <h3>Bloquear um dia específico</h3>
-                    <p>
-                      Escolha a data e, se quiser, escreva uma mensagem para o
-                      cliente.
-                    </p>
-                  </div>
+            <div id="areaConfiguracaoBarbeiro" class="area-config-barbeiro">
+              <div class="abas-config">
+                <button
+                  id="abaBloqueioBtn"
+                  class="aba ativa"
+                  onclick="abrirAbaConfig('bloqueio')"
+                >
+                  Bloquear dia
+                </button>
 
-                  <div class="form-config">
+                <button
+                  id="abaHorarioBtn"
+                  class="aba"
+                  onclick="abrirAbaConfig('horario')"
+                >
+                  Horários de atendimento
+                </button>
+              </div>
+
+              <div id="abaBloqueio" class="conteudo-aba ativa">
+                <div class="grid-config">
+                  <div class="card-config">
+                    <h3>Bloquear dia específico</h3>
+
                     <label class="campo">
                       <span>Data</span>
                       <input type="date" id="dataBloqueio" />
@@ -173,200 +183,252 @@
                       <span>Motivo</span>
                       <textarea
                         id="motivoBloqueio"
-                        placeholder="Ex: Não haverá atendimento neste dia."
+                        placeholder="Motivo que aparecerá para o cliente"
                       ></textarea>
                     </label>
 
-                    <button class="btn-principal" onclick="bloquearDia()">
+                    <button class="btn-bloquear" onclick="bloquearDia()">
                       Bloquear dia
                     </button>
 
                     <p id="mensagemBloqueio" class="mensagem"></p>
                   </div>
-                </section>
 
-                <section class="card">
-                  <div class="card-header">
-                    <h3>Dias bloqueados</h3>
-                    <p>
-                      Consulte e remova rapidamente os bloqueios já cadastrados.
+                  <div class="card-config">
+                    <h3>Bloqueios automáticos</h3>
+                    <p class="descricao-secao">
+                      Bloqueie um dia em toda a agenda.
                     </p>
+
+                    <div class="grade-dias-semana">
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearSegunda" />
+                        <span>Seg</span>
+                      </label>
+
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearTerca" />
+                        <span>Ter</span>
+                      </label>
+
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearQuarta" />
+                        <span>Qua</span>
+                      </label>
+
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearQuinta" />
+                        <span>Qui</span>
+                      </label>
+
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearSexta" />
+                        <span>Sex</span>
+                      </label>
+
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearSabado" />
+                        <span>Sáb</span>
+                      </label>
+
+                      <label class="check-dia">
+                        <input type="checkbox" id="bloquearDomingo" />
+                        <span>Dom</span>
+                      </label>
+                    </div>
+
+                    <button
+                      class="btn-principal"
+                      onclick="salvarConfiguracaoAgenda()"
+                    >
+                      Salvar bloqueios automáticos
+                    </button>
+
+                    <p id="mensagemConfiguracao" class="mensagem"></p>
                   </div>
 
-                  <div id="listaBloqueios" class="lista-bloqueios"></div>
+                  <div class="card-config card-lista">
+                    <h3>Dias bloqueados</h3>
 
-                  <p
-                    id="semBloqueios"
-                    class="texto-vazio"
-                    style="display: none"
-                  >
-                    Nenhum dia bloqueado.
-                  </p>
-                </section>
+                    <div id="listaBloqueios" class="lista-bloqueios"></div>
+                    <p id="semBloqueios" class="mensagem-vazia">
+                      Nenhum dia bloqueado.
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <section class="card">
-                <div class="card-header">
-                  <h3>Bloqueios automáticos</h3>
-                  <p>Defina dias da semana em que a barbearia não atende.</p>
-                </div>
-
-                <div class="opcoes-semana">
-                  <label class="opcao-semana">
-                    <input type="checkbox" id="bloquearSabado" />
-                    <div>
-                      <strong>Sábado</strong>
-                      <span
-                        >Bloquear todos os sábados no calendário do
-                        cliente.</span
-                      >
-                    </div>
-                  </label>
-
-                  <label class="opcao-semana">
-                    <input type="checkbox" id="bloquearDomingo" />
-                    <div>
-                      <strong>Domingo</strong>
-                      <span
-                        >Bloquear todos os domingos no calendário do
-                        cliente.</span
-                      >
-                    </div>
-                  </label>
-                </div>
-
-                <button
-                  class="btn-principal"
-                  onclick="salvarConfiguracaoAgenda()"
-                >
-                  Salvar bloqueios automáticos
-                </button>
-
-                <p id="mensagemConfiguracao" class="mensagem"></p>
-              </section>
-            </div>
-
-            <div id="abaHorario" class="conteudo-aba">
-              <section class="card">
-                <div class="card-header">
+              <div id="abaHorario" class="conteudo-aba">
+                <div class="card-config">
                   <h3>Horários de atendimento</h3>
-                  <p>
-                    Defina o início, fim e intervalo dos horários disponíveis.
-                  </p>
+
+                  <div class="linha-horarios">
+                    <label class="campo">
+                      <span>Hora inicial</span>
+                      <input type="time" id="horaInicio" />
+                    </label>
+
+                    <label class="campo">
+                      <span>Hora final</span>
+                      <input type="time" id="horaFim" />
+                    </label>
+
+                    <label class="campo">
+                      <span>Intervalo</span>
+                      <select id="intervalo">
+                        <option value="15">15 minutos</option>
+                        <option value="20">20 minutos</option>
+                        <option value="25">25 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="35">35 minutos</option>
+                        <option value="40">40 minutos</option>
+                        <option value="45">45 minutos</option>
+                        <option value="50">50 minutos</option>
+                        <option value="55">55 minutos</option>
+                        <option value="60">60 minutos</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div class="linha-horarios">
+                    <label class="campo">
+                      <span>Almoço início</span>
+                      <input type="time" id="almocoInicio" />
+                    </label>
+
+                    <label class="campo">
+                      <span>Almoço final</span>
+                      <input type="time" id="almocoFim" />
+                    </label>
+                  </div>
+
+                  <button
+                    class="btn-principal"
+                    onclick="salvarConfiguracaoAgenda()"
+                  >
+                    Salvar horários
+                  </button>
+
+                  <p id="mensagemConfiguracaoHorario" class="mensagem"></p>
                 </div>
-
-                <div class="linha-horarios">
-                  <label class="campo">
-                    <span>Hora inicial</span>
-                    <input type="time" id="horaInicio" />
-                  </label>
-
-                  <label class="campo">
-                    <span>Hora final</span>
-                    <input type="time" id="horaFim" />
-                  </label>
-
-                  <label class="campo">
-                    <span>Intervalo</span>
-                    <select id="intervalo">
-                      <option value="15">15 minutos</option>
-                      <option value="20">20 minutos</option>
-                      <option value="25">25 minutos</option>
-                      <option value="30">30 minutos</option>
-                      <option value="35">35 minutos</option>
-                      <option value="40">40 minutos</option>
-                      <option value="45">45 minutos</option>
-                      <option value="50">50 minutos</option>
-                      <option value="55">55 minutos</option>
-                      <option value="60">60 minutos</option>
-                    </select>
-                  </label>
-                </div>
-
-                <button
-                  class="btn-principal"
-                  onclick="salvarConfiguracaoAgenda()"
-                >
-                  Salvar horários
-                </button>
-
-                <p id="mensagemConfiguracaoHorario" class="mensagem"></p>
-              </section>
+              </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section id="secaoLocalizacao" class="secao">
+        <section id="secaoLocalizacao" class="secao">
+          <div class="painel-principal">
             <div class="topo-secao">
               <div>
-                <p class="eyebrow">Informações da barbearia</p>
-                <h2>Localização</h2>
+                <p class="eyebrow">Localização</p>
+                <h2>Endereço da barbearia</h2>
+              </div>
+            </div>
+
+            <div class="card-config">
+              <label class="campo">
+                <span>Rua</span>
+                <input
+                  type="text"
+                  id="ruaBarbearia"
+                  placeholder="Nome da rua"
+                />
+              </label>
+
+              <label class="campo">
+                <span>Número</span>
+                <input type="text" id="numeroBarbearia" placeholder="Número" />
+              </label>
+
+              <label class="campo">
+                <span>Bairro</span>
+                <input type="text" id="bairroBarbearia" placeholder="Bairro" />
+              </label>
+
+              <label class="campo">
+                <span>Cidade</span>
+                <input type="text" id="cidadeBarbearia" placeholder="Cidade" />
+              </label>
+
+              <button class="btn-principal" onclick="salvarLocalizacao()">
+                Salvar localização
+              </button>
+
+              <p id="mensagemLocalizacao" class="mensagem"></p>
+            </div>
+          </div>
+        </section>
+
+        <section id="secaoEquipe" class="secao">
+          <div class="painel-principal">
+            <div class="topo-secao">
+              <div>
+                <p class="eyebrow">Configurações</p>
+                <h2>Barbeiros cadastrados</h2>
                 <p class="descricao-secao">
-                  Defina os dados que aparecerão para o cliente ao clicar no
-                  ícone de localização.
+                  Cadastre e gerencie os barbeiros que aparecem para os
+                  clientes.
                 </p>
               </div>
             </div>
 
-            <section class="card">
-              <div class="card-header">
-                <h3>Endereço da barbearia</h3>
-                <p>
-                  Preencha os campos abaixo para mostrar a localização completa
-                  ao cliente.
-                </p>
-              </div>
+            <div class="bloco-config">
+              <div class="topo-lista-equipe">
+                <h3>Barbeiros cadastrados</h3>
 
-              <div class="form-config">
-                <div class="linha-horarios">
-                  <label class="campo">
-                    <span>Rua</span>
-                    <input
-                      type="text"
-                      id="ruaBarbearia"
-                      placeholder="Nome da rua"
+                <button
+                  class="btn-add-barbeiro"
+                  onclick="abrirModalBarbeiro()"
+                  aria-label="Adicionar barbeiro"
+                >
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
                     />
-                  </label>
-
-                  <label class="campo">
-                    <span>Número</span>
-                    <input
-                      type="text"
-                      id="numeroBarbearia"
-                      placeholder="Número"
+                    <path
+                      d="M19 8v6M16 11h6"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
                     />
-                  </label>
-                </div>
-
-                <div class="linha-horarios">
-                  <label class="campo">
-                    <span>Bairro</span>
-                    <input
-                      type="text"
-                      id="bairroBarbearia"
-                      placeholder="Nome do bairro"
-                    />
-                  </label>
-
-                  <label class="campo">
-                    <span>Cidade</span>
-                    <input
-                      type="text"
-                      id="cidadeBarbearia"
-                      placeholder="Nome da cidade"
-                    />
-                  </label>
-                </div>
-
-                <button class="btn-principal" onclick="salvarLocalizacao()">
-                  Salvar localização
+                  </svg>
                 </button>
-
-                <p id="mensagemLocalizacao" class="mensagem"></p>
               </div>
-            </section>
-          </section>
-        </div>
+
+              <div id="listaBarbeiros" class="lista-barbeiros"></div>
+            </div>
+          </div>
+        </section>
       </main>
+    </div>
+
+    <div id="modalBarbeiro" class="modal-overlay">
+      <div class="modal-card">
+        <h3>Adicionar barbeiro</h3>
+
+        <label class="campo">
+          <span>Nome do barbeiro</span>
+          <input
+            type="text"
+            id="novoBarbeiroNome"
+            placeholder="Digite o nome do barbeiro"
+          />
+        </label>
+
+        <div class="modal-acoes">
+          <button class="btn-secundario" onclick="fecharModalBarbeiro()">
+            Cancelar
+          </button>
+
+          <button class="btn-principal" onclick="criarBarbeiro()">
+            Confirmar
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="barbeiro.js"></script>

@@ -1,25 +1,282 @@
 const db = require("../models/db");
 
-// LISTAR agendamentos do painel do barbeiro
-const listarAgendamentos = (req, res) => {
+function pegarBarbeariaId(req) {
+  return req.query?.barbearia_id || req.body?.barbearia_id;
+}
+
+function pegarBarbeiroId(req) {
+  return req.query?.barbeiro_id || req.body?.barbeiro_id;
+}
+
+/* =========================
+   BARBEIROS
+========================= */
+
+// LISTAR barbeiros da barbearia
+const listarBarbeiros = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
   const sql = `
     SELECT *
-    FROM agendamentos
-    WHERE status IN ('agendado', 'cancelado')
-    ORDER BY
-      CASE
-        WHEN status = 'agendado' THEN 0
-        WHEN status = 'cancelado' THEN 1
-        ELSE 2
-      END,
-      data ASC,
-      hora ASC
+    FROM barbeiros
+    WHERE barbearia_id = ?
+    ORDER BY nome ASC
   `;
 
-  db.query(sql, (err, result) => {
+  db.query(sql, [barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar barbeiros:", err);
+      return res.status(500).json({ erro: "Erro ao buscar barbeiros." });
+    }
+
+    res.json(result);
+  });
+};
+
+// CRIAR barbeiro
+const criarBarbeiro = (req, res) => {
+  const { nome } = req.body;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!nome || !nome.trim()) {
+    return res.status(400).json({ erro: "Informe o nome do barbeiro." });
+  }
+
+  const sql = `
+    INSERT INTO barbeiros (nome, barbearia_id, ativo)
+    VALUES (?, ?, 1)
+  `;
+
+  db.query(sql, [nome.trim(), barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao criar barbeiro:", err);
+      return res.status(500).json({ erro: "Erro ao criar barbeiro." });
+    }
+
+    const barbeiro_id = result.insertId;
+
+    const configSql = `
+      INSERT INTO configuracoes_agenda (
+        hora_inicio,
+        hora_fim,
+        intervalo,
+        almoco_inicio,
+        almoco_fim,
+        bloquear_sabado,
+        bloquear_domingo,
+        rua,
+        numero,
+        bairro,
+        cidade,
+        barbearia_id,
+        barbeiro_id
+      )
+      VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, NULL, NULL, NULL, NULL, ?, ?)
+    `;
+
+    db.query(configSql, [barbearia_id, barbeiro_id], (errConfig) => {
+      if (errConfig) {
+        console.error("Erro ao criar configuração do barbeiro:", errConfig);
+        return res.status(500).json({
+          erro: "Barbeiro criado, mas erro ao criar configuração da agenda.",
+        });
+      }
+
+      res.json({
+        sucesso: true,
+        barbeiro: {
+          id: barbeiro_id,
+          nome: nome.trim(),
+          barbearia_id,
+          ativo: 1,
+        },
+      });
+    });
+  });
+};
+
+// ATUALIZAR barbeiro
+const atualizarBarbeiro = (req, res) => {
+  const { id } = req.params;
+  const { nome, ativo } = req.body;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!nome || !nome.trim()) {
+    return res.status(400).json({ erro: "Informe o nome do barbeiro." });
+  }
+
+  const sql = `
+    UPDATE barbeiros
+    SET nome = ?,
+        ativo = ?
+    WHERE id = ?
+    AND barbearia_id = ?
+  `;
+
+  db.query(
+    sql,
+    [nome.trim(), ativo ? 1 : 0, id, barbearia_id],
+    (err, result) => {
+      if (err) {
+        console.error("Erro ao atualizar barbeiro:", err);
+        return res.status(500).json({ erro: "Erro ao atualizar barbeiro." });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ erro: "Barbeiro não encontrado." });
+      }
+
+      res.json({ sucesso: true });
+    },
+  );
+};
+
+// DELETAR barbeiro
+const deletarBarbeiro = (req, res) => {
+  const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  const checkSql = `
+    SELECT id
+    FROM agendamentos
+    WHERE barbeiro_id = ?
+    AND barbearia_id = ?
+    LIMIT 1
+  `;
+
+  db.query(checkSql, [id, barbearia_id], (errCheck, resultCheck) => {
+    if (errCheck) {
+      console.error("Erro ao verificar barbeiro:", errCheck);
+      return res.status(500).json({ erro: "Erro ao verificar barbeiro." });
+    }
+
+    if (resultCheck.length > 0) {
+      const updateSql = `
+        UPDATE barbeiros
+        SET ativo = 0
+        WHERE id = ?
+        AND barbearia_id = ?
+      `;
+
+      db.query(updateSql, [id, barbearia_id], (errUpdate) => {
+        if (errUpdate) {
+          console.error("Erro ao desativar barbeiro:", errUpdate);
+          return res.status(500).json({ erro: "Erro ao desativar barbeiro." });
+        }
+
+        return res.json({
+          sucesso: true,
+          mensagem: "Barbeiro possui agendamentos e foi desativado.",
+        });
+      });
+
+      return;
+    }
+
+    const deleteConfigSql = `
+      DELETE FROM configuracoes_agenda
+      WHERE barbeiro_id = ?
+      AND barbearia_id = ?
+    `;
+
+    db.query(deleteConfigSql, [id, barbearia_id], (errConfig) => {
+      if (errConfig) {
+        console.error("Erro ao remover configuração:", errConfig);
+        return res.status(500).json({ erro: "Erro ao remover configuração." });
+      }
+
+      const deleteBloqueiosSql = `
+        DELETE FROM dias_bloqueados
+        WHERE barbeiro_id = ?
+        AND barbearia_id = ?
+      `;
+
+      db.query(deleteBloqueiosSql, [id, barbearia_id], (errBloqueios) => {
+        if (errBloqueios) {
+          console.error("Erro ao remover bloqueios:", errBloqueios);
+          return res.status(500).json({ erro: "Erro ao remover bloqueios." });
+        }
+
+        const deleteSql = `
+          DELETE FROM barbeiros
+          WHERE id = ?
+          AND barbearia_id = ?
+        `;
+
+        db.query(deleteSql, [id, barbearia_id], (errDelete) => {
+          if (errDelete) {
+            console.error("Erro ao deletar barbeiro:", errDelete);
+            return res.status(500).json({ erro: "Erro ao deletar barbeiro." });
+          }
+
+          res.json({ sucesso: true });
+        });
+      });
+    });
+  });
+};
+
+/* =========================
+   AGENDAMENTOS DO PAINEL
+========================= */
+
+// LISTAR agendamentos
+const listarAgendamentos = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  let sql = `
+    SELECT 
+      agendamentos.*,
+      barbeiros.nome AS barbeiro_nome
+    FROM agendamentos
+    LEFT JOIN barbeiros ON barbeiros.id = agendamentos.barbeiro_id
+    WHERE agendamentos.barbearia_id = ?
+    AND agendamentos.status IN ('agendado', 'cancelado')
+  `;
+
+  const params = [barbearia_id];
+
+  if (barbeiro_id) {
+    sql += ` AND agendamentos.barbeiro_id = ? `;
+    params.push(barbeiro_id);
+  }
+
+  sql += `
+    ORDER BY
+      CASE
+        WHEN agendamentos.status = 'agendado' THEN 0
+        WHEN agendamentos.status = 'cancelado' THEN 1
+        ELSE 2
+      END,
+      agendamentos.data ASC,
+      agendamentos.hora ASC
+  `;
+
+  db.query(sql, params, (err, result) => {
     if (err) {
       console.error("Erro ao buscar agendamentos:", err);
-      return res.status(500).json({ erro: "Erro ao buscar agendamentos" });
+      return res.status(500).json({ erro: "Erro ao buscar agendamentos." });
     }
 
     res.json(result);
@@ -29,24 +286,28 @@ const listarAgendamentos = (req, res) => {
 // CONCLUIR agendamento
 const concluirAgendamento = (req, res) => {
   const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
 
   const sql = `
     UPDATE agendamentos
     SET status = 'concluido'
     WHERE id = ?
+    AND barbearia_id = ?
     AND status = 'agendado'
   `;
 
-  db.query(sql, [id], (err, result) => {
+  db.query(sql, [id, barbearia_id], (err, result) => {
     if (err) {
       console.error("Erro ao concluir:", err);
-      return res.status(500).json({ erro: "Erro ao concluir agendamento" });
+      return res.status(500).json({ erro: "Erro ao concluir agendamento." });
     }
 
     if (result.affectedRows === 0) {
-      return res
-        .status(400)
-        .json({ erro: "Esse agendamento não pode ser concluído." });
+      return res.status(400).json({ erro: "Agendamento não encontrado." });
     }
 
     res.json({ sucesso: true });
@@ -56,32 +317,58 @@ const concluirAgendamento = (req, res) => {
 // DELETAR agendamento
 const deletarAgendamento = (req, res) => {
   const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
 
-  const sql = "DELETE FROM agendamentos WHERE id = ?";
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
 
-  db.query(sql, [id], (err) => {
+  const sql = `
+    DELETE FROM agendamentos
+    WHERE id = ?
+    AND barbearia_id = ?
+  `;
+
+  db.query(sql, [id, barbearia_id], (err) => {
     if (err) {
       console.error("Erro ao deletar:", err);
-      return res.status(500).json({ erro: "Erro ao deletar agendamento" });
+      return res.status(500).json({ erro: "Erro ao deletar agendamento." });
     }
 
     res.json({ sucesso: true });
   });
 };
 
-// LISTAR dias bloqueados futuros
+/* =========================
+   DIAS BLOQUEADOS
+========================= */
+
+// LISTAR dias bloqueados
 const listarDiasBloqueados = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
+
   const sql = `
     SELECT *
     FROM dias_bloqueados
     WHERE data >= CURDATE()
+    AND barbearia_id = ?
+    AND barbeiro_id = ?
     ORDER BY data ASC
   `;
 
-  db.query(sql, (err, result) => {
+  db.query(sql, [barbearia_id, barbeiro_id], (err, result) => {
     if (err) {
       console.error("Erro ao buscar dias bloqueados:", err);
-      return res.status(500).json({ erro: "Erro ao buscar dias bloqueados" });
+      return res.status(500).json({ erro: "Erro ao buscar dias bloqueados." });
     }
 
     res.json(result);
@@ -91,72 +378,167 @@ const listarDiasBloqueados = (req, res) => {
 // BLOQUEAR dia
 const bloquearDia = (req, res) => {
   const { data, motivo } = req.body;
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
 
-  if (!data) {
-    return res.status(400).json({ erro: "Data obrigatória" });
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
   }
 
-  const checkSql = "SELECT * FROM dias_bloqueados WHERE data = ?";
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
 
-  db.query(checkSql, [data], (err, result) => {
+  if (!data) {
+    return res.status(400).json({ erro: "Data obrigatória." });
+  }
+
+  const checkSql = `
+    SELECT *
+    FROM dias_bloqueados
+    WHERE data = ?
+    AND barbearia_id = ?
+    AND barbeiro_id = ?
+  `;
+
+  db.query(checkSql, [data, barbearia_id, barbeiro_id], (err, result) => {
     if (err) {
       console.error("Erro ao verificar dia bloqueado:", err);
-      return res.status(500).json({ erro: "Erro ao verificar dia" });
+      return res.status(500).json({ erro: "Erro ao verificar dia." });
     }
 
     if (result.length > 0) {
-      return res.status(400).json({ erro: "Esse dia já está bloqueado" });
+      return res.status(400).json({ erro: "Esse dia já está bloqueado." });
     }
 
     const insertSql = `
-      INSERT INTO dias_bloqueados (data, motivo)
-      VALUES (?, ?)
+      INSERT INTO dias_bloqueados (data, motivo, barbearia_id, barbeiro_id)
+      VALUES (?, ?, ?, ?)
     `;
 
-    db.query(insertSql, [data, motivo || null], (errInsert) => {
-      if (errInsert) {
-        console.error("Erro ao bloquear dia:", errInsert);
-        return res.status(500).json({ erro: "Erro ao bloquear dia" });
-      }
+    db.query(
+      insertSql,
+      [data, motivo || null, barbearia_id, barbeiro_id],
+      (errInsert) => {
+        if (errInsert) {
+          console.error("Erro ao bloquear dia:", errInsert);
+          return res.status(500).json({ erro: "Erro ao bloquear dia." });
+        }
 
-      res.json({ sucesso: true });
-    });
+        res.json({ sucesso: true });
+      },
+    );
   });
 };
 
 // DESBLOQUEAR dia
 const desbloquearDia = (req, res) => {
   const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
 
-  const sql = "DELETE FROM dias_bloqueados WHERE id = ?";
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
 
-  db.query(sql, [id], (err) => {
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
+
+  const sql = `
+    DELETE FROM dias_bloqueados
+    WHERE id = ?
+    AND barbearia_id = ?
+    AND barbeiro_id = ?
+  `;
+
+  db.query(sql, [id, barbearia_id, barbeiro_id], (err) => {
     if (err) {
       console.error("Erro ao desbloquear dia:", err);
-      return res.status(500).json({ erro: "Erro ao desbloquear dia" });
+      return res.status(500).json({ erro: "Erro ao desbloquear dia." });
     }
 
     res.json({ sucesso: true });
   });
 };
 
+/* =========================
+   CONFIGURAÇÃO DA AGENDA
+========================= */
+
 // BUSCAR configuração da agenda
 const buscarConfiguracaoAgenda = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
+
   const sql = `
     SELECT *
     FROM configuracoes_agenda
+    WHERE barbearia_id = ?
+    AND barbeiro_id = ?
     ORDER BY id ASC
     LIMIT 1
   `;
 
-  db.query(sql, (err, result) => {
+  db.query(sql, [barbearia_id, barbeiro_id], (err, result) => {
     if (err) {
       console.error("Erro ao buscar configuração:", err);
-      return res.status(500).json({ erro: "Erro ao buscar configuração" });
+      return res.status(500).json({ erro: "Erro ao buscar configuração." });
     }
 
     if (result.length === 0) {
-      return res.status(404).json({ erro: "Configuração não encontrada" });
+      const insertSql = `
+        INSERT INTO configuracoes_agenda (
+          hora_inicio,
+          hora_fim,
+          intervalo,
+          almoco_inicio,
+          almoco_fim,
+          bloquear_sabado,
+          bloquear_domingo,
+          rua,
+          numero,
+          bairro,
+          cidade,
+          barbearia_id,
+          barbeiro_id
+        )
+        VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, NULL, NULL, NULL, NULL, ?, ?)
+      `;
+
+      db.query(insertSql, [barbearia_id, barbeiro_id], (errInsert) => {
+        if (errInsert) {
+          console.error("Erro ao criar configuração:", errInsert);
+          return res.status(500).json({ erro: "Erro ao criar configuração." });
+        }
+
+        return res.json({
+          id: null,
+          hora_inicio: "08:00:00",
+          hora_fim: "18:00:00",
+          intervalo: 30,
+          almoco_inicio: null,
+          almoco_fim: null,
+          bloquear_sabado: 0,
+          bloquear_domingo: 1,
+          rua: null,
+          numero: null,
+          bairro: null,
+          cidade: null,
+          barbearia_id,
+          barbeiro_id,
+        });
+      });
+
+      return;
     }
 
     res.json(result[0]);
@@ -169,6 +551,13 @@ const salvarConfiguracaoAgenda = (req, res) => {
     hora_inicio,
     hora_fim,
     intervalo,
+    almoco_inicio,
+    almoco_fim,
+    bloquear_segunda,
+    bloquear_terca,
+    bloquear_quarta,
+    bloquear_quinta,
+    bloquear_sexta,
     bloquear_sabado,
     bloquear_domingo,
     rua,
@@ -177,35 +566,60 @@ const salvarConfiguracaoAgenda = (req, res) => {
     cidade,
   } = req.body;
 
-  if (!hora_inicio || !hora_fim || !intervalo) {
-    return res
-      .status(400)
-      .json({ erro: "Preencha todos os campos obrigatórios" });
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
   }
 
-  const checkSql = "SELECT * FROM configuracoes_agenda ORDER BY id ASC LIMIT 1";
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
 
-  db.query(checkSql, (err, result) => {
+  if (!hora_inicio || !hora_fim || !intervalo) {
+    return res.status(400).json({ erro: "Preencha os horários obrigatórios." });
+  }
+
+  const checkSql = `
+    SELECT *
+    FROM configuracoes_agenda
+    WHERE barbearia_id = ?
+    AND barbeiro_id = ?
+    ORDER BY id ASC
+    LIMIT 1
+  `;
+
+  db.query(checkSql, [barbearia_id, barbeiro_id], (err, result) => {
     if (err) {
       console.error("Erro ao verificar configuração:", err);
-      return res.status(500).json({ erro: "Erro ao verificar configuração" });
+      return res.status(500).json({ erro: "Erro ao verificar configuração." });
     }
 
     if (result.length === 0) {
       const insertSql = `
-        INSERT INTO configuracoes_agenda (
-          hora_inicio,
-          hora_fim,
-          intervalo,
-          bloquear_sabado,
-          bloquear_domingo,
-          rua,
-          numero,
-          bairro,
-          cidade
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
+  INSERT INTO configuracoes_agenda (
+    hora_inicio,
+    hora_fim,
+    intervalo,
+    almoco_inicio,
+    almoco_fim,
+    bloquear_segunda,
+    bloquear_terca,
+    bloquear_quarta,
+    bloquear_quinta,
+    bloquear_sexta,
+    bloquear_sabado,
+    bloquear_domingo,
+    rua,
+    numero,
+    bairro,
+    cidade,
+    barbearia_id,
+    barbeiro_id
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
 
       db.query(
         insertSql,
@@ -213,75 +627,110 @@ const salvarConfiguracaoAgenda = (req, res) => {
           hora_inicio,
           hora_fim,
           intervalo,
+          almoco_inicio || null,
+          almoco_fim || null,
+          bloquear_segunda ? 1 : 0,
+          bloquear_terca ? 1 : 0,
+          bloquear_quarta ? 1 : 0,
+          bloquear_quinta ? 1 : 0,
+          bloquear_sexta ? 1 : 0,
           bloquear_sabado ? 1 : 0,
           bloquear_domingo ? 1 : 0,
           rua || null,
           numero || null,
           bairro || null,
           cidade || null,
+          barbearia_id,
+          barbeiro_id,
         ],
         (errInsert) => {
           if (errInsert) {
             console.error("Erro ao salvar configuração:", errInsert);
             return res
               .status(500)
-              .json({ erro: "Erro ao salvar configuração" });
+              .json({ erro: "Erro ao salvar configuração." });
           }
 
           res.json({ sucesso: true });
         },
       );
-    } else {
-      const updateSql = `
-        UPDATE configuracoes_agenda
-        SET hora_inicio = ?,
-            hora_fim = ?,
-            intervalo = ?,
-            bloquear_sabado = ?,
-            bloquear_domingo = ?,
-            rua = ?,
-            numero = ?,
-            bairro = ?,
-            cidade = ?
-        WHERE id = ?
-      `;
-
-      db.query(
-        updateSql,
-        [
-          hora_inicio,
-          hora_fim,
-          intervalo,
-          bloquear_sabado ? 1 : 0,
-          bloquear_domingo ? 1 : 0,
-          rua || null,
-          numero || null,
-          bairro || null,
-          cidade || null,
-          result[0].id,
-        ],
-        (errUpdate) => {
-          if (errUpdate) {
-            console.error("Erro ao atualizar configuração:", errUpdate);
-            return res
-              .status(500)
-              .json({ erro: "Erro ao atualizar configuração" });
-          }
-
-          res.json({ sucesso: true });
-        },
-      );
+      return;
     }
+
+    const updateSql = `
+      UPDATE configuracoes_agenda
+      SET hora_inicio = ?,
+          hora_fim = ?,
+          intervalo = ?,
+          almoco_inicio = ?,
+          almoco_fim = ?,
+          bloquear_segunda = ?,
+          bloquear_terca = ?,
+          bloquear_quarta = ?,
+          bloquear_quinta = ?,
+          bloquear_sexta = ?,
+          bloquear_sabado = ?,
+          bloquear_domingo = ?,
+          rua = ?,
+          numero = ?,
+          bairro = ?,
+          cidade = ?
+      WHERE id = ?
+      AND barbearia_id = ?
+      AND barbeiro_id = ?
+    `;
+
+    db.query(
+      updateSql,
+      [
+        hora_inicio,
+        hora_fim,
+        intervalo,
+        almoco_inicio || null,
+        almoco_fim || null,
+        bloquear_segunda ? 1 : 0,
+        bloquear_terca ? 1 : 0,
+        bloquear_quarta ? 1 : 0,
+        bloquear_quinta ? 1 : 0,
+        bloquear_sexta ? 1 : 0,
+        bloquear_sabado ? 1 : 0,
+        bloquear_domingo ? 1 : 0,
+        rua || null,
+        numero || null,
+        bairro || null,
+        cidade || null,
+        result[0].id,
+        barbearia_id,
+        barbeiro_id,
+      ],
+      (errUpdate) => {
+        if (errUpdate) {
+          console.error("Erro ao atualizar configuração:", errUpdate);
+          return res
+            .status(500)
+            .json({ erro: "Erro ao atualizar configuração." });
+        }
+
+        res.json({ sucesso: true });
+      },
+    );
   });
 };
 
 module.exports = {
+  listarBarbeiros,
+  criarBarbeiro,
+  atualizarBarbeiro,
+  deletarBarbeiro,
+
   listarAgendamentos,
   concluirAgendamento,
   deletarAgendamento,
+
   listarDiasBloqueados,
   bloquearDia,
   desbloquearDia,
+
   buscarConfiguracaoAgenda,
   salvarConfiguracaoAgenda,
 };

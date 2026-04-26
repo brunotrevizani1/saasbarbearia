@@ -378,6 +378,36 @@ button:disabled {
   color: #991b1b;
 }
 
+/* campo com olho */
+.senha-campo .input-senha {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-senha input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+/* botão olho */
+.btn-olho {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-olho svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* TELA DE CANCELAMENTO */
 
 #mensagemCancelamento,
@@ -440,6 +470,74 @@ button:disabled {
 
 .btn-confirmar-cancelamento:hover {
   transform: translateY(-2px);
+}
+
+.lista-barbeiros-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-barbeiro-cliente {
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.item-barbeiro-cliente:hover {
+  background: #eef4fb;
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+}
+
+.item-barbeiro-cliente strong {
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.item-barbeiro-cliente span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.barbeiro-selecionado-info {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.barbeiro-selecionado-info span {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.barbeiro-selecionado-info strong {
+  display: block;
+  margin-top: 4px;
+  color: #2563eb;
+}
+
+#tela-barbeiro {
+  width: 100%;
+  display: none;
+  flex-direction: column;
+}
+
+.mensagem-vazia {
+  text-align: center;
+  color: #64748b;
+  margin-top: 14px;
 }
 
 /* BOTÕES FLUTUANTES */

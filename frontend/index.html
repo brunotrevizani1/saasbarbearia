@@ -9,8 +9,23 @@
   <body>
     <div class="area-agendamento">
       <div class="container">
+        <div id="tela-barbeiro">
+          <h1>Escolha o barbeiro</h1>
+
+          <div id="listaBarbeirosCliente" class="lista-barbeiros-cliente"></div>
+
+          <p id="semBarbeirosCliente" class="mensagem-vazia">
+            Nenhum barbeiro disponível no momento.
+          </p>
+        </div>
+
         <div id="tela-data">
           <h1>Escolha o dia</h1>
+
+          <div
+            id="barbeiroSelecionadoInfo"
+            class="barbeiro-selecionado-info"
+          ></div>
 
           <div class="calendario-header">
             <button onclick="mesAnterior()">←</button>
@@ -29,6 +44,10 @@
           </div>
 
           <div id="calendario"></div>
+
+          <button class="btn-voltar" onclick="voltarParaBarbeiros()">
+            Trocar barbeiro
+          </button>
         </div>
 
         <div id="tela-horarios">

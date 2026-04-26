@@ -10,9 +10,11 @@ app.use(express.json());
 
 const agendamentoRoutes = require("./routes/agendamentoRoutes");
 const barbeiroRoutes = require("./routes/barbeiroRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 app.use("/api", agendamentoRoutes);
 app.use("/api/barbeiro", barbeiroRoutes);
+app.use("/api", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Servidor rodando 🚀");
