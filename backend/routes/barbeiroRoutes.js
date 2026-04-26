@@ -15,10 +15,13 @@ const {
   bloquearDia,
   desbloquearDia,
 
+  listarExcecoesHorario,
+  criarExcecaoHorario,
+  deletarExcecaoHorario,
+
   buscarConfiguracaoAgenda,
   salvarConfiguracaoAgenda,
 
-  // 🔥 NOVO (localização da barbearia)
   buscarLocalizacaoBarbearia,
   salvarLocalizacaoBarbearia,
 } = require("../controllers/barbeiroController");
@@ -36,10 +39,13 @@ router.get("/dias-bloqueados", listarDiasBloqueados);
 router.post("/dias-bloqueados", bloquearDia);
 router.delete("/dias-bloqueados/:id", desbloquearDia);
 
+router.get("/excecoes-horario", listarExcecoesHorario);
+router.post("/excecoes-horario", criarExcecaoHorario);
+router.delete("/excecoes-horario/:id", deletarExcecaoHorario);
+
 router.get("/configuracao-agenda", buscarConfiguracaoAgenda);
 router.post("/configuracao-agenda", salvarConfiguracaoAgenda);
 
-// 🔥 NOVAS ROTAS DE LOCALIZAÇÃO
 router.get("/localizacao", buscarLocalizacaoBarbearia);
 router.put("/localizacao", salvarLocalizacaoBarbearia);
 

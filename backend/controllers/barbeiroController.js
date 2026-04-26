@@ -742,6 +742,151 @@ const salvarLocalizacaoBarbearia = (req, res) => {
   );
 };
 
+const listarExcecoesHorario = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
+
+  const sql = `
+    SELECT *
+    FROM excecoes_horario
+    WHERE barbearia_id = ?
+    AND barbeiro_id = ?
+    AND data >= CURDATE()
+    ORDER BY data ASC
+  `;
+
+  db.query(sql, [barbearia_id, barbeiro_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar exceções:", err);
+      return res.status(500).json({ erro: "Erro ao buscar exceções." });
+    }
+
+    res.json(result);
+  });
+};
+
+const criarExcecaoHorario = (req, res) => {
+  const { data, tipo, hora_inicio, hora_fim, motivo } = req.body;
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
+
+  if (!data || !tipo) {
+    return res
+      .status(400)
+      .json({ erro: "Informe a data e o tipo da exceção." });
+  }
+
+  if (tipo === "personalizado" && (!hora_inicio || !hora_fim)) {
+    return res.status(400).json({ erro: "Informe o horário inicial e final." });
+  }
+
+  const checkSql = `
+    SELECT id
+    FROM excecoes_horario
+    WHERE barbearia_id = ?
+    AND barbeiro_id = ?
+    AND data = ?
+    LIMIT 1
+  `;
+
+  db.query(
+    checkSql,
+    [barbearia_id, barbeiro_id, data],
+    (errCheck, resultCheck) => {
+      if (errCheck) {
+        console.error("Erro ao verificar exceção:", errCheck);
+        return res.status(500).json({ erro: "Erro ao verificar exceção." });
+      }
+
+      if (resultCheck.length > 0) {
+        return res.status(400).json({
+          erro: "Já existe uma exceção cadastrada para esse dia.",
+        });
+      }
+
+      const sql = `
+      INSERT INTO excecoes_horario (
+        barbearia_id,
+        barbeiro_id,
+        data,
+        tipo,
+        hora_inicio,
+        hora_fim,
+        motivo
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+      db.query(
+        sql,
+        [
+          barbearia_id,
+          barbeiro_id,
+          data,
+          tipo,
+          tipo === "personalizado" ? hora_inicio : null,
+          tipo === "personalizado" ? hora_fim : null,
+          motivo || null,
+        ],
+        (err) => {
+          if (err) {
+            console.error("Erro ao criar exceção:", err);
+            return res.status(500).json({ erro: "Erro ao criar exceção." });
+          }
+
+          res.json({ sucesso: true });
+        },
+      );
+    },
+  );
+};
+
+const deletarExcecaoHorario = (req, res) => {
+  const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+  const barbeiro_id = pegarBarbeiroId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  if (!barbeiro_id) {
+    return res.status(400).json({ erro: "Barbeiro não informado." });
+  }
+
+  const sql = `
+    DELETE FROM excecoes_horario
+    WHERE id = ?
+    AND barbearia_id = ?
+    AND barbeiro_id = ?
+  `;
+
+  db.query(sql, [id, barbearia_id, barbeiro_id], (err) => {
+    if (err) {
+      console.error("Erro ao excluir exceção:", err);
+      return res.status(500).json({ erro: "Erro ao excluir exceção." });
+    }
+
+    res.json({ sucesso: true });
+  });
+};
+
 module.exports = {
   listarBarbeiros,
   criarBarbeiro,
@@ -755,6 +900,9 @@ module.exports = {
   listarDiasBloqueados,
   bloquearDia,
   desbloquearDia,
+  listarExcecoesHorario,
+  criarExcecaoHorario,
+  deletarExcecaoHorario,
 
   buscarConfiguracaoAgenda,
   salvarConfiguracaoAgenda,
