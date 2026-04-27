@@ -161,6 +161,14 @@
                 </button>
 
                 <button
+                  id="abaExcecaoBtn"
+                  class="aba"
+                  onclick="abrirAbaConfig('excecao')"
+                >
+                  Exceções de horário
+                </button>
+
+                <button
                   id="abaHorarioBtn"
                   class="aba"
                   onclick="abrirAbaConfig('horario')"
@@ -255,6 +263,67 @@
                       Nenhum dia bloqueado.
                     </p>
                   </div>
+                </div>
+              </div>
+
+              <div id="abaExcecao" class="conteudo-configuracoes">
+                <div class="card-config">
+                  <h3>Exceções de horário</h3>
+
+                  <label class="campo">
+                    <span>Data</span>
+                    <input type="date" id="dataExcecao" />
+                  </label>
+
+                  <label class="campo">
+                    <span>Tipo de exceção</span>
+                    <select id="tipoExcecao" onchange="mostrarCamposExcecao()">
+                      <option value="">Selecione</option>
+                      <option value="fechar_manha">Não abre de manhã</option>
+                      <option value="fechar_tarde">Não abre à tarde</option>
+                      <option value="personalizado">
+                        Bloquear período personalizado
+                      </option>
+                    </select>
+                  </label>
+
+                  <div id="camposHorarioExcecao" style="display: none">
+                    <label class="campo">
+                      <span>Hora início</span>
+                      <input type="time" id="horaInicioExcecao" />
+                    </label>
+
+                    <label class="campo">
+                      <span>Hora fim</span>
+                      <input type="time" id="horaFimExcecao" />
+                    </label>
+                  </div>
+
+                  <label class="campo">
+                    <span>Motivo</span>
+                    <input
+                      type="text"
+                      id="motivoExcecao"
+                      placeholder="Opcional"
+                    />
+                  </label>
+
+                  <button
+                    class="btn-principal"
+                    onclick="salvarExcecaoHorario()"
+                  >
+                    Salvar exceção
+                  </button>
+
+                  <p id="mensagemExcecao" class="mensagem"></p>
+                </div>
+
+                <div class="bloco-config">
+                  <h3>Exceções cadastradas</h3>
+                  <div id="listaExcecoesHorario"></div>
+                  <p id="semExcecoesHorario" class="mensagem">
+                    Nenhuma exceção cadastrada.
+                  </p>
                 </div>
               </div>
 
@@ -364,42 +433,188 @@
             <div class="topo-secao">
               <div>
                 <p class="eyebrow">Configurações</p>
-                <h2>Barbeiros cadastrados</h2>
+                <h2>Configurações da barbearia</h2>
                 <p class="descricao-secao">
-                  Cadastre e gerencie os barbeiros que aparecem para os
-                  clientes.
+                  Gerencie barbeiros, senha de acesso e outras opções do
+                  sistema.
                 </p>
               </div>
             </div>
 
-            <div class="bloco-config">
-              <div class="topo-lista-equipe">
-                <h3>Barbeiros cadastrados</h3>
+            <div class="abas-config">
+              <button
+                id="abaCadastrarBarbeirosBtn"
+                class="aba ativa"
+                onclick="abrirAbaConfiguracoes('barbeiros')"
+              >
+                Cadastrar barbeiros
+              </button>
 
-                <button
-                  class="btn-add-barbeiro"
-                  onclick="abrirModalBarbeiro()"
-                  aria-label="Adicionar barbeiro"
-                >
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M19 8v6M16 11h6"
-                      stroke="currentColor"
-                      stroke-width="1.8"
-                      stroke-linecap="round"
-                    />
-                  </svg>
-                </button>
+              <button
+                id="abaTrocarSenhaBtn"
+                class="aba"
+                onclick="abrirAbaConfiguracoes('senha')"
+              >
+                Trocar senha
+              </button>
+            </div>
+
+            <div
+              id="abaCadastrarBarbeiros"
+              class="conteudo-configuracoes ativa"
+            >
+              <div class="bloco-config">
+                <div class="topo-lista-equipe">
+                  <h3>Barbeiros cadastrados</h3>
+
+                  <button
+                    class="btn-add-barbeiro"
+                    onclick="abrirModalBarbeiro()"
+                    aria-label="Adicionar barbeiro"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M19 8v6M16 11h6"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <div id="listaBarbeiros" class="lista-barbeiros"></div>
               </div>
+            </div>
 
-              <div id="listaBarbeiros" class="lista-barbeiros"></div>
+            <div id="abaTrocarSenha" class="conteudo-configuracoes">
+              <div class="card-config card-senha">
+                <h3>Alterar senha</h3>
+
+                <label class="campo senha-campo">
+                  <span>Senha atual</span>
+
+                  <div class="input-senha">
+                    <input
+                      type="password"
+                      id="senhaAtual"
+                      placeholder="Digite sua senha atual"
+                    />
+
+                    <button
+                      type="button"
+                      class="btn-olho"
+                      onclick="toggleSenha('senhaAtual', 'iconeOlhoAtual')"
+                    >
+                      <svg id="iconeOlhoAtual" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="3"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </label>
+
+                <label class="campo senha-campo">
+                  <span>Nova senha</span>
+
+                  <div class="input-senha">
+                    <input
+                      type="password"
+                      id="novaSenha"
+                      placeholder="Digite a nova senha"
+                    />
+
+                    <button
+                      type="button"
+                      class="btn-olho"
+                      onclick="toggleSenha('novaSenha', 'iconeOlhoNova')"
+                    >
+                      <svg id="iconeOlhoNova" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="3"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </label>
+
+                <label class="campo senha-campo">
+                  <span>Confirmar nova senha</span>
+
+                  <div class="input-senha">
+                    <input
+                      type="password"
+                      id="confirmarSenha"
+                      placeholder="Confirme a nova senha"
+                    />
+
+                    <button
+                      type="button"
+                      class="btn-olho"
+                      onclick="
+                        toggleSenha('confirmarSenha', 'iconeOlhoConfirmar')
+                      "
+                    >
+                      <svg
+                        id="iconeOlhoConfirmar"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <path
+                          d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="3"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </label>
+
+                <button class="btn-principal" onclick="alterarSenha()">
+                  Salvar nova senha
+                </button>
+
+                <p id="mensagemSenha" class="mensagem"></p>
+              </div>
             </div>
           </div>
         </section>

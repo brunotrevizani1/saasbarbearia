@@ -378,36 +378,6 @@ button:disabled {
   color: #991b1b;
 }
 
-/* campo com olho */
-.senha-campo .input-senha {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.input-senha input {
-  width: 100%;
-  padding-right: 45px;
-}
-
-/* botão olho */
-.btn-olho {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #64748b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-olho svg {
-  width: 20px;
-  height: 20px;
-}
-
 /* TELA DE CANCELAMENTO */
 
 #mensagemCancelamento,

@@ -60,20 +60,204 @@ function abrirSecao(secao) {
 function abrirAbaConfig(nome) {
   const abaBloqueio = document.getElementById("abaBloqueio");
   const abaHorario = document.getElementById("abaHorario");
+  const abaExcecao = document.getElementById("abaExcecao");
+
   const abaBloqueioBtn = document.getElementById("abaBloqueioBtn");
   const abaHorarioBtn = document.getElementById("abaHorarioBtn");
+  const abaExcecaoBtn = document.getElementById("abaExcecaoBtn");
 
   abaBloqueio.classList.remove("ativa");
   abaHorario.classList.remove("ativa");
+  abaExcecao.classList.remove("ativa");
+
   abaBloqueioBtn.classList.remove("ativa");
   abaHorarioBtn.classList.remove("ativa");
+  abaExcecaoBtn.classList.remove("ativa");
 
   if (nome === "bloqueio") {
     abaBloqueio.classList.add("ativa");
     abaBloqueioBtn.classList.add("ativa");
-  } else {
+  }
+
+  if (nome === "horario") {
     abaHorario.classList.add("ativa");
     abaHorarioBtn.classList.add("ativa");
+  }
+
+  if (nome === "excecao") {
+    abaExcecao.classList.add("ativa");
+    abaExcecaoBtn.classList.add("ativa");
+    carregarExcecoesHorario();
+  }
+}
+
+function mostrarCamposExcecao() {
+  const tipo = document.getElementById("tipoExcecao").value;
+  const campos = document.getElementById("camposHorarioExcecao");
+
+  campos.style.display = tipo === "personalizado" ? "block" : "none";
+}
+
+async function carregarExcecoesHorario() {
+  const lista = document.getElementById("listaExcecoesHorario");
+  const semExcecoes = document.getElementById("semExcecoesHorario");
+
+  if (!barbeiroSelecionado) {
+    lista.innerHTML = "";
+    semExcecoes.style.display = "block";
+    semExcecoes.innerText = "Selecione um barbeiro.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      `http://localhost:3000/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+    );
+
+    const excecoes = await resposta.json();
+
+    lista.innerHTML = "";
+
+    if (!excecoes.length) {
+      semExcecoes.style.display = "block";
+      semExcecoes.innerText = "Nenhuma exceção cadastrada.";
+      return;
+    }
+
+    semExcecoes.style.display = "none";
+
+    excecoes.forEach((excecao) => {
+      const card = document.createElement("div");
+      card.className = "card-bloqueio";
+
+      let textoTipo = "";
+
+      if (excecao.tipo === "fechar_manha") {
+        textoTipo = "Não abre de manhã";
+      }
+
+      if (excecao.tipo === "fechar_tarde") {
+        textoTipo = "Não abre à tarde";
+      }
+
+      if (excecao.tipo === "personalizado") {
+        textoTipo = `Horário personalizado removido: ${excecao.hora_inicio.slice(
+          0,
+          5,
+        )} às ${excecao.hora_fim.slice(0, 5)}`;
+      }
+
+      card.innerHTML = `
+        <div class="info-bloqueio">
+          <strong>${formatarData(excecao.data)}</strong>
+          <span>${textoTipo}</span>
+          ${excecao.motivo ? `<small>${excecao.motivo}</small>` : ""}
+        </div>
+
+        <button class="btn-desbloquear" onclick="deletarExcecaoHorario(${excecao.id})">
+          Remover
+        </button>
+      `;
+
+      lista.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar exceções:", error);
+    semExcecoes.style.display = "block";
+    semExcecoes.innerText = "Erro ao carregar exceções.";
+  }
+}
+
+async function salvarExcecaoHorario() {
+  const data = document.getElementById("dataExcecao").value;
+  const tipo = document.getElementById("tipoExcecao").value;
+  const hora_inicio = document.getElementById("horaInicioExcecao").value;
+  const hora_fim = document.getElementById("horaFimExcecao").value;
+  const motivo = document.getElementById("motivoExcecao").value.trim();
+
+  const mensagem = document.getElementById("mensagemExcecao");
+  mensagem.innerText = "";
+
+  if (!barbeiroSelecionado) {
+    mensagem.innerText = "Selecione um barbeiro.";
+    return;
+  }
+
+  if (!data || !tipo) {
+    mensagem.innerText = "Informe a data e o tipo da exceção.";
+    return;
+  }
+
+  if (tipo === "personalizado" && (!hora_inicio || !hora_fim)) {
+    mensagem.innerText = "Informe o horário inicial e final.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      "http://localhost:3000/api/barbeiro/excecoes-horario",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          barbearia_id: barbeariaId,
+          barbeiro_id: barbeiroSelecionado,
+          data,
+          tipo,
+          hora_inicio,
+          hora_fim,
+          motivo,
+        }),
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      mensagem.innerText = "Exceção salva com sucesso.";
+
+      document.getElementById("dataExcecao").value = "";
+      document.getElementById("tipoExcecao").value = "";
+      document.getElementById("horaInicioExcecao").value = "";
+      document.getElementById("horaFimExcecao").value = "";
+      document.getElementById("motivoExcecao").value = "";
+      mostrarCamposExcecao();
+
+      await carregarExcecoesHorario();
+    } else {
+      mensagem.innerText = resultado.erro || "Erro ao salvar exceção.";
+    }
+  } catch (error) {
+    console.error("Erro ao salvar exceção:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
+async function deletarExcecaoHorario(id) {
+  const confirmar = window.confirm("Deseja remover essa exceção?");
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(
+      `http://localhost:3000/api/barbeiro/excecoes-horario/${id}?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      await carregarExcecoesHorario();
+    } else {
+      alert(resultado.erro || "Erro ao remover exceção.");
+    }
+  } catch (error) {
+    console.error("Erro ao remover exceção:", error);
+    alert("Erro ao conectar com o servidor.");
   }
 }
 
@@ -238,6 +422,28 @@ async function deletarBarbeiro(id) {
   }
 }
 
+function toggleSenha(inputId, iconeId) {
+  const input = document.getElementById(inputId);
+  const icone = document.getElementById(iconeId);
+
+  if (input.type === "password") {
+    input.type = "text";
+
+    icone.innerHTML = `
+      <path d="M2 2l20 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M10.58 10.58a2 2 0 0 0 2.83 2.83" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.86 21.86 0 0 1-5.17 5.94M6.1 6.1A21.87 21.87 0 0 0 1 12s4 8 11 8c1.61 0 3.13-.27 4.53-.77" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    `;
+  } else {
+    input.type = "password";
+
+    icone.innerHTML = `
+      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+    `;
+  }
+}
+
 function trocarBarbeiroConfiguracao() {
   barbeiroSelecionado = document.getElementById("selectBarbeiroConfig").value;
 
@@ -247,6 +453,7 @@ function trocarBarbeiroConfiguracao() {
 
   carregarConfiguracaoAgenda();
   carregarDiasBloqueados();
+  carregarExcecoesHorario();
 }
 
 function trocarBarbeiroDashboard() {
@@ -255,6 +462,85 @@ function trocarBarbeiroDashboard() {
   ).value;
   ultimoAgendamentosJSON = "";
   carregarAgendamentos(true);
+}
+
+function abrirAbaConfiguracoes(nome) {
+  const abaCadastrarBarbeiros = document.getElementById(
+    "abaCadastrarBarbeiros",
+  );
+  const abaTrocarSenha = document.getElementById("abaTrocarSenha");
+
+  const abaCadastrarBarbeirosBtn = document.getElementById(
+    "abaCadastrarBarbeirosBtn",
+  );
+  const abaTrocarSenhaBtn = document.getElementById("abaTrocarSenhaBtn");
+
+  abaCadastrarBarbeiros.classList.remove("ativa");
+  abaTrocarSenha.classList.remove("ativa");
+
+  abaCadastrarBarbeirosBtn.classList.remove("ativa");
+  abaTrocarSenhaBtn.classList.remove("ativa");
+
+  if (nome === "barbeiros") {
+    abaCadastrarBarbeiros.classList.add("ativa");
+    abaCadastrarBarbeirosBtn.classList.add("ativa");
+  }
+
+  if (nome === "senha") {
+    abaTrocarSenha.classList.add("ativa");
+    abaTrocarSenhaBtn.classList.add("ativa");
+  }
+}
+
+async function alterarSenha() {
+  const senha_atual = document.getElementById("senhaAtual").value.trim();
+  const nova_senha = document.getElementById("novaSenha").value.trim();
+  const confirmar_senha = document
+    .getElementById("confirmarSenha")
+    .value.trim();
+  const mensagem = document.getElementById("mensagemSenha");
+
+  mensagem.innerText = "";
+
+  if (!senha_atual || !nova_senha || !confirmar_senha) {
+    mensagem.innerText = "Preencha todos os campos.";
+    return;
+  }
+
+  if (nova_senha !== confirmar_senha) {
+    mensagem.innerText = "As novas senhas não conferem.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch("http://localhost:3000/api/alterar-senha", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        barbearia_id: barbeariaId,
+        senha_atual,
+        nova_senha,
+        confirmar_senha,
+      }),
+    });
+
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      mensagem.innerText = "Senha alterada com sucesso.";
+
+      document.getElementById("senhaAtual").value = "";
+      document.getElementById("novaSenha").value = "";
+      document.getElementById("confirmarSenha").value = "";
+    } else {
+      mensagem.innerText = resultado.erro || "Erro ao alterar senha.";
+    }
+  } catch (error) {
+    console.error("Erro ao alterar senha:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
 }
 
 /* =========================
@@ -636,11 +922,6 @@ async function carregarConfiguracaoAgenda() {
     document.getElementById("bloquearDomingo").checked = Boolean(
       config.bloquear_domingo,
     );
-
-    document.getElementById("ruaBarbearia").value = config.rua || "";
-    document.getElementById("numeroBarbearia").value = config.numero || "";
-    document.getElementById("bairroBarbearia").value = config.bairro || "";
-    document.getElementById("cidadeBarbearia").value = config.cidade || "";
   } catch (error) {
     console.error("Erro ao carregar configuração:", error);
   }
@@ -659,11 +940,6 @@ async function salvarConfiguracaoAgenda() {
   const bloquear_quarta = document.getElementById("bloquearQuarta").checked;
   const bloquear_quinta = document.getElementById("bloquearQuinta").checked;
   const bloquear_sexta = document.getElementById("bloquearSexta").checked;
-
-  const rua = document.getElementById("ruaBarbearia").value.trim();
-  const numero = document.getElementById("numeroBarbearia").value.trim();
-  const bairro = document.getElementById("bairroBarbearia").value.trim();
-  const cidade = document.getElementById("cidadeBarbearia").value.trim();
 
   const mensagemBloqueio = document.getElementById("mensagemConfiguracao");
   const mensagemHorario = document.getElementById(
@@ -709,10 +985,6 @@ async function salvarConfiguracaoAgenda() {
           bloquear_sabado,
           bloquear_domingo,
 
-          rua,
-          numero,
-          bairro,
-          cidade,
           barbearia_id: barbeariaId,
           barbeiro_id: barbeiroSelecionado,
         }),
@@ -754,67 +1026,28 @@ async function salvarConfiguracaoAgenda() {
 }
 
 async function salvarLocalizacao() {
-  const hora_inicio = document.getElementById("horaInicio").value;
-  const hora_fim = document.getElementById("horaFim").value;
-  const intervalo = document.getElementById("intervalo").value;
-
-  const almoco_inicio = document.getElementById("almocoInicio").value;
-  const almoco_fim = document.getElementById("almocoFim").value;
-
-  const bloquear_segunda = document.getElementById("bloquearSegunda").checked;
-  const bloquear_terca = document.getElementById("bloquearTerca").checked;
-  const bloquear_quarta = document.getElementById("bloquearQuarta").checked;
-  const bloquear_quinta = document.getElementById("bloquearQuinta").checked;
-  const bloquear_sexta = document.getElementById("bloquearSexta").checked;
-  const bloquear_sabado = document.getElementById("bloquearSabado").checked;
-  const bloquear_domingo = document.getElementById("bloquearDomingo").checked;
-
   const rua = document.getElementById("ruaBarbearia").value.trim();
   const numero = document.getElementById("numeroBarbearia").value.trim();
   const bairro = document.getElementById("bairroBarbearia").value.trim();
   const cidade = document.getElementById("cidadeBarbearia").value.trim();
 
   const mensagem = document.getElementById("mensagemLocalizacao");
-
   mensagem.innerText = "";
-
-  if (!barbeiroSelecionado) {
-    mensagem.innerText = "Selecione um barbeiro em Configurações antes.";
-    return;
-  }
-
-  if (!hora_inicio || !hora_fim || !intervalo) {
-    mensagem.innerText = "Preencha primeiro os horários da agenda.";
-    return;
-  }
 
   try {
     const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/configuracao-agenda",
+      "http://localhost:3000/api/barbeiro/localizacao",
       {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          hora_inicio,
-          hora_fim,
-          intervalo,
-          almoco_inicio,
-          almoco_fim,
-          bloquear_segunda,
-          bloquear_terca,
-          bloquear_quarta,
-          bloquear_quinta,
-          bloquear_sexta,
-          bloquear_sabado,
-          bloquear_domingo,
+          barbearia_id: barbeariaId,
           rua,
           numero,
           bairro,
           cidade,
-          barbearia_id: barbeariaId,
-          barbeiro_id: barbeiroSelecionado,
         }),
       },
     );
@@ -832,12 +1065,30 @@ async function salvarLocalizacao() {
   }
 }
 
+async function carregarLocalizacaoBarbearia() {
+  try {
+    const resposta = await fetch(
+      `http://localhost:3000/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
+    );
+
+    const localizacao = await resposta.json();
+
+    document.getElementById("ruaBarbearia").value = localizacao.rua || "";
+    document.getElementById("numeroBarbearia").value = localizacao.numero || "";
+    document.getElementById("bairroBarbearia").value = localizacao.bairro || "";
+    document.getElementById("cidadeBarbearia").value = localizacao.cidade || "";
+  } catch (error) {
+    console.error("Erro ao carregar localização:", error);
+  }
+}
+
 /* =========================
    INÍCIO
 ========================= */
 
 carregarBarbeiros();
 carregarAgendamentos(true);
+carregarLocalizacaoBarbearia();
 
 setInterval(() => {
   carregarAgendamentos(false);

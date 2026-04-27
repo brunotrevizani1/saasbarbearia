@@ -40,7 +40,8 @@ function trocarTela(telaNovaId) {
   const btnLocalizacao = document.querySelector(".btn-localizacao");
   const btnCancelar = document.querySelector(".btn-cancelar");
 
-  if (telaNovaId === "tela-barbeiro" || telaNovaId === "tela-data") {
+  // 🔥 ALTERAÇÃO AQUI
+  if (telaNovaId === "tela-barbeiro") {
     btnLocalizacao.style.display = "flex";
     btnCancelar.style.display = "flex";
   } else {
@@ -259,7 +260,7 @@ async function gerarCalendario() {
 
   btnAnterior.disabled = mesAtual === mesAtualReal && anoAtual === anoAtualReal;
 
-  const [resAg, resBl, resConf] = await Promise.all([
+  const [resAg, resBl, resConf, resExc] = await Promise.all([
     fetch(
       `http://localhost:3000/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
@@ -269,11 +270,15 @@ async function gerarCalendario() {
     fetch(
       `http://localhost:3000/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
+    fetch(
+      `http://localhost:3000/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+    ),
   ]);
 
   const agendamentos = await resAg.json();
   const diasBloqueados = await resBl.json();
   const config = await resConf.json();
+  const excecoes = await resExc.json();
 
   let horariosPadrao = gerarHorarios(
     config.hora_inicio.slice(0, 5),
@@ -318,10 +323,18 @@ async function gerarCalendario() {
         (diaSemana === 6 && Number(config.bloquear_sabado) === 1) ||
         (diaSemana === 0 && Number(config.bloquear_domingo) === 1);
 
-      const horariosValidosDia = filtrarHorariosPassados(
-        horariosPadrao,
-        dataStr,
-      );
+      const excecaoDia = excecoes.find((e) => e.data.slice(0, 10) === dataStr);
+
+      let horariosValidosDia = [...horariosPadrao];
+
+      if (excecaoDia) {
+        horariosValidosDia = aplicarExcecaoHorario(
+          horariosValidosDia,
+          excecaoDia,
+        );
+      }
+
+      horariosValidosDia = filtrarHorariosPassados(horariosValidosDia, dataStr);
 
       const agendados = agendamentos.filter(
         (a) => a.data.slice(0, 10) === dataStr && a.status === "agendado",
@@ -342,6 +355,32 @@ async function gerarCalendario() {
   }
 }
 
+function aplicarExcecaoHorario(horarios, excecao) {
+  if (!excecao) return horarios;
+
+  if (excecao.tipo === "fechar_manha") {
+    return horarios.filter((h) => horarioParaMinutos(h) >= 12 * 60);
+  }
+
+  if (excecao.tipo === "fechar_tarde") {
+    return horarios.filter((h) => horarioParaMinutos(h) < 12 * 60);
+  }
+
+  if (excecao.tipo === "personalizado") {
+    const inicio = horarioParaMinutos(excecao.hora_inicio.slice(0, 5));
+    const fim = horarioParaMinutos(excecao.hora_fim.slice(0, 5));
+
+    return horarios.filter((h) => {
+      const minutos = horarioParaMinutos(h);
+
+      // remove apenas o período escolhido
+      return minutos < inicio || minutos >= fim;
+    });
+  }
+
+  return horarios;
+}
+
 function selecionarDia(data, bloqueio, bloqueioSemanal = false) {
   dataSelecionada = formatarDataLocal(data);
 
@@ -353,7 +392,7 @@ function selecionarDia(data, bloqueio, bloqueioSemanal = false) {
     if (bloqueio) {
       aviso.innerText = bloqueio.motivo || "Dia indisponível pelo barbeiro.";
     } else {
-      aviso.innerText = "Barbearia fechada neste dia.";
+      aviso.innerText = "O barbeiro escolhido não trabalhará neste dia.";
     }
 
     aviso.classList.add("mostrar");
@@ -372,17 +411,21 @@ async function carregarHorarios() {
     return;
   }
 
-  const [resAg, resConf] = await Promise.all([
+  const [resAg, resConf, resExc] = await Promise.all([
     fetch(
       `http://localhost:3000/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
     fetch(
       `http://localhost:3000/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
+    fetch(
+      `http://localhost:3000/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+    ),
   ]);
 
   const agendamentos = await resAg.json();
   const config = await resConf.json();
+  const excecoes = await resExc.json();
 
   let horarios = gerarHorarios(
     config.hora_inicio.slice(0, 5),
@@ -391,6 +434,14 @@ async function carregarHorarios() {
     config.almoco_inicio ? config.almoco_inicio.slice(0, 5) : null,
     config.almoco_fim ? config.almoco_fim.slice(0, 5) : null,
   );
+
+  const excecaoDia = excecoes.find(
+    (e) => e.data.slice(0, 10) === dataSelecionada,
+  );
+
+  if (excecaoDia) {
+    horarios = aplicarExcecaoHorario(horarios, excecaoDia);
+  }
 
   horarios = filtrarHorariosPassados(horarios, dataSelecionada);
 
@@ -541,47 +592,30 @@ async function confirmar() {
 }
 
 /* LOCALIZAÇÃO */
-async function pegarPrimeiroBarbeiroId() {
-  if (barbeiroSelecionado) {
-    return barbeiroSelecionado;
-  }
-
-  try {
-    const resposta = await fetch(
-      `http://localhost:3000/api/barbeiros?barbearia_id=${barbeariaId}`,
-    );
-
-    const barbeiros = await resposta.json();
-
-    if (barbeiros.length > 0) {
-      return barbeiros[0].id;
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 async function abrirTelaLocalizacao() {
-  const barbeiroParaConfig = await pegarPrimeiroBarbeiroId();
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
+    );
 
-  if (!barbeiroParaConfig) {
-    document.getElementById("textoLocalizacao").innerText =
-      "Localização ainda não informada.";
+    const c = await res.json();
+
+    if (!c.rua && !c.numero && !c.bairro && !c.cidade) {
+      document.getElementById("textoLocalizacao").innerText =
+        "Localização ainda não informada.";
+    } else {
+      document.getElementById("textoLocalizacao").innerText =
+        `${c.rua || ""}, ${c.numero || ""} - ${c.bairro || ""} - ${c.cidade || ""}`;
+    }
+
     trocarTela("tela-localizacao");
-    return;
+  } catch (error) {
+    console.error("Erro ao buscar localização:", error);
+    document.getElementById("textoLocalizacao").innerText =
+      "Erro ao carregar localização.";
+    trocarTela("tela-localizacao");
   }
-
-  const res = await fetch(
-    `http://localhost:3000/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroParaConfig}`,
-  );
-  const c = await res.json();
-
-  document.getElementById("textoLocalizacao").innerText =
-    `${c.rua || ""}, ${c.numero || ""} - ${c.bairro || ""} - ${c.cidade || ""}`;
-
-  trocarTela("tela-localizacao");
 }
 
 function voltarDaLocalizacao() {
