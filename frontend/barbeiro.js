@@ -291,7 +291,7 @@ async function salvarLogo() {
   formData.append("barbearia_id", barbeariaId);
 
   try {
-    const resposta = await fetch(`${API_URL}/api/barbeiro/logo", {
+    const resposta = await fetch(`${API_URL}/api/barbeiro/logo`, {
       method: "POST",
       body: formData,
     });
