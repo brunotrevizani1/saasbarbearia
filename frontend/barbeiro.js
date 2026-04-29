@@ -899,7 +899,7 @@ async function desbloquearDia(id) {
   }
 
   try {
-    const resposta = await (
+    const resposta = await fetch(
       `${API_URL}/api/barbeiro/dias-bloqueados/${id}?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
       {
         method: "DELETE",
