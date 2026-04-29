@@ -1,3 +1,5 @@
+const API_URL = "https://saasbarbearia.up.railway.app";
+
 function formatarData(dataString) {
   const [ano, mes, dia] = dataString.split("-");
   const data = new Date(Number(ano), Number(mes) - 1, Number(dia));

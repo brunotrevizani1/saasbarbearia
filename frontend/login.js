@@ -1,3 +1,5 @@
+const API_URL = "https://saasbarbearia.up.railway.app";
+
 async function fazerLogin() {
   const email = document.getElementById("email").value.trim();
   const senha = document.getElementById("senha").value.trim();
