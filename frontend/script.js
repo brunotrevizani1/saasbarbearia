@@ -1,3 +1,5 @@
+const API_URL = "https://saasbarbearia.up.railway.app";
+
 let mesAtual = new Date().getMonth();
 let anoAtual = new Date().getFullYear();
 let dataSelecionada = "";
