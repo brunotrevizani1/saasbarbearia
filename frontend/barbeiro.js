@@ -1,4 +1,4 @@
-const API_URL = "https://saasbarbearia.railway.internal";
+const API_URL = "https://saasbarbearia.up.railway.app";
 const barbeariaId = localStorage.getItem("barbearia_id");
 
 if (!barbeariaId) {
