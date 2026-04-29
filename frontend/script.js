@@ -144,7 +144,7 @@ async function carregarBarbeirosCliente() {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiros?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiros?barbearia_id=${barbeariaId}`,
     );
 
     const barbeiros = await resposta.json();
@@ -262,16 +262,16 @@ async function gerarCalendario() {
 
   const [resAg, resBl, resConf, resExc] = await Promise.all([
     fetch(
-      `http://localhost:3000/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
     fetch(
-      `http://localhost:3000/api/barbeiro/dias-bloqueados?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/dias-bloqueados?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
     fetch(
-      `http://localhost:3000/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
     fetch(
-      `http://localhost:3000/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
   ]);
 
@@ -413,13 +413,13 @@ async function carregarHorarios() {
 
   const [resAg, resConf, resExc] = await Promise.all([
     fetch(
-      `http://localhost:3000/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
     fetch(
-      `http://localhost:3000/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
     fetch(
-      `http://localhost:3000/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     ),
   ]);
 
@@ -506,7 +506,7 @@ async function confirmar() {
     return;
   }
 
-  const res = await fetch("http://localhost:3000/api/agendar", {
+  const res = await fetch(`${API_URL}/api/agendar`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -594,7 +594,7 @@ async function confirmar() {
 async function carregarLogoCliente() {
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/logo?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/logo?barbearia_id=${barbeariaId}`,
     );
 
     const data = await resposta.json();
@@ -602,7 +602,7 @@ async function carregarLogoCliente() {
     const img = document.getElementById("logoBarbearia");
 
     if (data.logo) {
-      img.src = `http://localhost:3000${data.logo}`;
+      img.src = `${API_URL}${data.logo}`;
       img.style.display = "block";
     }
   } catch (error) {
@@ -615,7 +615,7 @@ async function carregarLogoCliente() {
 async function abrirTelaLocalizacao() {
   try {
     const res = await fetch(
-      `http://localhost:3000/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
     );
 
     const c = await res.json();
@@ -683,7 +683,7 @@ async function buscarAgendamentoParaCancelar() {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/api/cancelar/buscar", {
+    const res = await fetch(`${API_URL}/api/cancelar/buscar`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -748,7 +748,7 @@ async function confirmarCancelamento(codigo) {
   mensagem.innerText = "";
 
   try {
-    const res = await fetch("http://localhost:3000/api/cancelar", {
+    const res = await fetch(`${API_URL}/api/cancelar`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

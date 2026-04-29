@@ -36,9 +36,7 @@ async function carregarDiasBloqueados() {
   lista.innerHTML = "";
 
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/dias-bloqueados",
-    );
+    const resposta = await fetch(`${API_URL}/api/barbeiro/dias-bloqueados`);
     const bloqueios = await resposta.json();
 
     if (!bloqueios.length) {
@@ -85,16 +83,13 @@ async function bloquearDia() {
   }
 
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/dias-bloqueados",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data, motivo }),
+    const resposta = await fetch(`${API_URL}/api/barbeiro/dias-bloqueados`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ data, motivo }),
+    });
 
     const resultado = await resposta.json();
 
@@ -119,7 +114,7 @@ async function desbloquearDia(id) {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/dias-bloqueados/${id}`,
+      `${API_URL}/api/barbeiro/dias-bloqueados/${id}`,
       {
         method: "DELETE",
       },
@@ -140,9 +135,7 @@ async function desbloquearDia(id) {
 
 async function carregarConfiguracaoAgenda() {
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/configuracao-agenda",
-    );
+    const resposta = await fetch(`${API_URL}/api/barbeiro/configuracao-agenda`);
     const config = await resposta.json();
 
     document.getElementById("horaInicio").value = config.hora_inicio
@@ -187,7 +180,7 @@ async function salvarConfiguracaoAgenda() {
 
   try {
     const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/configuracao-agenda",
+      `${API_URL}/api/barbeiro/configuracao-agenda`,
       {
         method: "POST",
         headers: {

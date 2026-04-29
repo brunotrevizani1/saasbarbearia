@@ -1,3 +1,4 @@
+const API_URL = "https://saasbarbearia.railway.internal";
 const barbeariaId = localStorage.getItem("barbearia_id");
 
 if (!barbeariaId) {
@@ -111,7 +112,7 @@ async function carregarExcecoesHorario() {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/excecoes-horario?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     );
 
     const excecoes = await resposta.json();
@@ -194,24 +195,21 @@ async function salvarExcecaoHorario() {
   }
 
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/excecoes-horario",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          barbearia_id: barbeariaId,
-          barbeiro_id: barbeiroSelecionado,
-          data,
-          tipo,
-          hora_inicio,
-          hora_fim,
-          motivo,
-        }),
+    const resposta = await fetch(`${API_URL}/api/barbeiro/excecoes-horario`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        barbearia_id: barbeariaId,
+        barbeiro_id: barbeiroSelecionado,
+        data,
+        tipo,
+        hora_inicio,
+        hora_fim,
+        motivo,
+      }),
+    });
 
     const resultado = await resposta.json();
 
@@ -242,7 +240,7 @@ async function deletarExcecaoHorario(id) {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/excecoes-horario/${id}?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/excecoes-horario/${id}?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
       {
         method: "DELETE",
       },
@@ -293,7 +291,7 @@ async function salvarLogo() {
   formData.append("barbearia_id", barbeariaId);
 
   try {
-    const resposta = await fetch("http://localhost:3000/api/barbeiro/logo", {
+    const resposta = await fetch(`${API_URL}/api/barbeiro/logo", {
       method: "POST",
       body: formData,
     });
@@ -315,7 +313,7 @@ async function salvarLogo() {
 async function carregarLogoBarbearia() {
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/logo?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/logo?barbearia_id=${barbeariaId}`,
     );
 
     const data = await resposta.json();
@@ -323,7 +321,7 @@ async function carregarLogoBarbearia() {
     const preview = document.getElementById("previewLogo");
 
     if (data.logo) {
-      preview.src = `http://localhost:3000${data.logo}`;
+      preview.src = `${API_URL}${data.logo}`;
       preview.style.display = "block";
     } else {
       preview.style.display = "none";
@@ -340,7 +338,7 @@ async function carregarLogoBarbearia() {
 async function carregarBarbeiros() {
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/barbeiros?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/barbeiros?barbearia_id=${barbeariaId}`,
     );
 
     const barbeiros = await resposta.json();
@@ -416,19 +414,16 @@ async function criarBarbeiro() {
   }
 
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/barbeiros",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome,
-          barbearia_id: barbeariaId,
-        }),
+    const resposta = await fetch(`${API_URL}/api/barbeiro/barbeiros`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        nome,
+        barbearia_id: barbeariaId,
+      }),
+    });
 
     const resultado = await resposta.json();
 
@@ -454,7 +449,7 @@ async function deletarBarbeiro(id) {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/barbeiros/${id}?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/barbeiros/${id}?barbearia_id=${barbeariaId}`,
       {
         method: "DELETE",
       },
@@ -579,7 +574,7 @@ async function alterarSenha() {
   }
 
   try {
-    const resposta = await fetch("http://localhost:3000/api/alterar-senha", {
+    const resposta = await fetch(`${API_URL}/api/alterar-senha`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -706,7 +701,7 @@ async function carregarAgendamentos(forcarRender = false) {
   const semAgendamentos = document.getElementById("semAgendamentos");
 
   try {
-    let url = `http://localhost:3000/api/barbeiro/agendamentos?barbearia_id=${barbeariaId}`;
+    let url = `${API_URL}/api/barbeiro/agendamentos?barbearia_id=${barbeariaId}`;
 
     if (barbeiroFiltroDashboard) {
       url += `&barbeiro_id=${barbeiroFiltroDashboard}`;
@@ -745,7 +740,7 @@ async function concluirAgendamento(id) {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/agendamentos/${id}/concluir?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/agendamentos/${id}/concluir?barbearia_id=${barbeariaId}`,
       {
         method: "PUT",
       },
@@ -772,7 +767,7 @@ async function excluirAgendamento(id) {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/agendamentos/${id}?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/agendamentos/${id}?barbearia_id=${barbeariaId}`,
       {
         method: "DELETE",
       },
@@ -810,7 +805,7 @@ async function carregarDiasBloqueados() {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/dias-bloqueados?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/dias-bloqueados?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     );
     const bloqueios = await resposta.json();
 
@@ -864,21 +859,18 @@ async function bloquearDia() {
   }
 
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/dias-bloqueados",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          data,
-          motivo,
-          barbearia_id: barbeariaId,
-          barbeiro_id: barbeiroSelecionado,
-        }),
+    const resposta = await fetch(`${API_URL}/api/barbeiro/dias-bloqueados`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        data,
+        motivo,
+        barbearia_id: barbeariaId,
+        barbeiro_id: barbeiroSelecionado,
+      }),
+    });
 
     const resultado = await resposta.json();
 
@@ -907,8 +899,8 @@ async function desbloquearDia(id) {
   }
 
   try {
-    const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/dias-bloqueados/${id}?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+    const resposta = await (
+      `${API_URL}/api/barbeiro/dias-bloqueados/${id}?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
       {
         method: "DELETE",
       },
@@ -938,7 +930,7 @@ async function carregarConfiguracaoAgenda() {
 
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+      `${API_URL}/api/barbeiro/configuracao-agenda?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
     );
 
     const config = await resposta.json();
@@ -1030,7 +1022,7 @@ async function salvarConfiguracaoAgenda() {
 
   try {
     const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/configuracao-agenda",
+      `${API_URL}/api/barbeiro/configuracao-agenda`,
       {
         method: "POST",
         headers: {
@@ -1101,22 +1093,19 @@ async function salvarLocalizacao() {
   mensagem.innerText = "";
 
   try {
-    const resposta = await fetch(
-      "http://localhost:3000/api/barbeiro/localizacao",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          barbearia_id: barbeariaId,
-          rua,
-          numero,
-          bairro,
-          cidade,
-        }),
+    const resposta = await fetch(`${API_URL}/api/barbeiro/localizacao`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        barbearia_id: barbeariaId,
+        rua,
+        numero,
+        bairro,
+        cidade,
+      }),
+    });
 
     const resultado = await resposta.json();
 
@@ -1134,7 +1123,7 @@ async function salvarLocalizacao() {
 async function carregarLocalizacaoBarbearia() {
   try {
     const resposta = await fetch(
-      `http://localhost:3000/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
+      `${API_URL}/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
     );
 
     const localizacao = await resposta.json();
