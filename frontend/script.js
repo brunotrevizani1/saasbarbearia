@@ -591,6 +591,25 @@ async function confirmar() {
   trocarTela("tela-sucesso");
 }
 
+async function carregarLogoCliente() {
+  try {
+    const resposta = await fetch(
+      `http://localhost:3000/api/barbeiro/logo?barbearia_id=${barbeariaId}`,
+    );
+
+    const data = await resposta.json();
+
+    const img = document.getElementById("logoBarbearia");
+
+    if (data.logo) {
+      img.src = `http://localhost:3000${data.logo}`;
+      img.style.display = "block";
+    }
+  } catch (error) {
+    console.error("Erro ao carregar logo cliente:", error);
+  }
+}
+
 /* LOCALIZAÇÃO */
 
 async function abrirTelaLocalizacao() {
@@ -808,3 +827,4 @@ function proximoMes() {
 /* START */
 carregarBarbeirosCliente();
 trocarTela("tela-barbeiro");
+carregarLogoCliente();

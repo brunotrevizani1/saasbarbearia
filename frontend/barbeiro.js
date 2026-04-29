@@ -277,6 +277,62 @@ function sair() {
   window.location.href = "login.html";
 }
 
+async function salvarLogo() {
+  const input = document.getElementById("inputLogo");
+  const mensagem = document.getElementById("mensagemLogo");
+
+  mensagem.innerText = "";
+
+  if (!input.files.length) {
+    mensagem.innerText = "Selecione uma imagem.";
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("logo", input.files[0]);
+  formData.append("barbearia_id", barbeariaId);
+
+  try {
+    const resposta = await fetch("http://localhost:3000/api/barbeiro/logo", {
+      method: "POST",
+      body: formData,
+    });
+
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      mensagem.innerText = "Logo salva com sucesso.";
+      carregarLogoBarbearia();
+    } else {
+      mensagem.innerText = resultado.erro || "Erro ao salvar logo.";
+    }
+  } catch (error) {
+    console.error("Erro ao enviar logo:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
+async function carregarLogoBarbearia() {
+  try {
+    const resposta = await fetch(
+      `http://localhost:3000/api/barbeiro/logo?barbearia_id=${barbeariaId}`,
+    );
+
+    const data = await resposta.json();
+
+    const preview = document.getElementById("previewLogo");
+
+    if (data.logo) {
+      preview.src = `http://localhost:3000${data.logo}`;
+      preview.style.display = "block";
+    } else {
+      preview.style.display = "none";
+    }
+  } catch (error) {
+    console.error("Erro ao carregar logo:", error);
+  }
+}
+
 /* =========================
    BARBEIROS
 ========================= */
@@ -469,17 +525,21 @@ function abrirAbaConfiguracoes(nome) {
     "abaCadastrarBarbeiros",
   );
   const abaTrocarSenha = document.getElementById("abaTrocarSenha");
+  const abaLogo = document.getElementById("abaLogo");
 
   const abaCadastrarBarbeirosBtn = document.getElementById(
     "abaCadastrarBarbeirosBtn",
   );
   const abaTrocarSenhaBtn = document.getElementById("abaTrocarSenhaBtn");
+  const abaLogoBtn = document.getElementById("abaLogoBtn");
 
   abaCadastrarBarbeiros.classList.remove("ativa");
   abaTrocarSenha.classList.remove("ativa");
+  abaLogo.classList.remove("ativa");
 
   abaCadastrarBarbeirosBtn.classList.remove("ativa");
   abaTrocarSenhaBtn.classList.remove("ativa");
+  abaLogoBtn.classList.remove("ativa");
 
   if (nome === "barbeiros") {
     abaCadastrarBarbeiros.classList.add("ativa");
@@ -489,6 +549,12 @@ function abrirAbaConfiguracoes(nome) {
   if (nome === "senha") {
     abaTrocarSenha.classList.add("ativa");
     abaTrocarSenhaBtn.classList.add("ativa");
+  }
+
+  if (nome === "logo") {
+    abaLogo.classList.add("ativa");
+    abaLogoBtn.classList.add("ativa");
+    carregarLogoBarbearia(); // carrega preview
   }
 }
 
@@ -1082,13 +1148,10 @@ async function carregarLocalizacaoBarbearia() {
   }
 }
 
-/* =========================
-   INÍCIO
-========================= */
-
 carregarBarbeiros();
 carregarAgendamentos(true);
 carregarLocalizacaoBarbearia();
+carregarLogoBarbearia();
 
 setInterval(() => {
   carregarAgendamentos(false);

@@ -1,4 +1,6 @@
 const db = require("../models/db");
+const multer = require("multer");
+const path = require("path");
 
 function pegarBarbeariaId(req) {
   return req.query?.barbearia_id || req.body?.barbearia_id;
@@ -227,6 +229,84 @@ const deletarBarbeiro = (req, res) => {
     });
   });
 };
+
+// CONFIGURAÇÃO MULTER (sempre antes de usar)
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/logos");
+  },
+  filename: function (req, file, cb) {
+    const nomeUnico = Date.now() + path.extname(file.originalname);
+    cb(null, nomeUnico);
+  },
+});
+
+const upload = multer({ storage });
+
+// BUSCAR LOGO
+const buscarLogoBarbearia = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  const sql = `
+    SELECT logo
+    FROM barbearias
+    WHERE id = ?
+    LIMIT 1
+  `;
+
+  db.query(sql, [barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar logo:", err);
+      return res.status(500).json({ erro: "Erro ao buscar logo." });
+    }
+
+    if (!result.length) {
+      return res.json({ logo: null });
+    }
+
+    res.json({ logo: result[0].logo });
+  });
+};
+
+// UPLOAD LOGO
+const uploadLogoBarbearia = [
+  upload.single("logo"),
+  (req, res) => {
+    const barbearia_id = pegarBarbeariaId(req);
+
+    if (!barbearia_id) {
+      return res.status(400).json({ erro: "Barbearia não informada." });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ erro: "Nenhuma imagem enviada." });
+    }
+
+    const caminho = `/uploads/logos/${req.file.filename}`;
+
+    const sql = `
+      UPDATE barbearias
+      SET logo = ?
+      WHERE id = ?
+    `;
+
+    db.query(sql, [caminho, barbearia_id], (err) => {
+      if (err) {
+        console.error("Erro ao salvar logo:", err);
+        return res.status(500).json({ erro: "Erro ao salvar logo." });
+      }
+
+      res.json({
+        sucesso: true,
+        logo: caminho,
+      });
+    });
+  },
+];
 
 /* =========================
    AGENDAMENTOS DO PAINEL
@@ -909,4 +989,7 @@ module.exports = {
 
   buscarLocalizacaoBarbearia,
   salvarLocalizacaoBarbearia,
+
+  buscarLogoBarbearia,
+  uploadLogoBarbearia,
 };

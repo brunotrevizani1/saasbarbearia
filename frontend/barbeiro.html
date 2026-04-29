@@ -457,6 +457,14 @@
               >
                 Trocar senha
               </button>
+
+              <button
+                id="abaLogoBtn"
+                class="aba"
+                onclick="abrirAbaConfiguracoes('logo')"
+              >
+                Logo da barbearia
+              </button>
             </div>
 
             <div
@@ -614,6 +622,34 @@
                 </button>
 
                 <p id="mensagemSenha" class="mensagem"></p>
+              </div>
+            </div>
+            <div id="abaLogo" class="conteudo-configuracoes">
+              <div class="card-config">
+                <h3>Logo da barbearia</h3>
+
+                <p class="descricao-secao">
+                  Adicione a logo ou símbolo da sua barbearia para aparecer na
+                  tela do cliente.
+                </p>
+
+                <img
+                  id="previewLogo"
+                  src=""
+                  alt="Logo da barbearia"
+                  style="display: none; max-width: 200px; margin-bottom: 15px"
+                />
+
+                <label class="campo">
+                  <span>Selecionar imagem</span>
+                  <input type="file" id="inputLogo" accept="image/*" />
+                </label>
+
+                <button class="btn-principal" onclick="salvarLogo()">
+                  Salvar logo
+                </button>
+
+                <p id="mensagemLogo" class="mensagem"></p>
               </div>
             </div>
           </div>

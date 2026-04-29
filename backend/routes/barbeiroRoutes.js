@@ -24,6 +24,9 @@ const {
 
   buscarLocalizacaoBarbearia,
   salvarLocalizacaoBarbearia,
+
+  uploadLogoBarbearia,
+  buscarLogoBarbearia,
 } = require("../controllers/barbeiroController");
 
 router.get("/barbeiros", listarBarbeiros);
@@ -48,5 +51,8 @@ router.post("/configuracao-agenda", salvarConfiguracaoAgenda);
 
 router.get("/localizacao", buscarLocalizacaoBarbearia);
 router.put("/localizacao", salvarLocalizacaoBarbearia);
+
+router.post("/logo", uploadLogoBarbearia);
+router.get("/logo", buscarLogoBarbearia);
 
 module.exports = router;
