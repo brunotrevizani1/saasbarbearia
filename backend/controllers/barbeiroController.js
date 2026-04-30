@@ -3,7 +3,18 @@ const path = require("path");
 const db = require("../models/db");
 const multer = require("multer");
 
-const pastaLogos = path.join(__dirname, "..", "uploads", "logos");
+const pastaUploads = path.join(__dirname, "..", "uploads");
+const pastaLogos = path.join(pastaUploads, "logos");
+
+if (fs.existsSync(pastaUploads)) {
+  if (!fs.lstatSync(pastaUploads).isDirectory()) {
+    fs.unlinkSync(pastaUploads);
+  }
+}
+
+if (!fs.existsSync(pastaUploads)) {
+  fs.mkdirSync(pastaUploads);
+}
 
 if (!fs.existsSync(pastaLogos)) {
   fs.mkdirSync(pastaLogos, { recursive: true });
