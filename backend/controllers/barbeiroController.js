@@ -284,7 +284,12 @@ const uploadLogoBarbearia = (req, res) => {
   upload.single("logo")(req, res, (err) => {
     if (err) {
       console.error("Erro no upload da logo:", err);
-      return res.status(500).json({ erro: "Erro ao fazer upload da imagem." });
+
+      return res.status(500).json({
+        erro: "Erro ao fazer upload da imagem.",
+        detalhe: err.message,
+        codigo: err.code,
+      });
     }
 
     const barbearia_id = pegarBarbeariaId(req);
