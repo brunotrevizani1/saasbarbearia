@@ -3,18 +3,7 @@ const path = require("path");
 const db = require("../models/db");
 const multer = require("multer");
 
-const pastaUploads = path.join(__dirname, "..", "uploads");
-const pastaLogos = path.join(pastaUploads, "logos");
-
-if (fs.existsSync(pastaUploads)) {
-  if (!fs.lstatSync(pastaUploads).isDirectory()) {
-    fs.unlinkSync(pastaUploads);
-  }
-}
-
-if (!fs.existsSync(pastaUploads)) {
-  fs.mkdirSync(pastaUploads);
-}
+const pastaLogos = path.join(__dirname, "..", "logos");
 
 if (!fs.existsSync(pastaLogos)) {
   fs.mkdirSync(pastaLogos, { recursive: true });
@@ -313,7 +302,7 @@ const uploadLogoBarbearia = (req, res) => {
       return res.status(400).json({ erro: "Nenhuma imagem enviada." });
     }
 
-    const caminho = `/uploads/logos/${req.file.filename}`;
+    const caminho = `/logos/${req.file.filename}`;
 
     const sql = `
       UPDATE barbearias
