@@ -567,3 +567,33 @@ button:disabled {
     bottom: -2px;
   }
 }
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+}
+
+.logo-barbearia {
+  display: block;
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 18px auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  background: #fff;
+  padding: 6px;
+}
+
+@media (max-width: 768px) {
+  .logo-barbearia {
+    width: 95px;
+    height: 95px;
+    margin-bottom: 16px;
+  }
+}

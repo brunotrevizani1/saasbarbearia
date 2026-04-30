@@ -1,6 +1,13 @@
+const fs = require("fs");
+const path = require("path");
 const db = require("../models/db");
 const multer = require("multer");
-const path = require("path");
+
+const pastaLogos = path.join(__dirname, "..", "uploads", "logos");
+
+if (!fs.existsSync(pastaLogos)) {
+  fs.mkdirSync(pastaLogos, { recursive: true });
+}
 
 function pegarBarbeariaId(req) {
   return req.query?.barbearia_id || req.body?.barbearia_id;
@@ -233,7 +240,7 @@ const deletarBarbeiro = (req, res) => {
 // CONFIGURAÇÃO MULTER (sempre antes de usar)
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/logos");
+    cb(null, pastaLogos);
   },
   filename: function (req, file, cb) {
     const nomeUnico = Date.now() + path.extname(file.originalname);
@@ -273,9 +280,13 @@ const buscarLogoBarbearia = (req, res) => {
 };
 
 // UPLOAD LOGO
-const uploadLogoBarbearia = [
-  upload.single("logo"),
-  (req, res) => {
+const uploadLogoBarbearia = (req, res) => {
+  upload.single("logo")(req, res, (err) => {
+    if (err) {
+      console.error("Erro no upload da logo:", err);
+      return res.status(500).json({ erro: "Erro ao fazer upload da imagem." });
+    }
+
     const barbearia_id = pegarBarbeariaId(req);
 
     if (!barbearia_id) {
@@ -294,10 +305,10 @@ const uploadLogoBarbearia = [
       WHERE id = ?
     `;
 
-    db.query(sql, [caminho, barbearia_id], (err) => {
-      if (err) {
-        console.error("Erro ao salvar logo:", err);
-        return res.status(500).json({ erro: "Erro ao salvar logo." });
+    db.query(sql, [caminho, barbearia_id], (errDb) => {
+      if (errDb) {
+        console.error("Erro ao salvar logo no banco:", errDb);
+        return res.status(500).json({ erro: "Erro ao salvar logo no banco." });
       }
 
       res.json({
@@ -305,8 +316,8 @@ const uploadLogoBarbearia = [
         logo: caminho,
       });
     });
-  },
-];
+  });
+};
 
 /* =========================
    AGENDAMENTOS DO PAINEL
