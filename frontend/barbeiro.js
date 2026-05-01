@@ -300,6 +300,7 @@ async function salvarLogo() {
 
     if (resultado.sucesso) {
       mensagem.innerText = "Logo salva com sucesso.";
+      input.value = ""; // 🔥 limpa input
       carregarLogoBarbearia();
     } else {
       mensagem.innerText = resultado.erro || "Erro ao salvar logo.";
@@ -310,6 +311,24 @@ async function salvarLogo() {
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const inputLogo = document.getElementById("inputLogo");
+  const previewLogo = document.getElementById("previewLogo");
+  const placeholderLogo = document.getElementById("placeholderLogo");
+
+  if (!inputLogo || !previewLogo || !placeholderLogo) return;
+
+  inputLogo.addEventListener("change", () => {
+    const arquivo = inputLogo.files[0];
+
+    if (!arquivo) return;
+
+    previewLogo.src = URL.createObjectURL(arquivo);
+    previewLogo.classList.add("ativo");
+    placeholderLogo.style.display = "none";
+  });
+});
+
 async function carregarLogoBarbearia() {
   try {
     const resposta = await fetch(
@@ -319,18 +338,38 @@ async function carregarLogoBarbearia() {
     const data = await resposta.json();
 
     const preview = document.getElementById("previewLogo");
+    const placeholder = document.getElementById("placeholderLogo");
 
     if (data.logo) {
       preview.src = `${API_URL}${data.logo}`;
-      preview.style.display = "block";
+      preview.classList.add("ativo");
+
+      if (placeholder) {
+        placeholder.style.display = "none";
+      }
     } else {
-      preview.style.display = "none";
+      preview.src = "";
+      preview.classList.remove("ativo");
+
+      if (placeholder) {
+        placeholder.style.display = "flex";
+      }
     }
   } catch (error) {
     console.error("Erro ao carregar logo:", error);
   }
 }
 
+function togglePreviewCliente() {
+  const box = document.getElementById("previewClienteBox");
+  const iframe = document.getElementById("iframePreviewCliente");
+
+  box.classList.toggle("ativo");
+
+  if (box.classList.contains("ativo")) {
+    iframe.src = `index.html?barbearia=${barbeariaId}`;
+  }
+}
 /* =========================
    BARBEIROS
 ========================= */

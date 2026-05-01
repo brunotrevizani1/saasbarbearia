@@ -624,32 +624,71 @@
                 <p id="mensagemSenha" class="mensagem"></p>
               </div>
             </div>
-            <div id="abaLogo" class="conteudo-configuracoes">
-              <div class="card-config">
-                <h3>Logo da barbearia</h3>
+         <div id="abaLogo" class="conteudo-configuracoes">
+  <div class="linha-logo-preview">
+    <div class="card-config card-logo-upload">
+      <div class="topo-logo-card">
+        <h3>Logo da barbearia</h3>
 
-                <p class="descricao-secao">
-                  Adicione a logo ou símbolo da sua barbearia para aparecer na
-                  tela do cliente.
-                </p>
+        <button class="btn-preview-cliente" onclick="togglePreviewCliente()">
+  <svg class="icone-olho" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <circle
+      cx="12"
+      cy="12"
+      r="3"
+      stroke="currentColor"
+      stroke-width="1.8"
+    />
+  </svg>
+  <span>Ver preview</span>
+</button>
+      </div>
 
-                <img
-                  id="previewLogo"
-                  src=""
-                  alt="Logo da barbearia"
-                  style="display: none; max-width: 200px; margin-bottom: 15px"
-                />
+      <p class="descricao-secao">
+        Adicione a logo da sua barbearia para aparecer na tela do cliente.
+      </p>
 
-                <label class="campo">
-                  <span>Selecionar imagem</span>
-                  <input type="file" id="inputLogo" accept="image/*" />
-                </label>
+      <label for="inputLogo" class="area-preview-logo">
+        <img id="previewLogo" src="" alt="Logo da barbearia" />
 
-                <button class="btn-principal" onclick="salvarLogo()">
-                  Salvar logo
-                </button>
+        <div id="placeholderLogo" class="placeholder-logo">
+          <span>+</span>
+          <small>Clique para escolher</small>
+        </div>
+      </label>
 
-                <p id="mensagemLogo" class="mensagem"></p>
+      <input type="file" id="inputLogo" accept="image/*" hidden />
+
+      <button class="btn-principal btn-salvar-logo" onclick="salvarLogo()">
+        Salvar logo
+      </button>
+
+      <p id="mensagemLogo" class="mensagem mensagem-logo"></p>
+    </div>
+
+    <div id="previewClienteBox" class="preview-cliente-box">
+      <div class="celular-preview">
+        <div class="celular-botao-lateral esquerda"></div>
+        <div class="celular-botao-lateral direita"></div>
+        <div class="celular-notch"></div>
+
+        <iframe
+          id="iframePreviewCliente"
+          class="iframe-preview-cliente"
+          title="Preview cliente"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+                </div>
               </div>
             </div>
           </div>
