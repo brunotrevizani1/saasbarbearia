@@ -15,10 +15,12 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const agendamentoRoutes = require("./routes/agendamentoRoutes");
 const barbeiroRoutes = require("./routes/barbeiroRoutes");
 const authRoutes = require("./routes/authRoutes");
+const produtoRoutes = require("./routes/produtoRoutes");
 
 app.use("/api", agendamentoRoutes);
 app.use("/api/barbeiro", barbeiroRoutes);
 app.use("/api", authRoutes);
+app.use("/api", produtoRoutes);
 
 app.get("/", (req, res) => {
   res.send("Servidor rodando 🚀");

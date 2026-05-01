@@ -8,12 +8,58 @@ if (!barbeariaId) {
 let ultimoAgendamentosJSON = "";
 let barbeiroSelecionado = "";
 let barbeiroFiltroDashboard = "";
+let dataFiltroAgendamentos = formatarDataInput(new Date());
 
 function formatarData(dataString) {
   const dataLimpa = dataString.toString().slice(0, 10);
   const [ano, mes, dia] = dataLimpa.split("-");
 
   return `${dia}/${mes}/${ano}`;
+}
+
+function formatarDataInput(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const dia = String(data.getDate()).padStart(2, "0");
+
+  return `${ano}-${mes}-${dia}`;
+}
+
+function atualizarTextoDataFiltro() {
+  const texto = document.getElementById("dataFiltroTexto");
+
+  if (!texto) return;
+
+  const [ano, mes, dia] = dataFiltroAgendamentos.split("-");
+  const data = new Date(Number(ano), Number(mes) - 1, Number(dia));
+
+  texto.innerText = data.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function mudarDiaAgendamentos(direcao) {
+  const [ano, mes, dia] = dataFiltroAgendamentos.split("-");
+  const data = new Date(Number(ano), Number(mes) - 1, Number(dia));
+
+  data.setDate(data.getDate() + direcao);
+
+  dataFiltroAgendamentos = formatarDataInput(data);
+  ultimoAgendamentosJSON = "";
+
+  atualizarTextoDataFiltro();
+  carregarAgendamentos(true);
+}
+
+function irParaHojeAgendamentos() {
+  dataFiltroAgendamentos = formatarDataInput(new Date());
+  ultimoAgendamentosJSON = "";
+
+  atualizarTextoDataFiltro();
+  carregarAgendamentos(true);
 }
 
 function abrirSecao(secao) {
@@ -656,7 +702,7 @@ function montarHTMLAgendamentos(agendamentos) {
         <div class="card-agendamento ${cancelado ? "cancelado" : ""}">
           <div class="info-agendamento">
             <div class="topo-agendamento">
-              <strong>${agendamento.nome}</strong>
+              <strong>${agendamento.barbeiro_nome || "Barbeiro não informado"}</strong>
               ${cancelado ? `<span class="badge-cancelado">Cancelado</span>` : ""}
             </div>
 
@@ -670,7 +716,7 @@ function montarHTMLAgendamentos(agendamentos) {
                   stroke-linejoin="round"
                 />
               </svg>
-              <span>${agendamento.barbeiro_nome || "Barbeiro não informado"}</span>
+              <span>${agendamento.nome}</span>
             </div>
 
             <div class="linha-info">
@@ -684,19 +730,6 @@ function montarHTMLAgendamentos(agendamentos) {
                 />
               </svg>
               <span>${agendamento.telefone}</span>
-            </div>
-
-            <div class="linha-info">
-              <svg viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M8 2v4M16 2v4M3 10h18M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              <span>${formatarData(agendamento.data)}</span>
             </div>
 
             <div class="linha-info">
@@ -749,7 +782,22 @@ async function carregarAgendamentos(forcarRender = false) {
     const resposta = await fetch(url);
     const agendamentos = await resposta.json();
 
-    const jsonAtual = JSON.stringify(agendamentos);
+    const agendamentosDoDia = agendamentos.filter(
+      (agendamento) =>
+        agendamento.data.toString().slice(0, 10) === dataFiltroAgendamentos,
+    );
+
+    const totalAgendamentosDia = document.getElementById(
+      "totalAgendamentosDia",
+    );
+
+    if (totalAgendamentosDia) {
+      totalAgendamentosDia.innerText = agendamentosDoDia.filter(
+        (agendamento) => agendamento.status === "agendado",
+      ).length;
+    }
+
+    const jsonAtual = JSON.stringify(agendamentosDoDia);
 
     if (!forcarRender && jsonAtual === ultimoAgendamentosJSON) {
       return;
@@ -757,14 +805,15 @@ async function carregarAgendamentos(forcarRender = false) {
 
     ultimoAgendamentosJSON = jsonAtual;
 
-    if (!agendamentos.length) {
+    if (!agendamentosDoDia.length) {
       lista.innerHTML = "";
       semAgendamentos.style.display = "block";
+      semAgendamentos.innerText = "Nenhum agendamento para esse dia.";
       return;
     }
 
     semAgendamentos.style.display = "none";
-    lista.innerHTML = montarHTMLAgendamentos(agendamentos);
+    lista.innerHTML = montarHTMLAgendamentos(agendamentosDoDia);
   } catch (error) {
     console.error("Erro ao carregar:", error);
     semAgendamentos.style.display = "block";
@@ -1177,6 +1226,7 @@ async function carregarLocalizacaoBarbearia() {
 }
 
 carregarBarbeiros();
+atualizarTextoDataFiltro();
 carregarAgendamentos(true);
 carregarLocalizacaoBarbearia();
 carregarLogoBarbearia();

@@ -105,19 +105,37 @@
       <main class="conteudo">
         <section id="secaoDashboard" class="secao ativa">
           <div class="painel-principal">
-            <div class="topo-secao">
-              <div>
-                <p class="eyebrow">Dashboard</p>
-                <h2>Agendamentos ativos</h2>
-              </div>
+          <div class="topo-dashboard">
+  <!-- ESQUERDA -->
+  <div class="lado-esquerdo">
+    <h1>Agendamentos do dia</h1>
 
-              <select
-                id="filtroBarbeiroAgendamentos"
-                onchange="trocarBarbeiroDashboard()"
-              >
-                <option value="">Todos os barbeiros</option>
-              </select>
-            </div>
+    <div class="controle-dia">
+  <div class="botoes-dia">
+    <button onclick="mudarDiaAgendamentos(-1)">←</button>
+    <button onclick="irParaHojeAgendamentos()">Avançar</button>
+    <button onclick="mudarDiaAgendamentos(1)">→</button>
+  </div>
+
+  <span class="tete" id="dataFiltroTexto"></span>
+</div>
+  </div>
+
+  <!-- DIREITA -->
+  <div class="lado-direito">
+    <div class="contador-agendamentos-dia">
+      <span>Agendamentos marcados</span>
+      <strong id="totalAgendamentosDia">8</strong>
+    </div>
+
+    <select
+  id="filtroBarbeiroAgendamentos"
+  onchange="trocarBarbeiroDashboard()"
+>
+  <option value="">Todos os barbeiros</option>
+</select>
+  </div>
+</div>
 
             <div id="listaAgendamentos" class="lista-agendamentos"></div>
             <p id="semAgendamentos" class="mensagem-vazia">
@@ -130,7 +148,6 @@
           <div class="painel-principal">
             <div class="topo-secao">
               <div>
-                <p class="eyebrow">Agenda</p>
                 <h2>Agenda dos barbeiros</h2>
                 <p class="descricao-secao">
                   Escolha um barbeiro para configurar horários, bloqueios e dias
@@ -204,9 +221,6 @@
 
                   <div class="card-config">
                     <h3>Bloqueios automáticos</h3>
-                    <p class="descricao-secao">
-                      Bloqueie um dia em toda a agenda.
-                    </p>
 
                     <div class="grade-dias-semana">
                       <label class="check-dia">
@@ -389,7 +403,6 @@
           <div class="painel-principal">
             <div class="topo-secao">
               <div>
-                <p class="eyebrow">Localização</p>
                 <h2>Endereço da barbearia</h2>
               </div>
             </div>
@@ -432,7 +445,6 @@
           <div class="painel-principal">
             <div class="topo-secao">
               <div>
-                <p class="eyebrow">Configurações</p>
                 <h2>Configurações da barbearia</h2>
                 <p class="descricao-secao">
                   Gerencie barbeiros, senha de acesso e outras opções do

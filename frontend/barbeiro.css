@@ -625,8 +625,6 @@ textarea {
   max-width: 760px;
 }
 
-/* ===== LOGIN CENTRALIZADO ===== */
-
 .login-layout {
   min-height: 100vh !important;
   height: 100vh !important;
@@ -708,8 +706,6 @@ textarea {
   margin-top: 10px;
   color: #dc2626;
 }
-
-/* OLHO SENHA */
 
 .input-senha {
   position: relative;
@@ -1196,4 +1192,138 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   .preview-cliente-box {
     justify-content: flex-start;
   }
+}
+
+.topo-dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.controles-dashboard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.controle-dia {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #d9e2ec;
+  padding: 6px 12px;
+  border-radius: 16px;
+  margin-bottom: 18px;
+}
+
+.controle-dia button {
+  border: none;
+  background: white;
+  color: #2563eb;
+  padding: 8px 11px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.controle-dia button:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+#dataFiltroTexto {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* RESPONSIVO */
+@media (max-width: 640px) {
+  .controles-dashboard {
+    width: 100%;
+  }
+
+  .controle-dia {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  #dataFiltroTexto {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  #filtroBarbeiroAgendamentos {
+    width: 100%;
+  }
+}
+
+.contador-agendamentos-dia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+.contador-agendamentos-dia span {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.contador-agendamentos-dia strong {
+  font-size: 18px;
+  color: #2563eb;
+}
+
+@media (max-width: 640px) {
+  .contador-agendamentos-dia {
+    width: 100%;
+  }
+}
+
+.lado-esquerdo {
+  display: flex;
+  flex-direction: column;
+}
+
+.lado-direito {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+#filtroBarbeiroAgendamentos {
+  width: fit-content;
+  min-width: 206px;
+  max-width: 220px;
+  font-size: 14px;
+  padding: 10px 36px 10px 14px; /* 🔥 espaço pra seta */
+  border-radius: 16px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #64748b;
+  font-weight: 700;
+
+  /* 🔥 remove seta padrão */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 🔥 cria seta custom */
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%232563eb' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+
+  /* 🔥 controla posição da seta */
+  background-position: right 10px center;
+  background-size: 18px;
 }
