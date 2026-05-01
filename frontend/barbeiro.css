@@ -1327,3 +1327,84 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   background-position: right 10px center;
   background-size: 18px;
 }
+
+/* ===== PRODUTOS ADMIN ===== */
+
+.grid-produtos-admin {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.lista-produtos-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.card-produto-admin {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.card-produto-admin img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  background: #e2e8f0;
+}
+
+.card-produto-admin-info {
+  padding: 14px;
+}
+
+.card-produto-admin-info h4 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+
+.card-produto-admin-info p {
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.card-produto-admin-info strong {
+  display: block;
+  color: #2563eb;
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.estoque-produto {
+  display: inline-block;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.btn-remover-produto {
+  width: 100%;
+  margin-top: 12px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  padding: 11px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+@media (max-width: 1000px) {
+  .grid-produtos-admin {
+    grid-template-columns: 1fr;
+  }
+}

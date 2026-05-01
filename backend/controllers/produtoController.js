@@ -14,12 +14,17 @@ function pegarBarbeariaId(req) {
 }
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination(req, file, cb) {
     cb(null, pastaProdutos);
   },
-  filename: function (req, file, cb) {
-    const nomeUnico = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, nomeUnico + path.extname(file.originalname));
+  filename(req, file, cb) {
+    const nomeUnico =
+      Date.now() +
+      "-" +
+      Math.round(Math.random() * 1e9) +
+      path.extname(file.originalname);
+
+    cb(null, nomeUnico);
   },
 });
 
@@ -42,7 +47,9 @@ const criarProduto = (req, res) => {
     const { titulo, descricao, valor, estoque } = req.body;
 
     if (!barbearia_id || !titulo || !valor) {
-      return res.status(400).json({ erro: "Preencha os campos obrigatórios." });
+      return res
+        .status(400)
+        .json({ erro: "Preencha título, valor e barbearia." });
     }
 
     const imagens = req.files || [];
@@ -112,7 +119,77 @@ const listarProdutos = (req, res) => {
   });
 };
 
+const deletarProduto = (req, res) => {
+  const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  const sql = `
+    UPDATE produtos
+    SET ativo = 0
+    WHERE id = ?
+    AND barbearia_id = ?
+  `;
+
+  db.query(sql, [id, barbearia_id], (err) => {
+    if (err) {
+      console.error("Erro ao deletar produto:", err);
+      return res.status(500).json({ erro: "Erro ao deletar produto." });
+    }
+
+    res.json({ sucesso: true });
+  });
+};
+
+const reservarProduto = (req, res) => {
+  const { produto_id, barbearia_id, nome_cliente, telefone_cliente } = req.body;
+
+  if (!produto_id || !barbearia_id || !nome_cliente || !telefone_cliente) {
+    return res.status(400).json({ erro: "Preencha todos os campos." });
+  }
+
+  const updateSql = `
+    UPDATE produtos
+    SET estoque = estoque - 1
+    WHERE id = ?
+    AND barbearia_id = ?
+    AND estoque > 0
+    AND ativo = 1
+  `;
+
+  db.query(updateSql, [produto_id, barbearia_id], (errUpdate, resultUpdate) => {
+    if (errUpdate) {
+      console.error("Erro ao atualizar estoque:", errUpdate);
+      return res.status(500).json({ erro: "Erro ao reservar produto." });
+    }
+
+    if (resultUpdate.affectedRows === 0) {
+      return res.status(400).json({ erro: "Produto sem estoque disponível." });
+    }
+
+    const insertSql = `
+      INSERT INTO reservas_produtos
+      (produto_id, barbearia_id, nome_cliente, telefone_cliente, quantidade, status)
+      VALUES (?, ?, ?, ?, 1, 'reservado')
+    `;
+
+    db.query(
+      insertSql,
+      [produto_id, barbearia_id, nome_cliente, telefone_cliente],
+      (errInsert) => {
+        if (errInsert) {
+          console.error("Erro ao criar reserva:", errInsert);
+          return res.status(500).json({ erro: "Erro ao criar reserva." });
+        }
+
+        res.json({ sucesso: true });
+      },
+    );
+  });
+};
+
 module.exports = {
   criarProduto,
   listarProdutos,
+  deletarProduto,
+  reservarProduto,
 };

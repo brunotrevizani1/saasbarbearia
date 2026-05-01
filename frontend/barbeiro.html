@@ -46,6 +46,81 @@
           Agenda
         </button>
 
+        <button id="menuProdutos" class="menu-item" onclick="abrirSecao('produtos')">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path
+      d="M6 7h12l-1 14H7L6 7Z"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M9 7a3 3 0 0 1 6 0"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+  </svg>
+  Produtos
+</button>
+
+<section id="secaoProdutos" class="secao">
+  <div class="painel-principal">
+    <div class="topo-secao">
+      <div>
+        <p class="eyebrow">Produtos</p>
+        <h2>Produtos da barbearia</h2>
+        <p class="descricao-secao">
+          Cadastre produtos vendidos na barbearia e controle o estoque.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid-produtos-admin">
+      <div class="card-config">
+        <h3>Novo produto</h3>
+
+        <label class="campo">
+          <span>Título</span>
+          <input type="text" id="produtoTitulo" placeholder="Ex: Pomada modeladora" />
+        </label>
+
+        <label class="campo">
+          <span>Descrição</span>
+          <textarea id="produtoDescricao" placeholder="Descrição do produto"></textarea>
+        </label>
+
+        <label class="campo">
+          <span>Valor</span>
+          <input type="number" id="produtoValor" placeholder="29.90" step="0.01" />
+        </label>
+
+        <label class="campo">
+          <span>Estoque</span>
+          <input type="number" id="produtoEstoque" placeholder="10" />
+        </label>
+
+        <label class="campo">
+          <span>Imagens do produto (máximo 3)</span>
+          <input type="file" id="produtoImagens" accept="image/*" multiple />
+        </label>
+
+        <button class="btn-principal" onclick="criarProduto()">
+          Salvar produto
+        </button>
+
+        <p id="mensagemProduto" class="mensagem"></p>
+      </div>
+
+      <div class="card-config">
+        <h3>Produtos cadastrados</h3>
+        <div id="listaProdutosAdmin" class="lista-produtos-admin"></div>
+        <p id="semProdutosAdmin" class="mensagem-vazia">Nenhum produto cadastrado.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
         <button
           id="menuLocalizacao"
           class="menu-item"

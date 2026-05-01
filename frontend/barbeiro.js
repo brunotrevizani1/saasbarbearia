@@ -72,16 +72,20 @@ function abrirSecao(secao) {
   const menuConfiguracoes = document.getElementById("menuConfiguracoes");
   const menuLocalizacao = document.getElementById("menuLocalizacao");
   const menuEquipe = document.getElementById("menuEquipe");
+  const produtos = document.getElementById("secaoProdutos");
+  const menuProdutos = document.getElementById("menuProdutos");
 
   dashboard.classList.remove("ativa");
   configuracoes.classList.remove("ativa");
   localizacao.classList.remove("ativa");
   equipe.classList.remove("ativa");
+  produtos.classList.remove("ativa");
 
   menuDashboard.classList.remove("ativo");
   menuConfiguracoes.classList.remove("ativo");
   menuLocalizacao.classList.remove("ativo");
   menuEquipe.classList.remove("ativo");
+  menuProdutos.classList.remove("ativo");
 
   if (secao === "dashboard") {
     dashboard.classList.add("ativa");
@@ -101,6 +105,12 @@ function abrirSecao(secao) {
   if (secao === "equipe") {
     equipe.classList.add("ativa");
     menuEquipe.classList.add("ativo");
+  }
+
+  if (secao === "produtos") {
+    produtos.classList.add("ativa");
+    menuProdutos.classList.add("ativo");
+    carregarProdutosAdmin();
   }
 }
 
@@ -1225,11 +1235,154 @@ async function carregarLocalizacaoBarbearia() {
   }
 }
 
+async function criarProduto() {
+  const titulo = document.getElementById("produtoTitulo").value.trim();
+  const descricao = document.getElementById("produtoDescricao").value.trim();
+  const valor = document.getElementById("produtoValor").value;
+  const estoque = document.getElementById("produtoEstoque").value;
+  const imagens = document.getElementById("produtoImagens").files;
+  const mensagem = document.getElementById("mensagemProduto");
+
+  mensagem.innerText = "";
+
+  if (!titulo || !valor) {
+    mensagem.innerText = "Preencha título e valor.";
+    return;
+  }
+
+  if (imagens.length > 3) {
+    mensagem.innerText = "Selecione no máximo 3 imagens.";
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append("barbearia_id", barbeariaId);
+  formData.append("titulo", titulo);
+  formData.append("descricao", descricao);
+  formData.append("valor", valor);
+  formData.append("estoque", estoque || 0);
+
+  for (let i = 0; i < imagens.length; i++) {
+    formData.append("imagens", imagens[i]);
+  }
+
+  try {
+    const resposta = await fetch(`${API_URL}/api/produtos`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      mensagem.innerText = "Produto cadastrado com sucesso.";
+
+      document.getElementById("produtoTitulo").value = "";
+      document.getElementById("produtoDescricao").value = "";
+      document.getElementById("produtoValor").value = "";
+      document.getElementById("produtoEstoque").value = "";
+      document.getElementById("produtoImagens").value = "";
+
+      await carregarProdutosAdmin();
+    } else {
+      mensagem.innerText = resultado.erro || "Erro ao cadastrar produto.";
+    }
+  } catch (error) {
+    console.error("Erro ao criar produto:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
+async function carregarProdutosAdmin() {
+  const lista = document.getElementById("listaProdutosAdmin");
+  const vazio = document.getElementById("semProdutosAdmin");
+
+  if (!lista || !vazio) return;
+
+  lista.innerHTML = "";
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos?barbearia_id=${barbeariaId}`,
+    );
+
+    const produtos = await resposta.json();
+
+    if (!produtos.length) {
+      vazio.style.display = "block";
+      return;
+    }
+
+    vazio.style.display = "none";
+
+    produtos.forEach((produto) => {
+      const imagem =
+        produto.imagem_1 || produto.imagem_2 || produto.imagem_3 || "";
+
+      const card = document.createElement("div");
+      card.className = "card-produto-admin";
+
+      card.innerHTML = `
+        ${
+          imagem
+            ? `<img src="${API_URL}${imagem}" alt="${produto.titulo}" />`
+            : `<div style="height:150px;background:#e2e8f0;"></div>`
+        }
+
+        <div class="card-produto-admin-info">
+          <h4>${produto.titulo}</h4>
+          <p>${produto.descricao || "Sem descrição."}</p>
+          <strong>R$ ${Number(produto.valor).toFixed(2).replace(".", ",")}</strong>
+          <span class="estoque-produto">Estoque: ${produto.estoque}</span>
+
+          <button class="btn-remover-produto" onclick="deletarProduto(${produto.id})">
+            Remover
+          </button>
+        </div>
+      `;
+
+      lista.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar produtos:", error);
+    vazio.style.display = "block";
+    vazio.innerText = "Erro ao carregar produtos.";
+  }
+}
+
+async function deletarProduto(id) {
+  const confirmar = window.confirm("Deseja remover esse produto?");
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/${id}?barbearia_id=${barbeariaId}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (resultado.sucesso) {
+      await carregarProdutosAdmin();
+    } else {
+      alert(resultado.erro || "Erro ao remover produto.");
+    }
+  } catch (error) {
+    console.error("Erro ao remover produto:", error);
+    alert("Erro ao conectar com o servidor.");
+  }
+}
+
 carregarBarbeiros();
 atualizarTextoDataFiltro();
 carregarAgendamentos(true);
 carregarLocalizacaoBarbearia();
 carregarLogoBarbearia();
+carregarProdutosAdmin();
 
 setInterval(() => {
   carregarAgendamentos(false);
