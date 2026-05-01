@@ -40,7 +40,11 @@ const criarProduto = (req, res) => {
   upload.array("imagens", 3)(req, res, (err) => {
     if (err) {
       console.error("Erro no upload do produto:", err);
-      return res.status(500).json({ erro: "Erro ao enviar imagens." });
+      return res.status(500).json({
+        erro: "Erro ao enviar imagens.",
+        detalhe: err.message,
+        codigo: err.code,
+      });
     }
 
     const barbearia_id = pegarBarbeariaId(req);
