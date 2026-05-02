@@ -978,7 +978,6 @@ async function carregarProdutosCliente() {
       </button>
     `
           }
-            Reservar produto
           </button>
         </div>
       `;
@@ -990,6 +989,26 @@ async function carregarProdutosCliente() {
     vazio.style.display = "block";
     vazio.innerText = "Erro ao carregar produtos.";
   }
+}
+
+function copiarCodigoReservaCliente() {
+  const codigo = document.getElementById("codigoReservaCliente")?.innerText;
+
+  if (!codigo) return;
+
+  navigator.clipboard.writeText(codigo).then(() => {
+    const mensagem = document.getElementById("mensagemReservaProduto");
+
+    const aviso = document.createElement("div");
+    aviso.className = "aviso-codigo-copiado";
+    aviso.innerText = "Código copiado!";
+
+    mensagem.appendChild(aviso);
+
+    setTimeout(() => {
+      aviso.remove();
+    }, 1800);
+  });
 }
 
 function abrirModalReservaProduto(produtoId) {
@@ -1045,10 +1064,28 @@ async function confirmarReservaProduto() {
     }
 
     mensagem.innerHTML = `
-      Produto reservado com sucesso!<br>
-      Pagamento presencial na barbearia.<br>
-      Código da reserva: <strong>${resultado.codigo}</strong>
-    `;
+  <div class="box-reserva-confirmada">
+    <strong class="titulo-reserva-confirmada">
+      Produto reservado com sucesso!
+    </strong>
+
+    <span>
+      O pagamento será feito presencialmente na barbearia.
+    </span>
+
+    <span>
+      Guarde este código e mostre para o barbeiro identificar seu pedido:
+    </span>
+
+    <div class="codigo-reserva-cliente-box">
+      <strong id="codigoReservaCliente">${resultado.codigo}</strong>
+
+      <button type="button" onclick="copiarCodigoReservaCliente()">
+        Copiar
+      </button>
+    </div>
+  </div>
+`;
 
     await carregarProdutosCliente();
   } catch (error) {

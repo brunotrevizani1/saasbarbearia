@@ -690,7 +690,7 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   text-align: center;
   display: flex;
   flex-direction: column;
-  height: 505px;
+  height: 540px;
   box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
   transition: 0.25s ease;
 }
@@ -1017,7 +1017,7 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 
 .mensagem-reserva-produto {
   margin-top: 14px;
-  color: #2563eb;
+  color: black;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -1052,4 +1052,59 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   background: #cbd5e1;
   cursor: not-allowed;
   transform: none;
+}
+
+.box-reserva-confirmada {
+  margin-top: 14px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: #334155;
+  text-align: center;
+}
+
+.titulo-reserva-confirmada {
+  color: #16a34a;
+  font-size: 17px;
+}
+
+.codigo-reserva-cliente-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.codigo-reserva-cliente-box strong {
+  color: #2563eb;
+  font-size: 22px;
+  letter-spacing: 2px;
+}
+
+.codigo-reserva-cliente-box button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.codigo-reserva-cliente-box button:hover {
+  background: #1d4ed8;
+}
+
+.aviso-codigo-copiado {
+  color: #16a34a;
+  font-weight: 800;
+  font-size: 13px;
 }

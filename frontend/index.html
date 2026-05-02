@@ -29,9 +29,12 @@
           <input type="text" id="produtoReservaNome" placeholder="Seu nome" />
 
           <input
-            type="text"
+            type="tel"
             id="produtoReservaTelefone"
             placeholder="Telefone"
+            inputmode="numeric"
+            maxlength="15"
+            oninput="this.value = this.value.replace(/\D/g, '')"
           />
 
           <button
