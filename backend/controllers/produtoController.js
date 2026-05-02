@@ -236,10 +236,232 @@ const listarProdutosCliente = (req, res) => {
   });
 };
 
+const buscarReservaProduto = (req, res) => {
+  const { codigo } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!codigo || !barbearia_id) {
+    return res
+      .status(400)
+      .json({ erro: "Código e barbearia são obrigatórios." });
+  }
+
+  const sql = `
+    SELECT
+      rp.id AS reserva_id,
+      rp.codigo,
+      rp.nome_cliente,
+      rp.telefone_cliente,
+      rp.quantidade,
+      rp.status,
+      rp.criado_em,
+
+      p.id AS produto_id,
+      p.titulo,
+      p.descricao,
+      p.valor,
+      p.estoque,
+      p.imagem_1,
+      p.imagem_2,
+      p.imagem_3
+    FROM reservas_produtos rp
+    INNER JOIN produtos p ON p.id = rp.produto_id
+    WHERE rp.codigo = ?
+    AND rp.barbearia_id = ?
+    LIMIT 1
+  `;
+
+  db.query(sql, [codigo.trim().toUpperCase(), barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar reserva:", err);
+      return res.status(500).json({ erro: "Erro ao buscar reserva." });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ erro: "Reserva não encontrada." });
+    }
+
+    res.json({
+      sucesso: true,
+      reserva: result[0],
+    });
+  });
+};
+
+const finalizarReservaProduto = (req, res) => {
+  const { codigo } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!codigo || !barbearia_id) {
+    return res
+      .status(400)
+      .json({ erro: "Código e barbearia são obrigatórios." });
+  }
+
+  const sql = `
+    UPDATE reservas_produtos
+    SET status = 'retirado'
+    WHERE codigo = ?
+    AND barbearia_id = ?
+    AND status = 'reservado'
+  `;
+
+  db.query(sql, [codigo.trim().toUpperCase(), barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao finalizar reserva:", err);
+      return res.status(500).json({ erro: "Erro ao finalizar reserva." });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(400).json({
+        erro: "Essa reserva não pode ser finalizada. Ela pode já estar finalizada ou cancelada.",
+      });
+    }
+
+    res.json({
+      sucesso: true,
+      mensagem: "Reserva finalizada com sucesso.",
+    });
+  });
+};
+
+const cancelarReservaProduto = (req, res) => {
+  const { codigo } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!codigo || !barbearia_id) {
+    return res
+      .status(400)
+      .json({ erro: "Código e barbearia são obrigatórios." });
+  }
+
+  db.getConnection((errConn, connection) => {
+    if (errConn) {
+      console.error("Erro ao conectar para cancelar reserva:", errConn);
+      return res.status(500).json({ erro: "Erro ao cancelar reserva." });
+    }
+
+    connection.beginTransaction((errTransaction) => {
+      if (errTransaction) {
+        connection.release();
+        console.error("Erro ao iniciar transação:", errTransaction);
+        return res.status(500).json({ erro: "Erro ao cancelar reserva." });
+      }
+
+      const sqlBusca = `
+        SELECT produto_id
+        FROM reservas_produtos
+        WHERE codigo = ?
+        AND barbearia_id = ?
+        AND status = 'reservado'
+        LIMIT 1
+      `;
+
+      connection.query(
+        sqlBusca,
+        [codigo.trim().toUpperCase(), barbearia_id],
+        (errBusca, resultBusca) => {
+          if (errBusca) {
+            return connection.rollback(() => {
+              connection.release();
+              console.error("Erro ao buscar reserva para cancelar:", errBusca);
+              res.status(500).json({ erro: "Erro ao cancelar reserva." });
+            });
+          }
+
+          if (resultBusca.length === 0) {
+            return connection.rollback(() => {
+              connection.release();
+              res.status(400).json({
+                erro: "Essa reserva não pode ser cancelada. Ela pode já estar cancelada ou finalizada.",
+              });
+            });
+          }
+
+          const produto_id = resultBusca[0].produto_id;
+
+          const sqlAtualizaReserva = `
+            UPDATE reservas_produtos
+            SET status = 'cancelado'
+            WHERE codigo = ?
+            AND barbearia_id = ?
+            AND status = 'reservado'
+          `;
+
+          connection.query(
+            sqlAtualizaReserva,
+            [codigo.trim().toUpperCase(), barbearia_id],
+            (errAtualizaReserva) => {
+              if (errAtualizaReserva) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error(
+                    "Erro ao atualizar reserva:",
+                    errAtualizaReserva,
+                  );
+                  res.status(500).json({ erro: "Erro ao cancelar reserva." });
+                });
+              }
+
+              const sqlDevolveEstoque = `
+                UPDATE produtos
+                SET estoque = estoque + 1
+                WHERE id = ?
+                AND barbearia_id = ?
+              `;
+
+              connection.query(
+                sqlDevolveEstoque,
+                [produto_id, barbearia_id],
+                (errEstoque) => {
+                  if (errEstoque) {
+                    return connection.rollback(() => {
+                      connection.release();
+                      console.error("Erro ao devolver estoque:", errEstoque);
+                      res
+                        .status(500)
+                        .json({ erro: "Erro ao devolver estoque." });
+                    });
+                  }
+
+                  connection.commit((errCommit) => {
+                    if (errCommit) {
+                      return connection.rollback(() => {
+                        connection.release();
+                        console.error(
+                          "Erro ao confirmar cancelamento:",
+                          errCommit,
+                        );
+                        res
+                          .status(500)
+                          .json({ erro: "Erro ao cancelar reserva." });
+                      });
+                    }
+
+                    connection.release();
+
+                    res.json({
+                      sucesso: true,
+                      mensagem: "Reserva cancelada e estoque devolvido.",
+                    });
+                  });
+                },
+              );
+            },
+          );
+        },
+      );
+    });
+  });
+};
+
 module.exports = {
   criarProduto,
   listarProdutos,
   listarProdutosCliente,
   deletarProduto,
   reservarProduto,
+  buscarReservaProduto,
+  finalizarReservaProduto,
+  cancelarReservaProduto,
 };

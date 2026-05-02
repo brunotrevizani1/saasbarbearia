@@ -422,19 +422,35 @@
   <div class="painel-principal">
     <div class="topo-secao topo-produtos-admin">
       <div>
-        <p class="eyebrow">Produtos</p>
         <h2>Produtos da barbearia</h2>
         <p class="descricao-secao">
           Cadastre produtos vendidos na barbearia e controle o estoque.
         </p>
       </div>
 
-      <button
-        class="btn-principal btn-novo-produto"
-        onclick="abrirModalProduto()"
-      >
-        + Adicionar produto
-      </button>
+     <div class="acoes-produtos-admin">
+  <button
+    class="btn-consultar-reserva"
+    onclick="abrirModalConsultaReserva()"
+  >
+    <svg viewBox="0 0 24 24" fill="none">
+      <path
+        d="M21 21l-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+    </svg>
+    Consultar reserva
+  </button>
+
+  <button
+    class="btn-principal btn-novo-produto"
+    onclick="abrirModalProduto()"
+  >
+    + Adicionar produto
+  </button>
+</div>
     </div>
 
     <div class="card-config">
@@ -844,6 +860,40 @@
     </button>
 
     <p id="mensagemProduto" class="mensagem"></p>
+  </div>
+</div>
+
+<div id="modalConsultaReserva" class="modal-consulta-reserva">
+  <div class="modal-consulta-card">
+    <div class="modal-consulta-topo">
+      <div>
+        <span>Reserva de produto</span>
+        <h3>Consultar reserva</h3>
+        <p>Digite o código informado pelo cliente para validar a retirada.</p>
+      </div>
+
+      <button onclick="fecharModalConsultaReserva()">×</button>
+    </div>
+
+    <div class="busca-reserva-box">
+      <label class="campo">
+        <span>Código da reserva</span>
+        <input
+          type="text"
+          id="inputCodigoReservaProduto"
+          placeholder="Ex: A7K92Q"
+          maxlength="10"
+        />
+      </label>
+
+      <button class="btn-buscar-reserva" onclick="buscarReservaProduto()">
+        Buscar reserva
+      </button>
+    </div>
+
+    <p id="mensagemConsultaReserva" class="mensagem-consulta-reserva"></p>
+
+    <div id="resultadoReservaProduto" class="resultado-reserva-produto"></div>
   </div>
 </div>
 

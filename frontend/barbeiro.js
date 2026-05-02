@@ -1438,6 +1438,240 @@ async function carregarProdutosAdmin() {
   }
 }
 
+function abrirModalConsultaReserva() {
+  const modal = document.getElementById("modalConsultaReserva");
+  const input = document.getElementById("inputCodigoReservaProduto");
+  const mensagem = document.getElementById("mensagemConsultaReserva");
+  const resultado = document.getElementById("resultadoReservaProduto");
+
+  if (!modal) return;
+
+  input.value = "";
+  mensagem.innerText = "";
+  resultado.innerHTML = "";
+
+  modal.classList.add("ativo");
+
+  setTimeout(() => {
+    input.focus();
+  }, 100);
+}
+
+function fecharModalConsultaReserva() {
+  const modal = document.getElementById("modalConsultaReserva");
+
+  if (modal) {
+    modal.classList.remove("ativo");
+  }
+}
+
+async function buscarReservaProduto() {
+  const input = document.getElementById("inputCodigoReservaProduto");
+  const mensagem = document.getElementById("mensagemConsultaReserva");
+  const resultado = document.getElementById("resultadoReservaProduto");
+
+  const codigo = input.value.trim().toUpperCase();
+
+  mensagem.innerText = "";
+  resultado.innerHTML = "";
+
+  if (!codigo) {
+    mensagem.innerText = "Digite o código da reserva.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/reservas/${codigo}?barbearia_id=${barbeariaId}`,
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) {
+      mensagem.innerText = data.erro || "Reserva não encontrada.";
+      return;
+    }
+
+    renderizarReservaProduto(data.reserva);
+  } catch (error) {
+    console.error("Erro ao buscar reserva:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
+function renderizarReservaProduto(reserva) {
+  const resultado = document.getElementById("resultadoReservaProduto");
+
+  const imagem = reserva.imagem_1 || reserva.imagem_2 || reserva.imagem_3 || "";
+
+  const status = reserva.status || "reservado";
+  const podeEditar = status === "reservado";
+
+  const valorFormatado = Number(reserva.valor).toFixed(2).replace(".", ",");
+
+  resultado.innerHTML = `
+    <div class="card-reserva-encontrada">
+      <div class="reserva-status-topo">
+        <h4>${reserva.titulo}</h4>
+
+        <span class="badge-reserva-status ${status}">
+          ${status}
+        </span>
+      </div>
+
+      <div class="reserva-conteudo">
+        ${
+          imagem
+            ? `<img class="reserva-produto-img" src="${API_URL}${imagem}" alt="${reserva.titulo}" />`
+            : `<div class="reserva-produto-sem-img">Sem imagem</div>`
+        }
+
+        <div>
+          <div class="reserva-info-grid">
+            <div class="info-reserva-item">
+              <span>Cliente</span>
+              <strong>${reserva.nome_cliente}</strong>
+            </div>
+
+            <div class="info-reserva-item">
+              <span>Telefone</span>
+              <strong>${reserva.telefone_cliente}</strong>
+            </div>
+
+            <div class="info-reserva-item preco">
+              <span>Valor do produto</span>
+              <strong>R$ ${valorFormatado}</strong>
+            </div>
+
+            <div class="info-reserva-item">
+              <span>Quantidade</span>
+              <strong>${reserva.quantidade}</strong>
+            </div>
+
+            <div class="info-reserva-item">
+              <span>Estoque atual</span>
+              <strong>${reserva.estoque}</strong>
+            </div>
+
+            <div class="info-reserva-item">
+              <span>Status</span>
+              <strong>${status}</strong>
+            </div>
+          </div>
+
+          <div class="codigo-reserva-destaque">
+            ${reserva.codigo}
+          </div>
+        </div>
+      </div>
+
+      <div class="reserva-acoes">
+        <button
+          class="btn-finalizar-reserva"
+          onclick="finalizarReservaProduto('${reserva.codigo}')"
+          ${podeEditar ? "" : "disabled"}
+        >
+          Confirmar retirada / pagamento
+        </button>
+
+        <button
+          class="btn-cancelar-reserva"
+          onclick="cancelarReservaProduto('${reserva.codigo}')"
+          ${podeEditar ? "" : "disabled"}
+        >
+          Cancelar reserva e devolver estoque
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function finalizarReservaProduto(codigo) {
+  const confirmar = window.confirm(
+    "Confirmar que o cliente retirou e pagou esse produto?",
+  );
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/reservas/${codigo}/finalizar`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          barbearia_id: barbeariaId,
+        }),
+      },
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) {
+      alert(data.erro || "Erro ao finalizar reserva.");
+      return;
+    }
+
+    await buscarReservaProduto();
+    await carregarProdutosAdmin();
+  } catch (error) {
+    console.error("Erro ao finalizar reserva:", error);
+    alert("Erro ao conectar com o servidor.");
+  }
+}
+
+async function cancelarReservaProduto(codigo) {
+  const confirmar = window.confirm(
+    "Cancelar essa reserva? O estoque desse produto será devolvido.",
+  );
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/reservas/${codigo}/cancelar`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          barbearia_id: barbeariaId,
+        }),
+      },
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) {
+      alert(data.erro || "Erro ao cancelar reserva.");
+      return;
+    }
+
+    await buscarReservaProduto();
+    await carregarProdutosAdmin();
+  } catch (error) {
+    console.error("Erro ao cancelar reserva:", error);
+    alert("Erro ao conectar com o servidor.");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const inputCodigoReserva = document.getElementById(
+    "inputCodigoReservaProduto",
+  );
+
+  if (inputCodigoReserva) {
+    inputCodigoReserva.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        buscarReservaProduto();
+      }
+    });
+  }
+});
+
 function mudarImagemProdutoAdmin(produtoId, direcao) {
   const img = document.getElementById(`imagemProdutoAdmin${produtoId}`);
 
