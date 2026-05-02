@@ -47,6 +47,7 @@
         </button>
 
         <button id="menuProdutos" class="menu-item" onclick="abrirSecao('produtos')">
+
   <svg viewBox="0 0 24 24" fill="none">
     <path
       d="M6 7h12l-1 14H7L6 7Z"
@@ -419,7 +420,7 @@
 
 <section id="secaoProdutos" class="secao">
   <div class="painel-principal">
-    <div class="topo-secao">
+    <div class="topo-secao topo-produtos-admin">
       <div>
         <p class="eyebrow">Produtos</p>
         <h2>Produtos da barbearia</h2>
@@ -427,49 +428,23 @@
           Cadastre produtos vendidos na barbearia e controle o estoque.
         </p>
       </div>
+
+      <button
+        class="btn-principal btn-novo-produto"
+        onclick="abrirModalProduto()"
+      >
+        + Adicionar produto
+      </button>
     </div>
 
-    <div class="grid-produtos-admin">
-      <div class="card-config">
-        <h3>Novo produto</h3>
+    <div class="card-config">
+      <h3>Produtos cadastrados</h3>
 
-        <label class="campo">
-          <span>Título</span>
-          <input type="text" id="produtoTitulo" placeholder="Ex: Pomada modeladora" />
-        </label>
+      <div id="listaProdutosAdmin" class="lista-produtos-admin"></div>
 
-        <label class="campo">
-          <span>Descrição</span>
-          <textarea id="produtoDescricao" placeholder="Descrição do produto"></textarea>
-        </label>
-
-        <label class="campo">
-          <span>Valor</span>
-          <input type="number" id="produtoValor" placeholder="29.90" step="0.01" />
-        </label>
-
-        <label class="campo">
-          <span>Estoque</span>
-          <input type="number" id="produtoEstoque" placeholder="10" />
-        </label>
-
-        <label class="campo">
-          <span>Imagens do produto (máximo 3)</span>
-          <input type="file" id="produtoImagens" accept="image/*" multiple />
-        </label>
-
-        <button class="btn-principal" onclick="criarProduto()">
-          Salvar produto
-        </button>
-
-        <p id="mensagemProduto" class="mensagem"></p>
-      </div>
-
-      <div class="card-config">
-        <h3>Produtos cadastrados</h3>
-        <div id="listaProdutosAdmin" class="lista-produtos-admin"></div>
-        <p id="semProdutosAdmin" class="mensagem-vazia">Nenhum produto cadastrado.</p>
-      </div>
+      <p id="semProdutosAdmin" class="mensagem-vazia">
+        Nenhum produto cadastrado.
+      </p>
     </div>
   </div>
 </section>
@@ -807,6 +782,70 @@
         </div>
       </div>
     </div>
+
+    <div id="modalProduto" class="modal-produto">
+  <div class="modal-produto-card">
+    <div class="modal-produto-topo">
+      <h3>Novo produto</h3>
+      <button onclick="fecharModalProduto()">×</button>
+    </div>
+
+    <label class="campo">
+      <span>Título</span>
+      <input type="text" id="produtoTitulo" placeholder="Ex: Pomada modeladora" />
+    </label>
+
+    <label class="campo">
+      <span>Descrição</span>
+      <textarea id="produtoDescricao" placeholder="Descrição do produto"></textarea>
+    </label>
+
+    <div class="linha-form-produto">
+      <label class="campo">
+        <span>Valor</span>
+        <input type="number" id="produtoValor" placeholder="29.90" step="0.01" />
+      </label>
+
+      <label class="campo">
+        <span>Estoque</span>
+        <input type="number" id="produtoEstoque" placeholder="10" />
+      </label>
+    </div>
+
+    <div class="campo">
+      <span>Fotos do produto (máximo 3)</span>
+
+      <div class="grid-upload-produto">
+        <label class="upload-produto-box">
+          <input type="file" class="input-foto-produto" accept="image/*" hidden />
+          <img />
+          <span>+</span>
+          <small>Foto 1</small>
+        </label>
+
+        <label class="upload-produto-box">
+          <input type="file" class="input-foto-produto" accept="image/*" hidden />
+          <img />
+          <span>+</span>
+          <small>Foto 2</small>
+        </label>
+
+        <label class="upload-produto-box">
+          <input type="file" class="input-foto-produto" accept="image/*" hidden />
+          <img />
+          <span>+</span>
+          <small>Foto 3</small>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-principal" onclick="criarProduto()">
+      Salvar produto
+    </button>
+
+    <p id="mensagemProduto" class="mensagem"></p>
+  </div>
+</div>
 
     <script src="barbeiro.js"></script>
   </body>

@@ -29,6 +29,7 @@ function trocarTela(telaNovaId) {
     "tela-confirmar",
     "tela-sucesso",
     "tela-localizacao",
+    "tela-produtos",
     "tela-cancelar",
   ];
 
@@ -41,14 +42,24 @@ function trocarTela(telaNovaId) {
 
   const btnLocalizacao = document.querySelector(".btn-localizacao");
   const btnCancelar = document.querySelector(".btn-cancelar");
+  const btnProdutos = document.querySelector(".btn-produtos");
 
-  // 🔥 ALTERAÇÃO AQUI
   if (telaNovaId === "tela-barbeiro") {
     btnLocalizacao.style.display = "flex";
     btnCancelar.style.display = "flex";
+    btnProdutos.style.display = "flex";
   } else {
     btnLocalizacao.style.display = "none";
     btnCancelar.style.display = "none";
+    btnProdutos.style.display = "none";
+  }
+
+  const container = document.querySelector(".container");
+
+  if (telaNovaId === "tela-produtos") {
+    container.style.display = "none";
+  } else {
+    container.style.display = "block";
   }
 }
 
@@ -826,7 +837,226 @@ function proximoMes() {
   gerarCalendario();
 }
 
-/* START */
+function abrirTelaProdutos() {
+  trocarTela("tela-produtos");
+  carregarProdutosCliente();
+}
+
+function voltarDaTelaProdutos() {
+  trocarTela("tela-barbeiro");
+}
+
+function mudarImagemProdutoCliente(produtoId, direcao) {
+  const img = document.getElementById(`imagemProdutoCliente${produtoId}`);
+  const indicador = document.getElementById(
+    `indicadorProdutoCliente${produtoId}`,
+  );
+
+  if (!img) return;
+
+  const imagens = JSON.parse(img.dataset.imagens || "[]");
+
+  if (!imagens.length) return;
+
+  let indexAtual = Number(img.dataset.index || 0);
+  let novoIndex = indexAtual + direcao;
+
+  if (novoIndex < 0) {
+    novoIndex = imagens.length - 1;
+  }
+
+  if (novoIndex >= imagens.length) {
+    novoIndex = 0;
+  }
+
+  img.dataset.index = novoIndex;
+  img.src = `${API_URL}${imagens[novoIndex]}`;
+
+  if (indicador) {
+    indicador.innerText = `${novoIndex + 1}/${imagens.length}`;
+  }
+}
+
+async function carregarProdutosCliente() {
+  const lista = document.getElementById("listaProdutosCliente");
+  const vazio = document.getElementById("semProdutosCliente");
+
+  lista.innerHTML = "";
+  vazio.style.display = "none";
+
+  try {
+    const res = await fetch(
+      `${API_URL}/api/produtos?barbearia_id=${barbeariaId}`,
+    );
+
+    const produtos = await res.json();
+
+    if (!produtos.length) {
+      vazio.style.display = "block";
+      return;
+    }
+
+    produtos.forEach((p) => {
+      const imagens = [p.imagem_1, p.imagem_2, p.imagem_3].filter(Boolean);
+
+      const card = document.createElement("div");
+      card.className = "card-produto-cliente";
+
+      card.innerHTML = `
+        ${
+          imagens.length
+            ? `
+              <div class="galeria-produto-cliente">
+                <img
+                  id="imagemProdutoCliente${p.id}"
+                  src="${API_URL}${imagens[0]}"
+                  alt="${p.titulo}"
+                  data-imagens='${JSON.stringify(imagens)}'
+                  data-index="0"
+                />
+
+                ${
+                  imagens.length > 1
+                    ? `
+                      <button
+                        class="btn-galeria-produto esquerda"
+                        onclick="mudarImagemProdutoCliente(${p.id}, -1)"
+                      >
+                        ‹
+                      </button>
+
+                      <button
+                        class="btn-galeria-produto direita"
+                        onclick="mudarImagemProdutoCliente(${p.id}, 1)"
+                      >
+                        ›
+                      </button>
+
+                      <span
+                        id="indicadorProdutoCliente${p.id}"
+                        class="indicador-galeria-produto"
+                      >
+                        1/${imagens.length}
+                      </span>
+                    `
+                    : ""
+                }
+              </div>
+            `
+            : `<div class="produto-sem-imagem">Sem imagem</div>`
+        }
+
+        <div class="card-produto-info">
+          <h3>${p.titulo}</h3>
+
+          <p>${p.descricao || "Sem descrição."}</p>
+
+          <strong>R$ ${Number(p.valor).toFixed(2).replace(".", ",")}</strong>
+
+          <span class="produto-aviso-pagamento">
+            Pagamento presencial na barbearia
+          </span>
+
+          ${
+            Number(p.estoque) > 0
+              ? `
+      <span class="produto-estoque-cliente">
+        Disponível: ${p.estoque}
+      </span>
+
+      <button class="btn-reservar-produto" onclick="abrirModalReservaProduto(${p.id})">
+        Reservar produto
+      </button>
+    `
+              : `
+      <span class="produto-esgotado-cliente">
+        Esgotado
+      </span>
+
+      <button class="btn-reservar-produto" disabled>
+        Produto esgotado
+      </button>
+    `
+          }
+            Reservar produto
+          </button>
+        </div>
+      `;
+
+      lista.appendChild(card);
+    });
+  } catch (e) {
+    console.error(e);
+    vazio.style.display = "block";
+    vazio.innerText = "Erro ao carregar produtos.";
+  }
+}
+
+function abrirModalReservaProduto(produtoId) {
+  document.getElementById("produtoReservaId").value = produtoId;
+  document.getElementById("produtoReservaNome").value = "";
+  document.getElementById("produtoReservaTelefone").value = "";
+  document.getElementById("mensagemReservaProduto").innerText = "";
+
+  document.getElementById("modalReservaProduto").classList.add("ativo");
+}
+
+function fecharModalReservaProduto() {
+  document.getElementById("modalReservaProduto").classList.remove("ativo");
+}
+
+async function confirmarReservaProduto() {
+  const produto_id = document.getElementById("produtoReservaId").value;
+  const nome_cliente = document
+    .getElementById("produtoReservaNome")
+    .value.trim();
+  const telefone_cliente = document
+    .getElementById("produtoReservaTelefone")
+    .value.trim();
+
+  const mensagem = document.getElementById("mensagemReservaProduto");
+
+  mensagem.innerText = "";
+
+  if (!nome_cliente || !telefone_cliente) {
+    mensagem.innerText = "Preencha nome e telefone.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(`${API_URL}/api/produtos/reservar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        produto_id,
+        barbearia_id: barbeariaId,
+        nome_cliente,
+        telefone_cliente,
+      }),
+    });
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+      mensagem.innerText = resultado.erro || "Erro ao reservar produto.";
+      return;
+    }
+
+    mensagem.innerHTML = `
+      Produto reservado com sucesso!<br>
+      Pagamento presencial na barbearia.<br>
+      Código da reserva: <strong>${resultado.codigo}</strong>
+    `;
+
+    await carregarProdutosCliente();
+  } catch (error) {
+    console.error("Erro ao reservar produto:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
 carregarBarbeirosCliente();
 trocarTela("tela-barbeiro");
 carregarLogoCliente();

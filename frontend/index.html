@@ -8,6 +8,42 @@
   </head>
   <body>
     <div class="area-agendamento">
+      <div id="modalReservaProduto" class="modal-reserva-produto">
+        <div class="modal-reserva-card">
+          <button
+            class="btn-fechar-reserva"
+            onclick="fecharModalReservaProduto()"
+          >
+            ×
+          </button>
+
+          <h2>Reservar produto</h2>
+
+          <p class="texto-reserva-produto">
+            Informe seus dados para reservar o produto. O pagamento será feito
+            presencialmente na barbearia.
+          </p>
+
+          <input type="hidden" id="produtoReservaId" />
+
+          <input type="text" id="produtoReservaNome" placeholder="Seu nome" />
+
+          <input
+            type="text"
+            id="produtoReservaTelefone"
+            placeholder="Telefone"
+          />
+
+          <button
+            class="btn-confirmar-reserva"
+            onclick="confirmarReservaProduto()"
+          >
+            Confirmar reserva
+          </button>
+
+          <p id="mensagemReservaProduto" class="mensagem-reserva-produto"></p>
+        </div>
+      </div>
       <div class="container">
         <div id="tela-barbeiro">
           <img
@@ -135,6 +171,48 @@
           </button>
         </div>
       </div>
+
+      <div id="tela-produtos" class="tela-produtos-loja">
+        <div class="topo-produtos-cliente">
+          <div class="title-produtos">
+            <h1>Produtos</h1>
+            <p class="title-desc">
+              Reserve seu produto e pague presencialmente na barbearia.
+            </p>
+          </div>
+
+          <button class="btn-voltar-produtos" onclick="voltarDaTelaProdutos()">
+            Voltar
+          </button>
+        </div>
+
+        <div id="listaProdutosCliente"></div>
+
+        <p id="semProdutosCliente" class="mensagem-vazia">
+          Nenhum produto disponível no momento.
+        </p>
+      </div>
+
+      <button
+        class="btn-produtos"
+        onclick="abrirTelaProdutos()"
+        aria-label="Ver produtos"
+      >
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M6 7h12l-1 14H7L6 7Z"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M9 7a3 3 0 0 1 6 0"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
 
       <button
         class="btn-localizacao"

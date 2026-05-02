@@ -12,5 +12,6 @@ router.post("/produtos", criarProduto);
 router.get("/produtos", listarProdutos);
 router.delete("/produtos/:id", deletarProduto);
 router.post("/produtos/reservar", reservarProduto);
+router.get("/", listarProdutosCliente);
 
 module.exports = router;

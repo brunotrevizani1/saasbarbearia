@@ -145,12 +145,25 @@ const deletarProduto = (req, res) => {
   });
 };
 
+function gerarCodigoReserva() {
+  const caracteres = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let codigo = "";
+
+  for (let i = 0; i < 6; i++) {
+    codigo += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+  }
+
+  return codigo;
+}
+
 const reservarProduto = (req, res) => {
   const { produto_id, barbearia_id, nome_cliente, telefone_cliente } = req.body;
 
   if (!produto_id || !barbearia_id || !nome_cliente || !telefone_cliente) {
     return res.status(400).json({ erro: "Preencha todos os campos." });
   }
+
+  const codigo = gerarCodigoReserva();
 
   const updateSql = `
     UPDATE produtos
@@ -173,28 +186,60 @@ const reservarProduto = (req, res) => {
 
     const insertSql = `
       INSERT INTO reservas_produtos
-      (produto_id, barbearia_id, nome_cliente, telefone_cliente, quantidade, status)
-      VALUES (?, ?, ?, ?, 1, 'reservado')
+      (produto_id, barbearia_id, nome_cliente, telefone_cliente, quantidade, codigo, status)
+      VALUES (?, ?, ?, ?, 1, ?, 'reservado')
     `;
 
     db.query(
       insertSql,
-      [produto_id, barbearia_id, nome_cliente, telefone_cliente],
+      [
+        produto_id,
+        barbearia_id,
+        nome_cliente.trim(),
+        telefone_cliente.trim(),
+        codigo,
+      ],
       (errInsert) => {
         if (errInsert) {
           console.error("Erro ao criar reserva:", errInsert);
           return res.status(500).json({ erro: "Erro ao criar reserva." });
         }
 
-        res.json({ sucesso: true });
+        res.json({
+          sucesso: true,
+          codigo,
+          mensagem:
+            "Produto reservado com sucesso. O pagamento será feito presencialmente na barbearia.",
+        });
       },
     );
+  });
+};
+
+const listarProdutosCliente = (req, res) => {
+  const { barbearia_id } = req.query;
+
+  const sql = `
+    SELECT *
+    FROM produtos
+    WHERE barbearia_id = ?
+    AND ativo = 1
+  `;
+
+  db.query(sql, [barbearia_id], (err, results) => {
+    if (err) {
+      console.error("Erro ao buscar produtos:", err);
+      return res.status(500).json({ erro: "Erro ao buscar produtos." });
+    }
+
+    res.json(results);
   });
 };
 
 module.exports = {
   criarProduto,
   listarProdutos,
+  listarProdutosCliente,
   deletarProduto,
   reservarProduto,
 };

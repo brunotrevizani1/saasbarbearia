@@ -63,54 +63,56 @@ function irParaHojeAgendamentos() {
 }
 
 function abrirSecao(secao) {
-  const dashboard = document.getElementById("secaoDashboard");
-  const configuracoes = document.getElementById("secaoConfiguracoes");
-  const localizacao = document.getElementById("secaoLocalizacao");
-  const equipe = document.getElementById("secaoEquipe");
+  const secoes = [
+    "secaoDashboard",
+    "secaoEquipe",
+    "secaoProdutos",
+    "secaoLocalizacao",
+    "secaoConfiguracoes",
+  ];
 
-  const menuDashboard = document.getElementById("menuDashboard");
-  const menuConfiguracoes = document.getElementById("menuConfiguracoes");
-  const menuLocalizacao = document.getElementById("menuLocalizacao");
-  const menuEquipe = document.getElementById("menuEquipe");
-  const produtos = document.getElementById("secaoProdutos");
-  const menuProdutos = document.getElementById("menuProdutos");
+  const menus = [
+    "menuDashboard",
+    "menuEquipe",
+    "menuProdutos",
+    "menuLocalizacao",
+    "menuConfiguracoes",
+  ];
 
-  dashboard.classList.remove("ativa");
-  configuracoes.classList.remove("ativa");
-  localizacao.classList.remove("ativa");
-  equipe.classList.remove("ativa");
-  produtos.classList.remove("ativa");
+  secoes.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("ativa");
+  });
 
-  menuDashboard.classList.remove("ativo");
-  menuConfiguracoes.classList.remove("ativo");
-  menuLocalizacao.classList.remove("ativo");
-  menuEquipe.classList.remove("ativo");
-  menuProdutos.classList.remove("ativo");
+  menus.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("ativo");
+  });
 
   if (secao === "dashboard") {
-    dashboard.classList.add("ativa");
-    menuDashboard.classList.add("ativo");
-  }
-
-  if (secao === "configuracoes") {
-    configuracoes.classList.add("ativa");
-    menuConfiguracoes.classList.add("ativo");
-  }
-
-  if (secao === "localizacao") {
-    localizacao.classList.add("ativa");
-    menuLocalizacao.classList.add("ativo");
+    document.getElementById("secaoDashboard").classList.add("ativa");
+    document.getElementById("menuDashboard").classList.add("ativo");
   }
 
   if (secao === "equipe") {
-    equipe.classList.add("ativa");
-    menuEquipe.classList.add("ativo");
+    document.getElementById("secaoEquipe").classList.add("ativa");
+    document.getElementById("menuEquipe").classList.add("ativo");
   }
 
   if (secao === "produtos") {
-    produtos.classList.add("ativa");
-    menuProdutos.classList.add("ativo");
+    document.getElementById("secaoProdutos").classList.add("ativa");
+    document.getElementById("menuProdutos").classList.add("ativo");
     carregarProdutosAdmin();
+  }
+
+  if (secao === "localizacao") {
+    document.getElementById("secaoLocalizacao").classList.add("ativa");
+    document.getElementById("menuLocalizacao").classList.add("ativo");
+  }
+
+  if (secao === "configuracoes") {
+    document.getElementById("secaoConfiguracoes").classList.add("ativa");
+    document.getElementById("menuConfiguracoes").classList.add("ativo");
   }
 }
 
@@ -154,6 +156,29 @@ function mostrarCamposExcecao() {
 
   campos.style.display = tipo === "personalizado" ? "block" : "none";
 }
+
+function abrirModalProduto() {
+  const modal = document.getElementById("modalProduto");
+  if (modal) modal.classList.add("ativo");
+}
+
+function fecharModalProduto() {
+  const modal = document.getElementById("modalProduto");
+  if (modal) modal.classList.remove("ativo");
+}
+
+document.querySelectorAll(".input-foto-produto").forEach((input) => {
+  input.addEventListener("change", () => {
+    const arquivo = input.files[0];
+    const box = input.closest(".upload-produto-box");
+    const img = box.querySelector("img");
+
+    if (!arquivo) return;
+
+    img.src = URL.createObjectURL(arquivo);
+    box.classList.add("com-imagem");
+  });
+});
 
 async function carregarExcecoesHorario() {
   const lista = document.getElementById("listaExcecoesHorario");
@@ -1240,8 +1265,16 @@ async function criarProduto() {
   const descricao = document.getElementById("produtoDescricao").value.trim();
   const valor = document.getElementById("produtoValor").value;
   const estoque = document.getElementById("produtoEstoque").value;
-  const imagens = document.getElementById("produtoImagens").files;
+  const inputsImagens = document.querySelectorAll(".input-foto-produto");
   const mensagem = document.getElementById("mensagemProduto");
+
+  const imagens = [];
+
+  inputsImagens.forEach((input) => {
+    if (input.files[0]) {
+      imagens.push(input.files[0]);
+    }
+  });
 
   mensagem.innerText = "";
 
@@ -1263,9 +1296,9 @@ async function criarProduto() {
   formData.append("valor", valor);
   formData.append("estoque", estoque || 0);
 
-  for (let i = 0; i < imagens.length; i++) {
-    formData.append("imagens", imagens[i]);
-  }
+  imagens.forEach((imagem) => {
+    formData.append("imagens", imagem);
+  });
 
   try {
     const resposta = await fetch(`${API_URL}/api/produtos`, {
@@ -1276,15 +1309,30 @@ async function criarProduto() {
     const resultado = await resposta.json();
 
     if (resultado.sucesso) {
-      mensagem.innerText = "Produto cadastrado com sucesso.";
+      await carregarProdutosAdmin();
 
       document.getElementById("produtoTitulo").value = "";
       document.getElementById("produtoDescricao").value = "";
       document.getElementById("produtoValor").value = "";
       document.getElementById("produtoEstoque").value = "";
-      document.getElementById("produtoImagens").value = "";
+      mensagem.innerText = "";
 
-      await carregarProdutosAdmin();
+      inputsImagens.forEach((input) => {
+        input.value = "";
+
+        const box = input.closest(".upload-produto-box");
+        const img = box.querySelector("img");
+
+        if (img) {
+          img.src = "";
+        }
+
+        if (box) {
+          box.classList.remove("com-imagem");
+        }
+      });
+
+      fecharModalProduto();
     } else {
       mensagem.innerText = resultado.erro || "Erro ao cadastrar produto.";
     }
@@ -1301,6 +1349,7 @@ async function carregarProdutosAdmin() {
   if (!lista || !vazio) return;
 
   lista.innerHTML = "";
+  vazio.style.display = "none";
 
   try {
     const resposta = await fetch(
@@ -1317,24 +1366,62 @@ async function carregarProdutosAdmin() {
     vazio.style.display = "none";
 
     produtos.forEach((produto) => {
-      const imagem =
-        produto.imagem_1 || produto.imagem_2 || produto.imagem_3 || "";
+      const imagens = [
+        produto.imagem_1,
+        produto.imagem_2,
+        produto.imagem_3,
+      ].filter(Boolean);
 
       const card = document.createElement("div");
       card.className = "card-produto-admin";
 
       card.innerHTML = `
         ${
-          imagem
-            ? `<img src="${API_URL}${imagem}" alt="${produto.titulo}" />`
-            : `<div style="height:150px;background:#e2e8f0;"></div>`
+          imagens.length
+            ? `
+              <div class="galeria-produto-admin">
+                <img
+                  id="imagemProdutoAdmin${produto.id}"
+                  src="${API_URL}${imagens[0]}"
+                  alt="${produto.titulo}"
+                  data-imagens='${JSON.stringify(imagens)}'
+                  data-index="0"
+                />
+
+                ${
+                  imagens.length > 1
+                    ? `
+                      <button
+                        class="btn-galeria-admin esquerda"
+                        onclick="mudarImagemProdutoAdmin(${produto.id}, -1)"
+                      >
+                        ‹
+                      </button>
+
+                      <button
+                        class="btn-galeria-admin direita"
+                        onclick="mudarImagemProdutoAdmin(${produto.id}, 1)"
+                      >
+                        ›
+                      </button>
+                    `
+                    : ""
+                }
+              </div>
+            `
+            : `<div class="produto-admin-sem-imagem">Sem imagem</div>`
         }
 
         <div class="card-produto-admin-info">
           <h4>${produto.titulo}</h4>
+
           <p>${produto.descricao || "Sem descrição."}</p>
+
           <strong>R$ ${Number(produto.valor).toFixed(2).replace(".", ",")}</strong>
-          <span class="estoque-produto">Estoque: ${produto.estoque}</span>
+
+         <span class="${Number(produto.estoque) === 0 ? "estoque-produto zerado" : "estoque-produto"}">
+  Estoque: ${produto.estoque}
+</span>
 
           <button class="btn-remover-produto" onclick="deletarProduto(${produto.id})">
             Remover
@@ -1349,6 +1436,30 @@ async function carregarProdutosAdmin() {
     vazio.style.display = "block";
     vazio.innerText = "Erro ao carregar produtos.";
   }
+}
+
+function mudarImagemProdutoAdmin(produtoId, direcao) {
+  const img = document.getElementById(`imagemProdutoAdmin${produtoId}`);
+
+  if (!img) return;
+
+  const imagens = JSON.parse(img.dataset.imagens || "[]");
+
+  if (!imagens.length) return;
+
+  let indexAtual = Number(img.dataset.index || 0);
+  let novoIndex = indexAtual + direcao;
+
+  if (novoIndex < 0) {
+    novoIndex = imagens.length - 1;
+  }
+
+  if (novoIndex >= imagens.length) {
+    novoIndex = 0;
+  }
+
+  img.dataset.index = novoIndex;
+  img.src = `${API_URL}${imagens[novoIndex]}`;
 }
 
 async function deletarProduto(id) {
@@ -1376,6 +1487,29 @@ async function deletarProduto(id) {
     alert("Erro ao conectar com o servidor.");
   }
 }
+
+function abrirModalProduto() {
+  document.getElementById("modalProduto").classList.add("ativo");
+}
+
+function fecharModalProduto() {
+  document.getElementById("modalProduto").classList.remove("ativo");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".input-foto-produto").forEach((input) => {
+    input.addEventListener("change", () => {
+      const arquivo = input.files[0];
+      const box = input.closest(".upload-produto-box");
+      const img = box.querySelector("img");
+
+      if (!arquivo) return;
+
+      img.src = URL.createObjectURL(arquivo);
+      box.classList.add("com-imagem");
+    });
+  });
+});
 
 carregarBarbeiros();
 atualizarTextoDataFiltro();
