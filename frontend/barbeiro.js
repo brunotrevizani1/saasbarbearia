@@ -9,12 +9,22 @@ let ultimoAgendamentosJSON = "";
 let barbeiroSelecionado = "";
 let barbeiroFiltroDashboard = "";
 let dataFiltroAgendamentos = formatarDataInput(new Date());
+let produtoEditandoId = null;
+let produtosAdminCache = [];
 
 function formatarData(dataString) {
   const dataLimpa = dataString.toString().slice(0, 10);
   const [ano, mes, dia] = dataLimpa.split("-");
 
   return `${dia}/${mes}/${ano}`;
+}
+
+function salvarProduto() {
+  if (produtoEditandoId) {
+    atualizarProduto();
+  } else {
+    criarProduto();
+  }
 }
 
 function formatarDataInput(data) {
@@ -1357,6 +1367,7 @@ async function carregarProdutosAdmin() {
     );
 
     const produtos = await resposta.json();
+    produtosAdminCache = produtos;
 
     if (!produtos.length) {
       vazio.style.display = "block";
@@ -1423,9 +1434,15 @@ async function carregarProdutosAdmin() {
   Estoque: ${produto.estoque}
 </span>
 
-          <button class="btn-remover-produto" onclick="deletarProduto(${produto.id})">
-            Remover
-          </button>
+          <div class="acoes-card-produto-admin">
+  <button class="btn-editar-produto" onclick="abrirModalEditarProduto(${produto.id})">
+    Editar
+  </button>
+
+  <button class="btn-remover-produto" onclick="deletarProduto(${produto.id})">
+    Remover
+  </button>
+</div>
         </div>
       `;
 
@@ -1722,12 +1739,114 @@ async function deletarProduto(id) {
   }
 }
 
+function abrirModalEditarProduto(produtoId) {
+  const produto = produtosAdminCache.find((item) => item.id === produtoId);
+
+  if (!produto) {
+    alert("Produto não encontrado.");
+    return;
+  }
+
+  produtoEditandoId = produto.id;
+
+  document.getElementById("tituloModalProduto").innerText = "Editar produto";
+  document.getElementById("btnSalvarProduto").innerText = "Salvar alterações";
+
+  document.getElementById("produtoTitulo").value = produto.titulo || "";
+  document.getElementById("produtoDescricao").value = produto.descricao || "";
+  document.getElementById("produtoValor").value = produto.valor || "";
+  document.getElementById("produtoEstoque").value = produto.estoque || 0;
+  document.getElementById("mensagemProduto").innerText = "";
+
+  const areaFotos = document.getElementById("areaFotosProduto");
+  if (areaFotos) {
+    areaFotos.style.display = "none";
+  }
+
+  document.getElementById("modalProduto").classList.add("ativo");
+}
+
+async function atualizarProduto() {
+  const titulo = document.getElementById("produtoTitulo").value.trim();
+  const descricao = document.getElementById("produtoDescricao").value.trim();
+  const valor = document.getElementById("produtoValor").value;
+  const estoque = document.getElementById("produtoEstoque").value;
+  const mensagem = document.getElementById("mensagemProduto");
+
+  mensagem.innerText = "";
+
+  if (!titulo || !valor) {
+    mensagem.innerText = "Preencha título e valor.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/${produtoEditandoId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          barbearia_id: barbeariaId,
+          titulo,
+          descricao,
+          valor,
+          estoque: estoque || 0,
+        }),
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+      mensagem.innerText = resultado.erro || "Erro ao editar produto.";
+      return;
+    }
+
+    await carregarProdutosAdmin();
+
+    fecharModalProduto();
+  } catch (error) {
+    console.error("Erro ao editar produto:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
 function abrirModalProduto() {
+  produtoEditandoId = null;
+
+  document.getElementById("tituloModalProduto").innerText = "Novo produto";
+  document.getElementById("btnSalvarProduto").innerText = "Salvar produto";
+
+  document.getElementById("produtoTitulo").value = "";
+  document.getElementById("produtoDescricao").value = "";
+  document.getElementById("produtoValor").value = "";
+  document.getElementById("produtoEstoque").value = "";
+  document.getElementById("mensagemProduto").innerText = "";
+
+  const areaFotos = document.getElementById("areaFotosProduto");
+  if (areaFotos) {
+    areaFotos.style.display = "block";
+  }
+
+  document.querySelectorAll(".input-foto-produto").forEach((input) => {
+    input.value = "";
+
+    const box = input.closest(".upload-produto-box");
+    const img = box.querySelector("img");
+
+    img.src = "";
+    box.classList.remove("com-imagem");
+  });
+
   document.getElementById("modalProduto").classList.add("ativo");
 }
 
 function fecharModalProduto() {
   document.getElementById("modalProduto").classList.remove("ativo");
+  produtoEditandoId = null;
 }
 
 document.addEventListener("DOMContentLoaded", () => {

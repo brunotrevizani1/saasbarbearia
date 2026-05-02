@@ -455,6 +455,47 @@ const cancelarReservaProduto = (req, res) => {
   });
 };
 
+const editarProduto = (req, res) => {
+  const { id } = req.params;
+  const barbearia_id = pegarBarbeariaId(req);
+  const { titulo, descricao, valor, estoque } = req.body;
+
+  if (!id || !barbearia_id) {
+    return res
+      .status(400)
+      .json({ erro: "Produto ou barbearia não informado." });
+  }
+
+  if (!titulo || !valor) {
+    return res.status(400).json({ erro: "Preencha título e valor." });
+  }
+
+  const sql = `
+    UPDATE produtos
+    SET titulo = ?, descricao = ?, valor = ?, estoque = ?
+    WHERE id = ?
+    AND barbearia_id = ?
+    AND ativo = 1
+  `;
+
+  db.query(
+    sql,
+    [titulo.trim(), descricao || null, valor, estoque || 0, id, barbearia_id],
+    (err, result) => {
+      if (err) {
+        console.error("Erro ao editar produto:", err);
+        return res.status(500).json({ erro: "Erro ao editar produto." });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ erro: "Produto não encontrado." });
+      }
+
+      res.json({ sucesso: true });
+    },
+  );
+};
+
 module.exports = {
   criarProduto,
   listarProdutos,
@@ -464,4 +505,5 @@ module.exports = {
   buscarReservaProduto,
   finalizarReservaProduto,
   cancelarReservaProduto,
+  editarProduto,
 };

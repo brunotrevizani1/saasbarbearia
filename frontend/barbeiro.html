@@ -802,7 +802,7 @@
     <div id="modalProduto" class="modal-produto">
   <div class="modal-produto-card">
     <div class="modal-produto-topo">
-      <h3>Novo produto</h3>
+      <h3 id="tituloModalProduto">Novo produto</h3>
       <button onclick="fecharModalProduto()">×</button>
     </div>
 
@@ -828,8 +828,8 @@
       </label>
     </div>
 
-    <div class="campo">
-      <span>Fotos do produto (máximo 3)</span>
+    <div class="campo" id="areaFotosProduto">
+  <span>Fotos do produto (máximo 3)</span>
 
       <div class="grid-upload-produto">
         <label class="upload-produto-box">
@@ -855,9 +855,9 @@
       </div>
     </div>
 
-    <button class="btn-principal" onclick="criarProduto()">
-      Salvar produto
-    </button>
+    <button class="btn-principal" onclick="salvarProduto()" id="btnSalvarProduto">
+  Salvar produto
+</button>
 
     <p id="mensagemProduto" class="mensagem"></p>
   </div>
@@ -867,7 +867,6 @@
   <div class="modal-consulta-card">
     <div class="modal-consulta-topo">
       <div>
-        <span>Reserva de produto</span>
         <h3>Consultar reserva</h3>
         <p>Digite o código informado pelo cliente para validar a retirada.</p>
       </div>
