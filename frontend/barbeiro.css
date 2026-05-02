@@ -1307,28 +1307,23 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   min-width: 206px;
   max-width: 220px;
   font-size: 14px;
-  padding: 10px 36px 10px 14px; /* 🔥 espaço pra seta */
+  padding: 10px 36px 10px 14px;
   border-radius: 16px;
   border: 1px solid #bfdbfe;
   background: #eff6ff;
   color: #64748b;
   font-weight: 700;
 
-  /* 🔥 remove seta padrão */
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
 
-  /* 🔥 cria seta custom */
   background-image: url("data:image/svg+xml;utf8,<svg fill='%232563eb' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
   background-repeat: no-repeat;
 
-  /* 🔥 controla posição da seta */
   background-position: right 10px center;
   background-size: 18px;
 }
-
-/* ===== PRODUTOS ADMIN ===== */
 
 .grid-produtos-admin {
   display: grid;
@@ -1336,8 +1331,6 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   gap: 22px;
   align-items: flex-start;
 }
-
-/* ===== CARDS PRODUTOS ADMIN ALINHADOS ===== */
 
 .lista-produtos-admin {
   display: grid;
@@ -1946,4 +1939,66 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   .reserva-acoes {
     flex-direction: column;
   }
+}
+
+/* ===== TOGGLE PRODUTOS CLIENTE ===== */
+
+.card-toggle-produtos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.card-toggle-produtos h3 {
+  margin: 0 0 6px;
+  color: #0f172a;
+}
+
+.card-toggle-produtos p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.switch-produtos {
+  position: relative;
+  width: 58px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.switch-produtos input {
+  display: none;
+}
+
+.switch-produtos span {
+  position: absolute;
+  inset: 0;
+  background: #cbd5e1;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.switch-produtos span::before {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.2s ease;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+}
+
+.switch-produtos input:checked + span {
+  background: #2563eb;
+}
+
+.switch-produtos input:checked + span::before {
+  transform: translateX(26px);
 }

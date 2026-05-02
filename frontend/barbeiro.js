@@ -113,6 +113,7 @@ function abrirSecao(secao) {
     document.getElementById("secaoProdutos").classList.add("ativa");
     document.getElementById("menuProdutos").classList.add("ativo");
     carregarProdutosAdmin();
+    carregarConfigProdutos();
   }
 
   if (secao === "localizacao") {
@@ -1452,6 +1453,54 @@ async function carregarProdutosAdmin() {
     console.error("Erro ao carregar produtos:", error);
     vazio.style.display = "block";
     vazio.innerText = "Erro ao carregar produtos.";
+  }
+}
+
+async function carregarConfigProdutos() {
+  const toggle = document.getElementById("toggleMostrarProdutos");
+
+  if (!toggle) return;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/config?barbearia_id=${barbeariaId}`,
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) return;
+
+    toggle.checked = data.mostrar_produtos;
+  } catch (error) {
+    console.error("Erro ao carregar configuração de produtos:", error);
+  }
+}
+
+async function salvarVisibilidadeProdutos() {
+  const toggle = document.getElementById("toggleMostrarProdutos");
+
+  if (!toggle) return;
+
+  try {
+    const resposta = await fetch(`${API_URL}/api/produtos/config`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        barbearia_id: barbeariaId,
+        mostrar_produtos: toggle.checked,
+      }),
+    });
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) {
+      alert(data.erro || "Erro ao salvar configuração.");
+    }
+  } catch (error) {
+    console.error("Erro ao salvar configuração de produtos:", error);
+    alert("Erro ao conectar com o servidor.");
   }
 }
 

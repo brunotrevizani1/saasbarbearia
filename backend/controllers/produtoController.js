@@ -455,6 +455,66 @@ const cancelarReservaProduto = (req, res) => {
   });
 };
 
+const buscarConfigProdutos = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  const sql = `
+    SELECT mostrar_produtos
+    FROM barbearias
+    WHERE id = ?
+    LIMIT 1
+  `;
+
+  db.query(sql, [barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar configuração de produtos:", err);
+      return res.status(500).json({ erro: "Erro ao buscar configuração." });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ erro: "Barbearia não encontrada." });
+    }
+
+    res.json({
+      sucesso: true,
+      mostrar_produtos: Number(result[0].mostrar_produtos) === 1,
+    });
+  });
+};
+
+const salvarConfigProdutos = (req, res) => {
+  const barbearia_id = pegarBarbeariaId(req);
+  const { mostrar_produtos } = req.body;
+
+  if (!barbearia_id) {
+    return res.status(400).json({ erro: "Barbearia não informada." });
+  }
+
+  const valor = mostrar_produtos ? 1 : 0;
+
+  const sql = `
+    UPDATE barbearias
+    SET mostrar_produtos = ?
+    WHERE id = ?
+  `;
+
+  db.query(sql, [valor, barbearia_id], (err) => {
+    if (err) {
+      console.error("Erro ao salvar configuração de produtos:", err);
+      return res.status(500).json({ erro: "Erro ao salvar configuração." });
+    }
+
+    res.json({
+      sucesso: true,
+      mostrar_produtos: valor === 1,
+    });
+  });
+};
+
 const editarProduto = (req, res) => {
   const { id } = req.params;
   const barbearia_id = pegarBarbeariaId(req);
@@ -506,4 +566,6 @@ module.exports = {
   finalizarReservaProduto,
   cancelarReservaProduto,
   editarProduto,
+  buscarConfigProdutos,
+  salvarConfigProdutos,
 };

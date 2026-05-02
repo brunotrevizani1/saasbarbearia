@@ -1011,6 +1011,30 @@ function copiarCodigoReservaCliente() {
   });
 }
 
+async function carregarConfigProdutosCliente() {
+  const btnProdutos = document.querySelector(".btn-produtos");
+
+  if (!btnProdutos) return;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/produtos/config?barbearia_id=${barbeariaId}`,
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso || !data.mostrar_produtos) {
+      btnProdutos.style.display = "none";
+      return;
+    }
+
+    btnProdutos.style.display = "flex";
+  } catch (error) {
+    console.error("Erro ao carregar configuração de produtos:", error);
+    btnProdutos.style.display = "none";
+  }
+}
+
 function abrirModalReservaProduto(produtoId) {
   document.getElementById("produtoReservaId").value = produtoId;
   document.getElementById("produtoReservaNome").value = "";
@@ -1097,3 +1121,4 @@ async function confirmarReservaProduto() {
 carregarBarbeirosCliente();
 trocarTela("tela-barbeiro");
 carregarLogoCliente();
+carregarConfigProdutosCliente();
