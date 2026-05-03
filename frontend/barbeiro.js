@@ -536,7 +536,7 @@ async function carregarBarbeiros() {
     </button>
 
     <button class="btn-desbloquear" onclick="deletarBarbeiro(${barbeiro.id})">
-      Removerer
+      Remover
     </button>
   </div>
 `;

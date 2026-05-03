@@ -33,6 +33,7 @@ const listarBarbeiros = (req, res) => {
     SELECT *
     FROM barbeiros
     WHERE barbearia_id = ?
+    AND ativo = 1
     ORDER BY nome ASC
   `;
 
