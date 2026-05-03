@@ -525,21 +525,21 @@ async function carregarBarbeiros() {
         card.className = "card-bloqueio";
 
         card.innerHTML = `
-          <div class="info-bloqueio">
-            <strong>${barbeiro.nome}</strong>
-            <span>${barbeiro.ativo ? "Ativo" : "Inativo"}</span>
-          </div>
+  <div class="info-bloqueio">
+    <strong>${barbeiro.nome}</strong>
+    <span>${Number(barbeiro.ativo) === 1 ? "Ativo" : "Inativo"}</span>
+  </div>
 
-          <div class="acoes-card-barbeiro">
-  <button class="btn-editar-barbeiro" onclick="abrirModalEditarBarbeiro(${barbeiro.id})">
-    Editar
-  </button>
+  <div class="acoes-card-barbeiro">
+    <button class="btn-editar-barbeiro" onclick="abrirModalEditarBarbeiro(${barbeiro.id})">
+      Editar
+    </button>
 
-  <button class="btn-desbloquear" onclick="deletarBarbeiro(${barbeiro.id})">
-    Remover
-  </button>
-</div>
-        `;
+    <button class="btn-desbloquear" onclick="deletarBarbeiro(${barbeiro.id})">
+      Remover
+    </button>
+  </div>
+`;
 
         listaBarbeiros.appendChild(card);
       }
