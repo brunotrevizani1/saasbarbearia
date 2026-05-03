@@ -60,33 +60,77 @@ router.get("/barbeiros", (req, res) => {
   });
 });
 
+function horarioParaMinutos(horario) {
+  const [hora, minuto] = horario.split(":").map(Number);
+  return hora * 60 + minuto;
+}
+
 // CRIAR agendamento
 router.post("/agendar", (req, res) => {
-  const { nome, telefone, data, hora, barbearia_id, barbeiro_id } = req.body;
+  const {
+    nome,
+    telefone,
+    data,
+    hora,
+    barbearia_id,
+    barbeiro_id,
+    servico_id,
+    servico_nome,
+    servico_preco,
+    servico_duracao,
+  } = req.body;
 
-  if (!nome || !telefone || !data || !hora || !barbearia_id || !barbeiro_id) {
+  if (
+    !nome ||
+    !telefone ||
+    !data ||
+    !hora ||
+    !barbearia_id ||
+    !barbeiro_id ||
+    !servico_id ||
+    !servico_nome ||
+    !servico_preco ||
+    !servico_duracao
+  ) {
     return res.status(400).json({ erro: "Preencha todos os campos." });
   }
 
+  const inicioNovo = horarioParaMinutos(hora);
+  const fimNovo = inicioNovo + Number(servico_duracao);
+
   const checkSql = `
-    SELECT id
+    SELECT
+      id,
+      hora,
+      servico_duracao
     FROM agendamentos
     WHERE data = ?
-    AND hora = ?
     AND status = 'agendado'
     AND barbearia_id = ?
     AND barbeiro_id = ?
-    LIMIT 1
   `;
 
-  db.query(checkSql, [data, hora, barbearia_id, barbeiro_id], (err, result) => {
+  db.query(checkSql, [data, barbearia_id, barbeiro_id], (err, agendamentos) => {
     if (err) {
       console.error("Erro ao verificar horário:", err);
       return res.status(500).json({ erro: "Erro ao verificar horário." });
     }
 
-    if (result.length > 0) {
-      return res.status(400).json({ erro: "Horário já agendado." });
+    const temConflito = agendamentos.some((agendamento) => {
+      const inicioExistente = horarioParaMinutos(
+        agendamento.hora.toString().slice(0, 5),
+      );
+
+      const duracaoExistente = Number(agendamento.servico_duracao || 30);
+      const fimExistente = inicioExistente + duracaoExistente;
+
+      return inicioNovo < fimExistente && fimNovo > inicioExistente;
+    });
+
+    if (temConflito) {
+      return res.status(400).json({
+        erro: "Esse horário não tem tempo suficiente para este serviço.",
+      });
     }
 
     gerarCodigoUnico((erroCodigo, codigo) => {
@@ -97,13 +141,38 @@ router.post("/agendar", (req, res) => {
 
       const insertSql = `
         INSERT INTO agendamentos
-        (nome, telefone, data, hora, codigo, status, barbearia_id, barbeiro_id)
-        VALUES (?, ?, ?, ?, ?, 'agendado', ?, ?)
+        (
+          nome,
+          telefone,
+          data,
+          hora,
+          codigo,
+          status,
+          barbearia_id,
+          barbeiro_id,
+          servico_id,
+          servico_nome,
+          servico_preco,
+          servico_duracao
+        )
+        VALUES (?, ?, ?, ?, ?, 'agendado', ?, ?, ?, ?, ?, ?)
       `;
 
       db.query(
         insertSql,
-        [nome, telefone, data, hora, codigo, barbearia_id, barbeiro_id],
+        [
+          nome,
+          telefone,
+          data,
+          hora,
+          codigo,
+          barbearia_id,
+          barbeiro_id,
+          servico_id,
+          servico_nome,
+          servico_preco,
+          servico_duracao,
+        ],
         (errInsert) => {
           if (errInsert) {
             console.error("Erro ao salvar agendamento:", errInsert);

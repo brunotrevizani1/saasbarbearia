@@ -131,9 +131,46 @@ const deletarServico = (req, res) => {
   });
 };
 
+const listarServicosPorBarbeiro = (req, res) => {
+  const { barbearia_id, barbeiro_id } = req.query;
+
+  if (!barbearia_id || !barbeiro_id) {
+    return res.status(400).json({
+      erro: "Barbearia e barbeiro são obrigatórios.",
+    });
+  }
+
+  const sql = `
+    SELECT
+      s.id,
+      s.nome,
+      s.descricao,
+      s.preco,
+      s.duracao_minutos
+    FROM barbeiro_servicos bs
+    INNER JOIN servicos s ON s.id = bs.servico_id
+    WHERE bs.barbearia_id = ?
+    AND bs.barbeiro_id = ?
+    AND s.ativo = 1
+    ORDER BY s.nome ASC
+  `;
+
+  db.query(sql, [barbearia_id, barbeiro_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao listar serviços do barbeiro:", err);
+      return res.status(500).json({
+        erro: "Erro ao listar serviços.",
+      });
+    }
+
+    res.json(result);
+  });
+};
+
 module.exports = {
   criarServico,
   listarServicos,
   editarServico,
   deletarServico,
+  listarServicosPorBarbeiro,
 };

@@ -55,6 +55,8 @@ h1 {
 
 /* TELAS */
 
+#tela-barbeiro,
+#tela-servicos,
 #tela-data,
 #tela-horarios,
 #tela-confirmar,
@@ -83,7 +85,6 @@ h1 {
     transform: translateY(0);
   }
 }
-
 /* HEADER CALENDÁRIO */
 
 .calendario-header {
@@ -1142,4 +1143,77 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   margin-top: 2px;
   font-weight: 800;
   color: #ef4444;
+}
+
+.lista-servicos-cliente {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.card-servico-cliente {
+  background: #f8fafc;
+  border: 1px solid #d9e2ec;
+  border-radius: 18px;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  transition: 0.2s ease;
+  text-align: left;
+}
+
+.card-servico-cliente:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+  transform: translateY(-2px);
+}
+
+.card-servico-cliente h3 {
+  margin: 0 0 6px;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.card-servico-cliente p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.servico-cliente-info {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.servico-cliente-info strong {
+  display: block;
+  color: #2563eb;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.servico-cliente-info span {
+  display: inline-block;
+  background: white;
+  color: #64748b;
+  border: 1px solid #d9e2ec;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+@media (max-width: 620px) {
+  .card-servico-cliente {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .servico-cliente-info {
+    text-align: left;
+  }
 }

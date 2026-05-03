@@ -4,6 +4,11 @@ let mesAtual = new Date().getMonth();
 let anoAtual = new Date().getFullYear();
 let dataSelecionada = "";
 let horaSelecionada = "";
+let servicoSelecionado = null;
+let servicoSelecionadoNome = "";
+let servicoSelecionadoPreco = 0;
+let servicoSelecionadoDuracao = 0;
+let mostrarProdutosCliente = false;
 
 const params = new URLSearchParams(window.location.search);
 const barbeariaId = params.get("barbearia");
@@ -24,6 +29,7 @@ const anoAtualReal = hoje.getFullYear();
 function trocarTela(telaNovaId) {
   const telas = [
     "tela-barbeiro",
+    "tela-servicos",
     "tela-data",
     "tela-horarios",
     "tela-confirmar",
@@ -47,7 +53,7 @@ function trocarTela(telaNovaId) {
   if (telaNovaId === "tela-barbeiro") {
     btnLocalizacao.style.display = "flex";
     btnCancelar.style.display = "flex";
-    btnProdutos.style.display = "flex";
+    btnProdutos.style.display = mostrarProdutosCliente ? "flex" : "none";
   } else {
     btnLocalizacao.style.display = "none";
     btnCancelar.style.display = "none";
@@ -174,7 +180,7 @@ async function carregarBarbeirosCliente() {
 
       card.innerHTML = `
         <strong>${barbeiro.nome}</strong>
-        <span>Ver horários disponíveis</span>
+        <span>Escolher serviço</span>
       `;
 
       lista.appendChild(card);
@@ -189,10 +195,16 @@ async function carregarBarbeirosCliente() {
 function selecionarBarbeiro(id, nome) {
   barbeiroSelecionado = id;
   barbeiroSelecionadoNome = nome;
+
+  servicoSelecionado = null;
+  servicoSelecionadoNome = "";
+  servicoSelecionadoPreco = 0;
+  servicoSelecionadoDuracao = 0;
+
   dataSelecionada = "";
   horaSelecionada = "";
 
-  const info = document.getElementById("barbeiroSelecionadoInfo");
+  const info = document.getElementById("barbeiroServicoInfo");
 
   if (info) {
     info.innerHTML = `
@@ -201,8 +213,8 @@ function selecionarBarbeiro(id, nome) {
     `;
   }
 
-  trocarTela("tela-data");
-  gerarCalendario();
+  trocarTela("tela-servicos");
+  carregarServicosCliente();
 }
 
 function voltarParaBarbeiros() {
@@ -349,15 +361,24 @@ async function gerarCalendario() {
 
       horariosValidosDia = filtrarHorariosPassados(horariosValidosDia, dataStr);
 
-      const agendados = agendamentos.filter(
+      const agendamentosDia = agendamentos.filter(
         (a) => a.data.slice(0, 10) === dataStr && a.status === "agendado",
       );
 
-      if (
-        bloqueio ||
-        bloqueioSemanal ||
-        agendados.length >= horariosValidosDia.length
-      ) {
+      const fimExpedienteMin = horarioParaMinutos(config.hora_fim.slice(0, 5));
+
+      horariosValidosDia = horariosValidosDia.filter((h) => {
+        const inicio = horarioParaMinutos(h);
+        const fim = inicio + Number(servicoSelecionadoDuracao || 0);
+
+        return fim <= fimExpedienteMin;
+      });
+
+      const temHorarioLivreNoDia = horariosValidosDia.some((h) =>
+        horarioTemEspacoLivre(h, servicoSelecionadoDuracao, agendamentosDia),
+      );
+
+      if (bloqueio || bloqueioSemanal || !temHorarioLivreNoDia) {
         div.classList.add("lotado");
       }
 
@@ -424,6 +445,11 @@ async function carregarHorarios() {
     return;
   }
 
+  if (!servicoSelecionado || !servicoSelecionadoDuracao) {
+    trocarTela("tela-servicos");
+    return;
+  }
+
   const [resAg, resConf, resExc] = await Promise.all([
     fetch(
       `${API_URL}/api/agendamentos?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
@@ -458,6 +484,19 @@ async function carregarHorarios() {
 
   horarios = filtrarHorariosPassados(horarios, dataSelecionada);
 
+  const fimExpedienteMin = horarioParaMinutos(config.hora_fim.slice(0, 5));
+
+  horarios = horarios.filter((h) => {
+    const inicio = horarioParaMinutos(h);
+    const fim = inicio + Number(servicoSelecionadoDuracao);
+
+    return fim <= fimExpedienteMin;
+  });
+
+  const agendamentosDia = agendamentos.filter(
+    (a) => a.data.slice(0, 10) === dataSelecionada,
+  );
+
   const lista = document.getElementById("listaHorarios");
   const aviso = document.getElementById("semHorarios");
 
@@ -474,11 +513,10 @@ async function carregarHorarios() {
   }
 
   horarios.forEach((h) => {
-    const ocupado = agendamentos.some(
-      (a) =>
-        a.data.slice(0, 10) === dataSelecionada &&
-        a.hora.slice(0, 5) === h &&
-        a.status === "agendado",
+    const ocupado = !horarioTemEspacoLivre(
+      h,
+      servicoSelecionadoDuracao,
+      agendamentosDia,
     );
 
     const div = document.createElement("div");
@@ -487,7 +525,7 @@ async function carregarHorarios() {
       div.className = "horario horario-ocupado";
       div.innerHTML = `
         <strong>${h}</strong>
-        <span>Já agendado</span>
+        <span>Indisponível</span>
       `;
     } else {
       temHorarioLivre = true;
@@ -524,6 +562,11 @@ async function confirmar() {
     return;
   }
 
+  if (!servicoSelecionado || !servicoSelecionadoDuracao) {
+    mensagem.innerText = "Escolha um serviço.";
+    return;
+  }
+
   if (!nome || !telefone) {
     mensagem.innerText = "Preencha tudo.";
     return;
@@ -539,6 +582,10 @@ async function confirmar() {
       hora: horaSelecionada,
       barbearia_id: barbeariaId,
       barbeiro_id: barbeiroSelecionado,
+      servico_id: servicoSelecionado,
+      servico_nome: servicoSelecionadoNome,
+      servico_preco: servicoSelecionadoPreco,
+      servico_duracao: servicoSelecionadoDuracao,
     }),
   });
 
@@ -603,6 +650,18 @@ async function confirmar() {
       <span>${nome}</span>
     </div>
 
+    <div class="item-resumo">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path
+      d="M4 7h16M4 12h16M4 17h10"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+  </svg>
+  <span>${servicoSelecionadoNome} • R$ ${Number(servicoSelecionadoPreco).toFixed(2).replace(".", ",")}</span>
+</div>
+
     <p class="texto-sucesso">Tudo certo! Te esperamos.</p>
   `;
 
@@ -661,11 +720,22 @@ async function abrirTelaLocalizacao() {
 }
 
 function voltarDaLocalizacao() {
-  if (barbeiroSelecionado) {
+  if (dataSelecionada) {
     trocarTela("tela-data");
-  } else {
-    trocarTela("tela-barbeiro");
+    return;
   }
+
+  if (servicoSelecionado) {
+    trocarTela("tela-data");
+    return;
+  }
+
+  if (barbeiroSelecionado) {
+    trocarTela("tela-servicos");
+    return;
+  }
+
+  trocarTela("tela-barbeiro");
 }
 
 /* CANCELAMENTO */
@@ -681,11 +751,22 @@ function voltarDaTelaCancelar() {
   document.getElementById("mensagemCancelamento").innerText = "";
   document.getElementById("agendamentoCancelamentoInfo").innerHTML = "";
 
-  if (barbeiroSelecionado) {
+  if (dataSelecionada) {
     trocarTela("tela-data");
-  } else {
-    trocarTela("tela-barbeiro");
+    return;
   }
+
+  if (servicoSelecionado) {
+    trocarTela("tela-data");
+    return;
+  }
+
+  if (barbeiroSelecionado) {
+    trocarTela("tela-servicos");
+    return;
+  }
+
+  trocarTela("tela-barbeiro");
 }
 
 async function buscarAgendamentoParaCancelar() {
@@ -818,6 +899,10 @@ function novoAgendamento() {
   barbeiroSelecionadoNome = "";
   dataSelecionada = "";
   horaSelecionada = "";
+  servicoSelecionado = null;
+  servicoSelecionadoNome = "";
+  servicoSelecionadoPreco = 0;
+  servicoSelecionadoDuracao = 0;
 
   trocarTela("tela-barbeiro");
   carregarBarbeirosCliente();
@@ -1033,13 +1118,22 @@ async function carregarConfigProdutosCliente() {
     const data = await resposta.json();
 
     if (!data.sucesso || !data.mostrar_produtos) {
+      mostrarProdutosCliente = false;
       btnProdutos.style.display = "none";
       return;
     }
 
-    btnProdutos.style.display = "flex";
+    mostrarProdutosCliente = true;
+
+    if (
+      document.getElementById("tela-barbeiro").classList.contains("tela-ativa")
+    ) {
+      btnProdutos.style.display = "flex";
+    }
   } catch (error) {
     console.error("Erro ao carregar configuração de produtos:", error);
+
+    mostrarProdutosCliente = false;
     btnProdutos.style.display = "none";
   }
 }
@@ -1125,6 +1219,104 @@ async function confirmarReservaProduto() {
     console.error("Erro ao reservar produto:", error);
     mensagem.innerText = "Erro ao conectar com o servidor.";
   }
+}
+
+async function carregarServicosCliente() {
+  const lista = document.getElementById("listaServicosCliente");
+  const vazio = document.getElementById("semServicosCliente");
+
+  lista.innerHTML = "";
+  vazio.style.display = "none";
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/servicos/barbeiro?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroSelecionado}`,
+    );
+
+    const servicos = await resposta.json();
+
+    if (!servicos.length) {
+      vazio.style.display = "block";
+      return;
+    }
+
+    servicos.forEach((servico) => {
+      const card = document.createElement("div");
+      card.className = "card-servico-cliente";
+
+      card.onclick = () => selecionarServicoCliente(servico);
+
+      card.innerHTML = `
+        <div>
+          <h3>${servico.nome}</h3>
+          <p>${servico.descricao || "Sem descrição."}</p>
+        </div>
+
+        <div class="servico-cliente-info">
+          <strong>R$ ${Number(servico.preco).toFixed(2).replace(".", ",")}</strong>
+          <span>${servico.duracao_minutos} min</span>
+        </div>
+      `;
+
+      lista.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar serviços:", error);
+    vazio.style.display = "block";
+    vazio.innerText = "Erro ao carregar serviços.";
+  }
+}
+
+function selecionarServicoCliente(servico) {
+  servicoSelecionado = servico.id;
+  servicoSelecionadoNome = servico.nome;
+  servicoSelecionadoPreco = servico.preco;
+  servicoSelecionadoDuracao = Number(servico.duracao_minutos);
+
+  dataSelecionada = "";
+  horaSelecionada = "";
+
+  const info = document.getElementById("barbeiroSelecionadoInfo");
+
+  if (info) {
+    info.innerHTML = `
+      <span>${barbeiroSelecionadoNome}</span>
+      <strong>${servico.nome} • ${servico.duracao_minutos} min</strong>
+    `;
+  }
+
+  trocarTela("tela-data");
+  gerarCalendario();
+}
+
+function voltarParaServicos() {
+  dataSelecionada = "";
+  horaSelecionada = "";
+  trocarTela("tela-servicos");
+}
+
+function intervaloSobrepoe(inicioA, fimA, inicioB, fimB) {
+  return inicioA < fimB && fimA > inicioB;
+}
+
+function horarioTemEspacoLivre(horario, duracaoServico, agendamentosDia) {
+  const inicioNovo = horarioParaMinutos(horario);
+  const fimNovo = inicioNovo + Number(duracaoServico);
+
+  return !agendamentosDia.some((agendamento) => {
+    if (agendamento.status !== "agendado") return false;
+
+    const inicioExistente = horarioParaMinutos(agendamento.hora.slice(0, 5));
+    const duracaoExistente = Number(agendamento.servico_duracao || 30);
+    const fimExistente = inicioExistente + duracaoExistente;
+
+    return intervaloSobrepoe(
+      inicioNovo,
+      fimNovo,
+      inicioExistente,
+      fimExistente,
+    );
+  });
 }
 
 carregarBarbeirosCliente();
