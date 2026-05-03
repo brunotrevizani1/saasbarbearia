@@ -4,7 +4,6 @@ const router = express.Router();
 const {
   listarBarbeiros,
   criarBarbeiro,
-  atualizarBarbeiro,
   deletarBarbeiro,
 
   listarAgendamentos,
@@ -35,7 +34,8 @@ const {
 
 router.get("/barbeiros", listarBarbeiros);
 router.post("/barbeiros", criarBarbeiro);
-router.put("/barbeiros/:id", atualizarBarbeiro);
+router.get("/barbeiros/:id/servicos", buscarServicosDoBarbeiro);
+router.put("/barbeiros/:id", editarBarbeiro);
 router.delete("/barbeiros/:id", deletarBarbeiro);
 
 router.get("/agendamentos", listarAgendamentos);
@@ -60,8 +60,5 @@ router.post("/logo", uploadLogoBarbearia);
 router.get("/logo", buscarLogoBarbearia);
 
 router.get("/relatorios", gerarRelatorioAgendamentos);
-
-router.get("/barbeiros/:id/servicos", buscarServicosDoBarbeiro);
-router.put("/barbeiros/:id", editarBarbeiro);
 
 module.exports = router;
