@@ -46,6 +46,25 @@
           Agenda
         </button>
 
+        <button id="menuServicos" class="menu-item" onclick="abrirSecao('servicos')">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path
+      d="M4 7h16M4 12h16M4 17h10"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+    <path
+      d="M18 15l2 2 3-4"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+  Serviços
+</button>
+
         <button id="menuProdutos" class="menu-item" onclick="abrirSecao('produtos')">
 
   <svg viewBox="0 0 24 24" fill="none">
@@ -431,6 +450,34 @@
           </div>
         </section>
 
+        <section id="secaoServicos" class="secao">
+  <div class="painel-principal">
+    <div class="topo-secao topo-servicos-admin">
+      <div>
+        <h2>Serviços da barbearia</h2>
+        <p class="descricao-secao">
+          Cadastre os serviços que poderão ser escolhidos pelos clientes no
+          agendamento.
+        </p>
+      </div>
+
+      <button class="btn-principal btn-novo-servico" onclick="abrirModalServico()">
+        + Adicionar serviço
+      </button>
+    </div>
+
+    <div class="card-config">
+      <h3>Serviços cadastrados</h3>
+
+      <div id="listaServicosAdmin" class="lista-servicos-admin"></div>
+
+      <p id="semServicosAdmin" class="mensagem-vazia">
+        Nenhum serviço cadastrado.
+      </p>
+    </div>
+  </div>
+</section>
+
 <section id="secaoProdutos" class="secao">
   <div class="painel-principal">
     <div class="topo-secao topo-produtos-admin">
@@ -547,42 +594,23 @@
       <div class="card-config">
         <h3>Resumo do período</h3>
 
-        <div class="mini-resumo-status">
-          <div>
-            <span>Agendados</span>
-            <strong id="relatorioAgendados">0</strong>
-          </div>
+       <div class="mini-resumo-status">
+  <div>
+    <span>Concluídos</span>
+    <strong id="relatorioConcluidos">0</strong>
+  </div>
 
-          <div>
-            <span>Concluídos</span>
-            <strong id="relatorioConcluidos">0</strong>
-          </div>
+  <div>
+    <span>Cancelados</span>
+    <strong id="relatorioCancelados">0</strong>
+  </div>
 
-          <div>
-            <span>Cancelados</span>
-            <strong id="relatorioCancelados">0</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-     <div class="cards-relatorio">
-      <div class="card-relatorio-resumo">
-        <span>Hoje</span>
-        <strong id="relatorioHoje">0</strong>
-        <small>agendamentos</small>
-      </div>
-
-      <div class="card-relatorio-resumo">
-        <span>Semana</span>
-        <strong id="relatorioSemana">0</strong>
-        <small>agendamentos</small>
-      </div>
-
-      <div class="card-relatorio-resumo">
-  <span>Período escolhido</span>
-  <strong id="relatorioPeriodo">0</strong>
-  <small>agendamentos</small>
+  <div class="resumo-total-destaque">
+  <span>Total</span>
+  <strong id="relatorioTotalResumo">0</strong>
 </div>
+</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1015,6 +1043,74 @@
     <p id="mensagemConsultaReserva" class="mensagem-consulta-reserva"></p>
 
     <div id="resultadoReservaProduto" class="resultado-reserva-produto"></div>
+  </div>
+</div>
+
+<div id="modalServico" class="modal-servico">
+  <div class="modal-servico-card">
+    <div class="modal-servico-topo">
+      <h3 id="tituloModalServico">Novo serviço</h3>
+
+      <button onclick="fecharModalServico()">×</button>
+    </div>
+
+    <label class="campo">
+      <span>Nome do serviço</span>
+      <input
+        type="text"
+        id="servicoNome"
+        placeholder="Ex: Corte masculino"
+      />
+    </label>
+
+    <label class="campo">
+      <span>Descrição</span>
+      <textarea
+        id="servicoDescricao"
+        placeholder="Ex: Corte completo com acabamento"
+      ></textarea>
+    </label>
+
+    <div class="linha-form-servico">
+      <label class="campo">
+        <span>Preço</span>
+        <input
+          type="number"
+          id="servicoPreco"
+          placeholder="35.00"
+          step="0.01"
+        />
+      </label>
+
+      <label class="campo">
+        <span>Duração</span>
+        <select id="servicoDuracao">
+          <option value="">Selecione</option>
+          <option value="15">15 minutos</option>
+          <option value="20">20 minutos</option>
+          <option value="30">30 minutos</option>
+          <option value="40">40 minutos</option>
+          <option value="45">45 minutos</option>
+          <option value="50">50 minutos</option>
+          <option value="60">1 hora</option>
+          <option value="75">1h15</option>
+          <option value="90">1h30</option>
+          <option value="120">2 horas</option>
+          <option value="150">2h30</option>
+          <option value="180">3 horas</option>
+        </select>
+      </label>
+    </div>
+
+    <button
+      class="btn-principal"
+      id="btnSalvarServico"
+      onclick="salvarServico()"
+    >
+      Salvar serviço
+    </button>
+
+    <p id="mensagemServico" class="mensagem"></p>
   </div>
 </div>
 

@@ -76,6 +76,7 @@ function abrirSecao(secao) {
   const secoes = [
     "secaoDashboard",
     "secaoEquipe",
+    "secaoServicos",
     "secaoProdutos",
     "secaoLocalizacao",
     "secaoRelatorios",
@@ -85,6 +86,7 @@ function abrirSecao(secao) {
   const menus = [
     "menuDashboard",
     "menuEquipe",
+    "menuServicos",
     "menuProdutos",
     "menuRelatorios",
     "menuLocalizacao",
@@ -109,6 +111,12 @@ function abrirSecao(secao) {
   if (secao === "equipe") {
     document.getElementById("secaoEquipe").classList.add("ativa");
     document.getElementById("menuEquipe").classList.add("ativo");
+  }
+
+  if (secao === "servicos") {
+    document.getElementById("secaoServicos").classList.add("ativa");
+    document.getElementById("menuServicos").classList.add("ativo");
+    carregarServicosAdmin();
   }
 
   if (secao === "produtos") {
@@ -174,11 +182,6 @@ function mostrarCamposExcecao() {
   const campos = document.getElementById("camposHorarioExcecao");
 
   campos.style.display = tipo === "personalizado" ? "block" : "none";
-}
-
-function abrirModalProduto() {
-  const modal = document.getElementById("modalProduto");
-  if (modal) modal.classList.add("ativo");
 }
 
 function fecharModalProduto() {
@@ -1686,18 +1689,14 @@ function renderizarRelatorioAgendamentos(data) {
   const resumo = data.resumo;
   const barbeiros = data.barbeiros || [];
 
-  document.getElementById("relatorioHoje").innerText = resumo.hoje || 0;
-  document.getElementById("relatorioSemana").innerText = resumo.semana || 0;
-  document.getElementById("relatorioPeriodo").innerText = resumo.periodo || 0;
-
-  document.getElementById("relatorioAgendados").innerText =
-    resumo.agendados || 0;
-
   document.getElementById("relatorioConcluidos").innerText =
     resumo.concluidos || 0;
 
   document.getElementById("relatorioCancelados").innerText =
     resumo.cancelados || 0;
+
+  document.getElementById("relatorioTotalResumo").innerText =
+    resumo.periodo || 0;
 
   renderizarGraficoRelatorio(barbeiros);
 }
@@ -2087,6 +2086,250 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+let servicoEditandoId = null;
+let servicosAdminCache = [];
+
+function abrirModalServico() {
+  servicoEditandoId = null;
+
+  document.getElementById("tituloModalServico").innerText = "Novo serviço";
+  document.getElementById("btnSalvarServico").innerText = "Salvar serviço";
+
+  document.getElementById("servicoNome").value = "";
+  document.getElementById("servicoDescricao").value = "";
+  document.getElementById("servicoPreco").value = "";
+  document.getElementById("servicoDuracao").value = "";
+  document.getElementById("mensagemServico").innerText = "";
+
+  document.getElementById("modalServico").classList.add("ativo");
+}
+
+function fecharModalServico() {
+  servicoEditandoId = null;
+
+  document.getElementById("modalServico").classList.remove("ativo");
+  document.getElementById("mensagemServico").innerText = "";
+}
+
+function salvarServico() {
+  if (servicoEditandoId) {
+    atualizarServico();
+  } else {
+    criarServico();
+  }
+}
+
+async function criarServico() {
+  const nome = document.getElementById("servicoNome").value.trim();
+  const descricao = document.getElementById("servicoDescricao").value.trim();
+  const preco = document.getElementById("servicoPreco").value;
+  const duracao_minutos = document.getElementById("servicoDuracao").value;
+  const mensagem = document.getElementById("mensagemServico");
+
+  mensagem.innerText = "";
+
+  if (!nome || !preco || !duracao_minutos) {
+    mensagem.innerText = "Preencha nome, preço e duração.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(`${API_URL}/api/servicos`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        barbearia_id: barbeariaId,
+        nome,
+        descricao,
+        preco,
+        duracao_minutos,
+      }),
+    });
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+      mensagem.innerText = resultado.erro || "Erro ao criar serviço.";
+      return;
+    }
+
+    await carregarServicosAdmin();
+    fecharModalServico();
+  } catch (error) {
+    console.error("Erro ao criar serviço:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
+async function carregarServicosAdmin() {
+  const lista = document.getElementById("listaServicosAdmin");
+  const vazio = document.getElementById("semServicosAdmin");
+
+  if (!lista || !vazio) return;
+
+  lista.innerHTML = "";
+  vazio.style.display = "none";
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/servicos?barbearia_id=${barbeariaId}`,
+    );
+
+    const servicos = await resposta.json();
+
+    servicosAdminCache = servicos;
+
+    if (!servicos.length) {
+      vazio.style.display = "block";
+      return;
+    }
+
+    servicos.forEach((servico) => {
+      const card = document.createElement("div");
+      card.className = "card-servico-admin";
+
+      card.innerHTML = `
+        <div class="card-servico-topo">
+          <div>
+            <h4>${servico.nome}</h4>
+            <p>${servico.descricao || "Sem descrição."}</p>
+          </div>
+
+          <span>${servico.duracao_minutos} min</span>
+        </div>
+
+        <div class="servico-preco">
+          R$ ${Number(servico.preco).toFixed(2).replace(".", ",")}
+        </div>
+
+        <div class="acoes-card-servico">
+          <button
+            class="btn-editar-servico"
+            onclick="abrirModalEditarServico(${servico.id})"
+          >
+            Editar
+          </button>
+
+          <button
+            class="btn-remover-servico"
+            onclick="deletarServico(${servico.id})"
+          >
+            Remover
+          </button>
+        </div>
+      `;
+
+      lista.appendChild(card);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar serviços:", error);
+    vazio.style.display = "block";
+    vazio.innerText = "Erro ao carregar serviços.";
+  }
+}
+
+function abrirModalEditarServico(servicoId) {
+  const servico = servicosAdminCache.find((item) => item.id === servicoId);
+
+  if (!servico) {
+    alert("Serviço não encontrado.");
+    return;
+  }
+
+  servicoEditandoId = servico.id;
+
+  document.getElementById("tituloModalServico").innerText = "Editar serviço";
+  document.getElementById("btnSalvarServico").innerText = "Salvar alterações";
+
+  document.getElementById("servicoNome").value = servico.nome || "";
+  document.getElementById("servicoDescricao").value = servico.descricao || "";
+  document.getElementById("servicoPreco").value = servico.preco || "";
+  document.getElementById("servicoDuracao").value =
+    servico.duracao_minutos || "";
+
+  document.getElementById("mensagemServico").innerText = "";
+
+  document.getElementById("modalServico").classList.add("ativo");
+}
+
+async function atualizarServico() {
+  const nome = document.getElementById("servicoNome").value.trim();
+  const descricao = document.getElementById("servicoDescricao").value.trim();
+  const preco = document.getElementById("servicoPreco").value;
+  const duracao_minutos = document.getElementById("servicoDuracao").value;
+  const mensagem = document.getElementById("mensagemServico");
+
+  mensagem.innerText = "";
+
+  if (!nome || !preco || !duracao_minutos) {
+    mensagem.innerText = "Preencha nome, preço e duração.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/servicos/${servicoEditandoId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          barbearia_id: barbeariaId,
+          nome,
+          descricao,
+          preco,
+          duracao_minutos,
+        }),
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+      mensagem.innerText = resultado.erro || "Erro ao editar serviço.";
+      return;
+    }
+
+    await carregarServicosAdmin();
+    fecharModalServico();
+  } catch (error) {
+    console.error("Erro ao editar serviço:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
+  }
+}
+
+async function deletarServico(id) {
+  const confirmar = window.confirm(
+    "Tem certeza que deseja remover este serviço?",
+  );
+
+  if (!confirmar) return;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/servicos/${id}?barbearia_id=${barbeariaId}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+      alert(resultado.erro || "Erro ao remover serviço.");
+      return;
+    }
+
+    await carregarServicosAdmin();
+  } catch (error) {
+    console.error("Erro ao remover serviço:", error);
+    alert("Erro ao conectar com o servidor.");
+  }
+}
 
 carregarBarbeiros();
 atualizarTextoDataFiltro();

@@ -16,11 +16,13 @@ const agendamentoRoutes = require("./routes/agendamentoRoutes");
 const barbeiroRoutes = require("./routes/barbeiroRoutes");
 const authRoutes = require("./routes/authRoutes");
 const produtoRoutes = require("./routes/produtoRoutes");
+const servicoRoutes = require("./routes/servicoRoutes");
 
 app.use("/api", agendamentoRoutes);
 app.use("/api/barbeiro", barbeiroRoutes);
 app.use("/api", authRoutes);
 app.use("/api", produtoRoutes);
+app.use("/api", servicoRoutes);
 
 app.get("/", (req, res) => {
   res.send("Servidor rodando 🚀");
