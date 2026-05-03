@@ -13,7 +13,6 @@ const {
   editarProduto,
   buscarConfigProdutos,
   salvarConfigProdutos,
-  gerarRelatorioAgendamentos,
 } = require("../controllers/produtoController");
 
 router.post("/produtos", criarProduto);
@@ -31,7 +30,5 @@ router.put("/produtos/reservas/:codigo/cancelar", cancelarReservaProduto);
 
 router.put("/produtos/:id", editarProduto);
 router.delete("/produtos/:id", deletarProduto);
-
-router.get("/relatorios", gerarRelatorioAgendamentos);
 
 module.exports = router;
