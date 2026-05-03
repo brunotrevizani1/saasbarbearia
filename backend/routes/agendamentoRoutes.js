@@ -80,6 +80,9 @@ router.post("/agendar", (req, res) => {
     servico_duracao,
   } = req.body;
 
+  const precoServico = Number(servico_preco);
+  const duracaoServico = Number(servico_duracao);
+
   if (
     !nome ||
     !telefone ||
@@ -89,14 +92,15 @@ router.post("/agendar", (req, res) => {
     !barbeiro_id ||
     !servico_id ||
     !servico_nome ||
-    !servico_preco ||
-    !servico_duracao
+    Number.isNaN(precoServico) ||
+    Number.isNaN(duracaoServico) ||
+    duracaoServico <= 0
   ) {
     return res.status(400).json({ erro: "Preencha todos os campos." });
   }
 
   const inicioNovo = horarioParaMinutos(hora);
-  const fimNovo = inicioNovo + Number(servico_duracao);
+  const fimNovo = inicioNovo + duracaoServico;
 
   const checkSql = `
     SELECT
@@ -158,35 +162,36 @@ router.post("/agendar", (req, res) => {
         VALUES (?, ?, ?, ?, ?, 'agendado', ?, ?, ?, ?, ?, ?)
       `;
 
-      db.query(
-        insertSql,
-        [
-          nome,
-          telefone,
-          data,
-          hora,
-          codigo,
-          barbearia_id,
-          barbeiro_id,
-          servico_id,
-          servico_nome,
-          servico_preco,
-          servico_duracao,
-        ],
-        (errInsert) => {
-          if (errInsert) {
-            console.error("Erro ao salvar agendamento:", errInsert);
-            return res
-              .status(500)
-              .json({ erro: "Erro ao salvar agendamento." });
-          }
+      const valores = [
+        nome.trim(),
+        telefone.trim(),
+        data,
+        hora,
+        codigo,
+        barbearia_id,
+        barbeiro_id,
+        servico_id,
+        servico_nome,
+        precoServico,
+        duracaoServico,
+      ];
 
-          res.json({
-            sucesso: true,
-            codigo,
+      db.query(insertSql, valores, (errInsert) => {
+        if (errInsert) {
+          console.error("Erro ao salvar agendamento:", errInsert);
+          console.error("Valores enviados:", valores);
+
+          return res.status(500).json({
+            erro: "Erro ao salvar agendamento.",
+            detalhe: errInsert.sqlMessage,
           });
-        },
-      );
+        }
+
+        res.json({
+          sucesso: true,
+          codigo,
+        });
+      });
     });
   });
 });
