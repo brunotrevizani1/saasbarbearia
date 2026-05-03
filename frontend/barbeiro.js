@@ -78,6 +78,7 @@ function abrirSecao(secao) {
     "secaoEquipe",
     "secaoProdutos",
     "secaoLocalizacao",
+    "secaoRelatorios",
     "secaoConfiguracoes",
   ];
 
@@ -85,6 +86,7 @@ function abrirSecao(secao) {
     "menuDashboard",
     "menuEquipe",
     "menuProdutos",
+    "menuRelatorios",
     "menuLocalizacao",
     "menuConfiguracoes",
   ];
@@ -114,6 +116,12 @@ function abrirSecao(secao) {
     document.getElementById("menuProdutos").classList.add("ativo");
     carregarProdutosAdmin();
     carregarConfigProdutos();
+  }
+
+  if (secao === "relatorios") {
+    document.getElementById("secaoRelatorios").classList.add("ativa");
+    document.getElementById("menuRelatorios").classList.add("ativo");
+    iniciarRelatorios();
   }
 
   if (secao === "localizacao") {
@@ -1563,6 +1571,202 @@ async function buscarReservaProduto() {
     console.error("Erro ao buscar reserva:", error);
     mensagem.innerText = "Erro ao conectar com o servidor.";
   }
+}
+
+let relatoriosIniciados = false;
+
+function formatarDataRelatorio(data) {
+  const ano = data.getFullYear();
+  const mes = String(data.getMonth() + 1).padStart(2, "0");
+  const dia = String(data.getDate()).padStart(2, "0");
+
+  return `${ano}-${mes}-${dia}`;
+}
+
+function pegarInicioSemanaRelatorio() {
+  const hoje = new Date();
+  const diaSemana = hoje.getDay();
+
+  const diff = diaSemana === 0 ? 6 : diaSemana - 1;
+
+  const inicio = new Date(hoje);
+  inicio.setDate(hoje.getDate() - diff);
+
+  return inicio;
+}
+
+function pegarFimSemanaRelatorio() {
+  const inicio = pegarInicioSemanaRelatorio();
+
+  const fim = new Date(inicio);
+  fim.setDate(inicio.getDate() + 6);
+
+  return fim;
+}
+
+async function iniciarRelatorios() {
+  if (!relatoriosIniciados) {
+    const hoje = new Date();
+    const inicioSemana = pegarInicioSemanaRelatorio();
+
+    document.getElementById("relatorioDataInicio").value =
+      formatarDataRelatorio(inicioSemana);
+
+    document.getElementById("relatorioDataFim").value =
+      formatarDataRelatorio(hoje);
+
+    await carregarBarbeirosRelatorio();
+
+    relatoriosIniciados = true;
+  }
+
+  await buscarRelatorioAgendamentos();
+}
+
+async function carregarBarbeirosRelatorio() {
+  const select = document.getElementById("filtroRelatorioBarbeiro");
+
+  if (!select) return;
+
+  select.innerHTML = `<option value="todos">Todos os barbeiros</option>`;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/barbeiros?barbearia_id=${barbeariaId}`,
+    );
+
+    const barbeiros = await resposta.json();
+
+    barbeiros.forEach((barbeiro) => {
+      const option = document.createElement("option");
+      option.value = barbeiro.id;
+      option.innerText = barbeiro.nome;
+
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar barbeiros do relatório:", error);
+  }
+}
+
+async function buscarRelatorioAgendamentos() {
+  const barbeiroId = document.getElementById("filtroRelatorioBarbeiro").value;
+  const dataInicio = document.getElementById("relatorioDataInicio").value;
+  const dataFim = document.getElementById("relatorioDataFim").value;
+
+  if (!dataInicio || !dataFim) {
+    alert("Informe a data inicial e final.");
+    return;
+  }
+
+  const hoje = formatarDataRelatorio(new Date());
+  const semanaInicio = formatarDataRelatorio(pegarInicioSemanaRelatorio());
+  const semanaFim = formatarDataRelatorio(pegarFimSemanaRelatorio());
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/barbeiro/relatorios?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroId}&data_inicio=${dataInicio}&data_fim=${dataFim}&data_hoje=${hoje}&semana_inicio=${semanaInicio}&semana_fim=${semanaFim}`,
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) {
+      alert(data.erro || "Erro ao buscar relatório.");
+      return;
+    }
+
+    renderizarRelatorioAgendamentos(data);
+  } catch (error) {
+    console.error("Erro ao buscar relatório:", error);
+    alert("Erro ao conectar com o servidor.");
+  }
+}
+
+function renderizarRelatorioAgendamentos(data) {
+  const resumo = data.resumo;
+  const barbeiros = data.barbeiros || [];
+
+  document.getElementById("relatorioHoje").innerText = resumo.hoje || 0;
+  document.getElementById("relatorioSemana").innerText = resumo.semana || 0;
+  document.getElementById("relatorioPeriodo").innerText = resumo.periodo || 0;
+
+  document.getElementById("relatorioAgendados").innerText =
+    resumo.agendados || 0;
+
+  document.getElementById("relatorioConcluidos").innerText =
+    resumo.concluidos || 0;
+
+  document.getElementById("relatorioCancelados").innerText =
+    resumo.cancelados || 0;
+
+  renderizarGraficoRelatorio(barbeiros);
+  renderizarTabelaRelatorio(barbeiros);
+}
+
+function renderizarGraficoRelatorio(barbeiros) {
+  const grafico = document.getElementById("graficoRelatorioBarbeiros");
+  const vazio = document.getElementById("semDadosGraficoRelatorio");
+
+  grafico.innerHTML = "";
+
+  const maiorValor = Math.max(...barbeiros.map((b) => Number(b.total)), 0);
+
+  if (!barbeiros.length || maiorValor === 0) {
+    vazio.style.display = "block";
+    return;
+  }
+
+  vazio.style.display = "none";
+
+  barbeiros.forEach((barbeiro) => {
+    const total = Number(barbeiro.total);
+    const largura = maiorValor > 0 ? (total / maiorValor) * 100 : 0;
+
+    const linha = document.createElement("div");
+    linha.className = "linha-grafico-relatorio";
+
+    linha.innerHTML = `
+      <div class="nome-grafico-relatorio">
+        ${barbeiro.barbeiro_nome}
+      </div>
+
+      <div class="barra-grafico-relatorio">
+        <div style="width: ${largura}%"></div>
+      </div>
+
+      <strong>${total}</strong>
+    `;
+
+    grafico.appendChild(linha);
+  });
+}
+
+function renderizarTabelaRelatorio(barbeiros) {
+  const tbody = document.getElementById("tabelaRelatorioBarbeiros");
+  const vazio = document.getElementById("semDadosTabelaRelatorio");
+
+  tbody.innerHTML = "";
+
+  if (!barbeiros.length) {
+    vazio.style.display = "block";
+    return;
+  }
+
+  vazio.style.display = "none";
+
+  barbeiros.forEach((barbeiro) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${barbeiro.barbeiro_nome}</td>
+      <td>${barbeiro.total}</td>
+      <td>${barbeiro.agendados}</td>
+      <td>${barbeiro.concluidos}</td>
+      <td>${barbeiro.cancelados}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
 }
 
 function renderizarReservaProduto(reserva) {

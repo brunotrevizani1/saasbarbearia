@@ -983,6 +983,160 @@ const deletarExcecaoHorario = (req, res) => {
   });
 };
 
+const gerarRelatorioAgendamentos = (req, res) => {
+  const {
+    barbearia_id,
+    barbeiro_id,
+    data_inicio,
+    data_fim,
+    data_hoje,
+    semana_inicio,
+    semana_fim,
+  } = req.query;
+
+  if (!barbearia_id || !data_inicio || !data_fim) {
+    return res.status(400).json({
+      erro: "Barbearia, data inicial e data final são obrigatórios.",
+    });
+  }
+
+  const usarFiltroBarbeiro = barbeiro_id && barbeiro_id !== "todos";
+
+  let filtroBarbeiroSql = "";
+  const paramsPeriodo = [data_inicio, data_fim, barbearia_id];
+
+  if (usarFiltroBarbeiro) {
+    filtroBarbeiroSql = " AND b.id = ? ";
+    paramsPeriodo.push(barbeiro_id);
+  }
+
+  const sqlPeriodo = `
+    SELECT
+      b.id AS barbeiro_id,
+      b.nome AS barbeiro_nome,
+
+      COUNT(a.id) AS total,
+
+      COALESCE(SUM(CASE WHEN a.status = 'agendado' THEN 1 ELSE 0 END), 0) AS agendados,
+      COALESCE(SUM(CASE WHEN a.status = 'concluido' THEN 1 ELSE 0 END), 0) AS concluidos,
+      COALESCE(SUM(CASE WHEN a.status = 'cancelado' THEN 1 ELSE 0 END), 0) AS cancelados
+
+    FROM barbeiros b
+
+    LEFT JOIN agendamentos a
+      ON a.barbeiro_id = b.id
+      AND a.barbearia_id = b.barbearia_id
+      AND a.data BETWEEN ? AND ?
+
+    WHERE b.barbearia_id = ?
+    ${filtroBarbeiroSql}
+
+    GROUP BY b.id, b.nome
+    ORDER BY total DESC, b.nome ASC
+  `;
+
+  db.query(sqlPeriodo, paramsPeriodo, (errPeriodo, resultadoPeriodo) => {
+    if (errPeriodo) {
+      console.error("Erro ao gerar relatório por período:", errPeriodo);
+      return res.status(500).json({ erro: "Erro ao gerar relatório." });
+    }
+
+    const paramsResumoHoje = [barbearia_id, data_hoje || data_inicio];
+    const paramsResumoSemana = [
+      barbearia_id,
+      semana_inicio || data_inicio,
+      semana_fim || data_fim,
+    ];
+    const paramsResumoPeriodo = [barbearia_id, data_inicio, data_fim];
+
+    let filtroResumoBarbeiro = "";
+
+    if (usarFiltroBarbeiro) {
+      filtroResumoBarbeiro = " AND barbeiro_id = ? ";
+      paramsResumoHoje.push(barbeiro_id);
+      paramsResumoSemana.push(barbeiro_id);
+      paramsResumoPeriodo.push(barbeiro_id);
+    }
+
+    const sqlResumoHoje = `
+      SELECT COUNT(*) AS total
+      FROM agendamentos
+      WHERE barbearia_id = ?
+      AND data = ?
+      ${filtroResumoBarbeiro}
+    `;
+
+    const sqlResumoSemana = `
+      SELECT COUNT(*) AS total
+      FROM agendamentos
+      WHERE barbearia_id = ?
+      AND data BETWEEN ? AND ?
+      ${filtroResumoBarbeiro}
+    `;
+
+    const sqlResumoPeriodo = `
+      SELECT
+        COUNT(*) AS total,
+        COALESCE(SUM(CASE WHEN status = 'agendado' THEN 1 ELSE 0 END), 0) AS agendados,
+        COALESCE(SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END), 0) AS concluidos,
+        COALESCE(SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END), 0) AS cancelados
+      FROM agendamentos
+      WHERE barbearia_id = ?
+      AND data BETWEEN ? AND ?
+      ${filtroResumoBarbeiro}
+    `;
+
+    db.query(sqlResumoHoje, paramsResumoHoje, (errHoje, resultadoHoje) => {
+      if (errHoje) {
+        console.error("Erro ao gerar resumo de hoje:", errHoje);
+        return res.status(500).json({ erro: "Erro ao gerar resumo de hoje." });
+      }
+
+      db.query(
+        sqlResumoSemana,
+        paramsResumoSemana,
+        (errSemana, resultadoSemana) => {
+          if (errSemana) {
+            console.error("Erro ao gerar resumo da semana:", errSemana);
+            return res
+              .status(500)
+              .json({ erro: "Erro ao gerar resumo da semana." });
+          }
+
+          db.query(
+            sqlResumoPeriodo,
+            paramsResumoPeriodo,
+            (errResumoPeriodo, resultadoResumoPeriodo) => {
+              if (errResumoPeriodo) {
+                console.error(
+                  "Erro ao gerar resumo do período:",
+                  errResumoPeriodo,
+                );
+                return res
+                  .status(500)
+                  .json({ erro: "Erro ao gerar resumo do período." });
+              }
+
+              res.json({
+                sucesso: true,
+                resumo: {
+                  hoje: resultadoHoje[0]?.total || 0,
+                  semana: resultadoSemana[0]?.total || 0,
+                  periodo: resultadoResumoPeriodo[0]?.total || 0,
+                  agendados: resultadoResumoPeriodo[0]?.agendados || 0,
+                  concluidos: resultadoResumoPeriodo[0]?.concluidos || 0,
+                  cancelados: resultadoResumoPeriodo[0]?.cancelados || 0,
+                },
+                barbeiros: resultadoPeriodo,
+              });
+            },
+          );
+        },
+      );
+    });
+  });
+};
+
 module.exports = {
   listarBarbeiros,
   criarBarbeiro,
@@ -1008,4 +1162,6 @@ module.exports = {
 
   buscarLogoBarbearia,
   uploadLogoBarbearia,
+
+  gerarRelatorioAgendamentos,
 };

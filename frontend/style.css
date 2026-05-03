@@ -1108,3 +1108,38 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   font-weight: 800;
   font-size: 13px;
 }
+
+.horario-ocupado {
+  padding: 6px 8px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #fecaca;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.horario-ocupado:hover {
+  transform: none;
+  background: #f8fafc;
+}
+
+.horario-ocupado strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1;
+  color: #ef4444;
+}
+
+.horario-ocupado span {
+  display: block;
+  font-size: 9px;
+  line-height: 1;
+  margin-top: 2px;
+  font-weight: 800;
+  color: #ef4444;
+}

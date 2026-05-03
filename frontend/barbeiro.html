@@ -65,6 +65,19 @@
   Produtos
 </button>
 
+<button id="menuRelatorios" class="menu-item" onclick="abrirSecao('relatorios')">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path
+      d="M4 19V5M4 19H20M8 16V11M12 16V8M16 16V13"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+  Relatórios
+</button>
+
         <button
           id="menuLocalizacao"
           class="menu-item"
@@ -478,6 +491,123 @@
 
       <p id="semProdutosAdmin" class="mensagem-vazia">
         Nenhum produto cadastrado.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="secaoRelatorios" class="secao">
+  <div class="painel-principal">
+    <div class="topo-secao">
+      <div>
+        <p class="eyebrow">Relatórios</p>
+        <h2>Relatórios de agendamentos</h2>
+        <p class="descricao-secao">
+          Acompanhe a quantidade de agendamentos por barbeiro, dia, semana ou
+          período personalizado.
+        </p>
+      </div>
+    </div>
+
+    <div class="cards-relatorio">
+      <div class="card-relatorio-resumo">
+        <span>Hoje</span>
+        <strong id="relatorioHoje">0</strong>
+        <small>agendamentos</small>
+      </div>
+
+      <div class="card-relatorio-resumo">
+        <span>Semana</span>
+        <strong id="relatorioSemana">0</strong>
+        <small>agendamentos</small>
+      </div>
+
+      <div class="card-relatorio-resumo destaque">
+        <span>Período escolhido</span>
+        <strong id="relatorioPeriodo">0</strong>
+        <small>agendamentos</small>
+      </div>
+    </div>
+
+    <div class="card-config filtro-relatorio-card">
+      <div class="filtros-relatorio">
+        <label>
+          <span>Barbeiro</span>
+          <select id="filtroRelatorioBarbeiro">
+            <option value="todos">Todos os barbeiros</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Data inicial</span>
+          <input type="date" id="relatorioDataInicio" />
+        </label>
+
+        <label>
+          <span>Data final</span>
+          <input type="date" id="relatorioDataFim" />
+        </label>
+
+        <button class="btn-principal" onclick="buscarRelatorioAgendamentos()">
+          Buscar relatório
+        </button>
+      </div>
+    </div>
+
+    <div class="area-relatorio-grid">
+      <div class="card-config">
+        <h3>Agendamentos por barbeiro</h3>
+
+        <div id="graficoRelatorioBarbeiros" class="grafico-relatorio"></div>
+
+        <p id="semDadosGraficoRelatorio" class="mensagem-vazia">
+          Nenhum agendamento encontrado no período.
+        </p>
+      </div>
+
+      <div class="card-config">
+        <h3>Resumo do período</h3>
+
+        <div class="mini-resumo-status">
+          <div>
+            <span>Agendados</span>
+            <strong id="relatorioAgendados">0</strong>
+          </div>
+
+          <div>
+            <span>Concluídos</span>
+            <strong id="relatorioConcluidos">0</strong>
+          </div>
+
+          <div>
+            <span>Cancelados</span>
+            <strong id="relatorioCancelados">0</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-config">
+      <h3>Detalhamento por barbeiro</h3>
+
+      <div class="tabela-relatorio-wrapper">
+        <table class="tabela-relatorio">
+          <thead>
+            <tr>
+              <th>Barbeiro</th>
+              <th>Total</th>
+              <th>Agendados</th>
+              <th>Concluídos</th>
+              <th>Cancelados</th>
+            </tr>
+          </thead>
+
+          <tbody id="tabelaRelatorioBarbeiros"></tbody>
+        </table>
+      </div>
+
+      <p id="semDadosTabelaRelatorio" class="mensagem-vazia">
+        Nenhum dado encontrado.
       </p>
     </div>
   </div>

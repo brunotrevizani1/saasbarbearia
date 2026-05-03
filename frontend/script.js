@@ -462,36 +462,46 @@ async function carregarHorarios() {
   const aviso = document.getElementById("semHorarios");
 
   lista.innerHTML = "";
+  lista.classList.remove("duas-colunas");
+
   aviso.classList.remove("mostrar");
   aviso.innerText = "Todos os horários para esse dia foram esgotados";
 
-  const livres = horarios.filter(
-    (h) =>
-      !agendamentos.some(
-        (a) =>
-          a.data.slice(0, 10) === dataSelecionada &&
-          a.hora.slice(0, 5) === h &&
-          a.status === "agendado",
-      ),
-  );
+  let temHorarioLivre = false;
 
-  if (livres.length > 10) {
+  if (horarios.length > 10) {
     lista.classList.add("duas-colunas");
-  } else {
-    lista.classList.remove("duas-colunas");
   }
 
-  if (livres.length === 0) {
-    aviso.classList.add("mostrar");
-  }
+  horarios.forEach((h) => {
+    const ocupado = agendamentos.some(
+      (a) =>
+        a.data.slice(0, 10) === dataSelecionada &&
+        a.hora.slice(0, 5) === h &&
+        a.status === "agendado",
+    );
 
-  livres.forEach((h) => {
     const div = document.createElement("div");
-    div.className = "horario";
-    div.innerText = h;
-    div.onclick = () => selecionarHorario(h);
+
+    if (ocupado) {
+      div.className = "horario horario-ocupado";
+      div.innerHTML = `
+        <strong>${h}</strong>
+        <span>Já agendado</span>
+      `;
+    } else {
+      temHorarioLivre = true;
+      div.className = "horario";
+      div.innerText = h;
+      div.onclick = () => selecionarHorario(h);
+    }
+
     lista.appendChild(div);
   });
+
+  if (!temHorarioLivre) {
+    aviso.classList.add("mostrar");
+  }
 
   trocarTela("tela-horarios");
 }
@@ -978,7 +988,6 @@ async function carregarProdutosCliente() {
       </button>
     `
           }
-          </button>
         </div>
       `;
 
