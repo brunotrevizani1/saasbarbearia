@@ -11,6 +11,10 @@ let barbeiroFiltroDashboard = "";
 let dataFiltroAgendamentos = formatarDataInput(new Date());
 let produtoEditandoId = null;
 let produtosAdminCache = [];
+let servicoEditandoId = null;
+let servicosAdminCache = [];
+let barbeiroEditandoId = null;
+let barbeirosAdminCache = [];
 
 function formatarData(dataString) {
   const dataLimpa = dataString.toString().slice(0, 10);
@@ -362,14 +366,29 @@ async function deletarExcecaoHorario(id) {
   }
 }
 
-function abrirModalBarbeiro() {
+async function abrirModalBarbeiro() {
+  barbeiroEditandoId = null;
+
+  document.getElementById("tituloModalBarbeiro").innerText = "Novo barbeiro";
+  document.getElementById("btnSalvarBarbeiro").innerText = "Criar barbeiro";
+  document.getElementById("novoBarbeiroNome").value = "";
+  document.getElementById("mensagemBarbeiro").innerText = "";
+
+  await carregarServicosNoModalBarbeiro([]);
+
   document.getElementById("modalBarbeiro").classList.add("ativo");
   document.getElementById("novoBarbeiroNome").focus();
 }
 
 function fecharModalBarbeiro() {
+  barbeiroEditandoId = null;
+
   document.getElementById("modalBarbeiro").classList.remove("ativo");
   document.getElementById("novoBarbeiroNome").value = "";
+  document.getElementById("mensagemBarbeiro").innerText = "";
+
+  const lista = document.getElementById("listaServicosBarbeiroModal");
+  if (lista) lista.innerHTML = "";
 }
 
 function sair() {
@@ -484,6 +503,7 @@ async function carregarBarbeiros() {
     );
 
     const barbeiros = await resposta.json();
+    barbeirosAdminCache = barbeiros;
 
     const listaBarbeiros = document.getElementById("listaBarbeiros");
     const selectConfig = document.getElementById("selectBarbeiroConfig");
@@ -510,9 +530,15 @@ async function carregarBarbeiros() {
             <span>${barbeiro.ativo ? "Ativo" : "Inativo"}</span>
           </div>
 
-          <button class="btn-desbloquear" onclick="deletarBarbeiro(${barbeiro.id})">
-            Remover
-          </button>
+          <div class="acoes-card-barbeiro">
+  <button class="btn-editar-barbeiro" onclick="abrirModalEditarBarbeiro(${barbeiro.id})">
+    Editar
+  </button>
+
+  <button class="btn-desbloquear" onclick="deletarBarbeiro(${barbeiro.id})">
+    Remover
+  </button>
+</div>
         `;
 
         listaBarbeiros.appendChild(card);
@@ -548,10 +574,15 @@ async function carregarBarbeiros() {
 
 async function criarBarbeiro() {
   const input = document.getElementById("novoBarbeiroNome");
+  const mensagem = document.getElementById("mensagemBarbeiro");
+
   const nome = input.value.trim();
+  const servicos = pegarServicosSelecionadosBarbeiro();
+
+  mensagem.innerText = "";
 
   if (!nome) {
-    alert("Digite o nome do barbeiro.");
+    mensagem.innerText = "Digite o nome do barbeiro.";
     return;
   }
 
@@ -564,23 +595,23 @@ async function criarBarbeiro() {
       body: JSON.stringify({
         nome,
         barbearia_id: barbeariaId,
+        servicos,
       }),
     });
 
     const resultado = await resposta.json();
 
     if (resultado.sucesso) {
-      input.value = "";
-
       fecharModalBarbeiro();
+
       await carregarBarbeiros();
       await carregarAgendamentos(true);
     } else {
-      alert(resultado.erro || "Erro ao criar barbeiro.");
+      mensagem.innerText = resultado.erro || "Erro ao criar barbeiro.";
     }
   } catch (error) {
     console.error("Erro ao criar barbeiro:", error);
-    alert("Erro ao conectar com o servidor.");
+    mensagem.innerText = "Erro ao conectar com o servidor.";
   }
 }
 
@@ -2087,9 +2118,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-let servicoEditandoId = null;
-let servicosAdminCache = [];
-
 function abrirModalServico() {
   servicoEditandoId = null;
 
@@ -2328,6 +2356,161 @@ async function deletarServico(id) {
   } catch (error) {
     console.error("Erro ao remover serviço:", error);
     alert("Erro ao conectar com o servidor.");
+  }
+}
+
+async function carregarServicosNoModalBarbeiro(servicosMarcados = []) {
+  const lista = document.getElementById("listaServicosBarbeiroModal");
+
+  if (!lista) return;
+
+  lista.innerHTML = `<p class="mensagem-vazia">Carregando serviços...</p>`;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/servicos?barbearia_id=${barbeariaId}`,
+    );
+
+    const servicos = await resposta.json();
+
+    if (!servicos.length) {
+      lista.innerHTML = `
+        <p class="mensagem-vazia">
+          Nenhum serviço cadastrado. Cadastre serviços na aba Serviços primeiro.
+        </p>
+      `;
+      return;
+    }
+
+    lista.innerHTML = "";
+
+    servicos.forEach((servico) => {
+      const marcado = servicosMarcados.some(
+        (id) => String(id) === String(servico.id),
+      );
+
+      const label = document.createElement("label");
+      label.className = "item-servico-barbeiro";
+
+      label.innerHTML = `
+        <input
+          type="checkbox"
+          class="checkbox-servico-barbeiro"
+          value="${servico.id}"
+          ${marcado ? "checked" : ""}
+        />
+
+        <div>
+          <strong>${servico.nome}</strong>
+          <span>
+            R$ ${Number(servico.preco).toFixed(2).replace(".", ",")}
+            • ${servico.duracao_minutos} min
+          </span>
+        </div>
+      `;
+
+      lista.appendChild(label);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar serviços no modal:", error);
+
+    lista.innerHTML = `
+      <p class="mensagem-vazia">
+        Erro ao carregar serviços.
+      </p>
+    `;
+  }
+}
+
+function salvarBarbeiro() {
+  if (barbeiroEditandoId) {
+    atualizarBarbeiro();
+  } else {
+    criarBarbeiro();
+  }
+}
+
+function pegarServicosSelecionadosBarbeiro() {
+  return Array.from(
+    document.querySelectorAll(".checkbox-servico-barbeiro:checked"),
+  ).map((checkbox) => checkbox.value);
+}
+
+async function abrirModalEditarBarbeiro(barbeiroId) {
+  const barbeiro = barbeirosAdminCache.find(
+    (item) => String(item.id) === String(barbeiroId),
+  );
+
+  if (!barbeiro) {
+    alert("Barbeiro não encontrado.");
+    return;
+  }
+
+  barbeiroEditandoId = barbeiro.id;
+
+  document.getElementById("tituloModalBarbeiro").innerText = "Editar barbeiro";
+  document.getElementById("btnSalvarBarbeiro").innerText = "Salvar alterações";
+  document.getElementById("novoBarbeiroNome").value = barbeiro.nome || "";
+  document.getElementById("mensagemBarbeiro").innerText = "";
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/barbeiro/barbeiros/${barbeiro.id}/servicos?barbearia_id=${barbeariaId}`,
+    );
+
+    const servicosMarcados = await resposta.json();
+
+    await carregarServicosNoModalBarbeiro(servicosMarcados);
+
+    document.getElementById("modalBarbeiro").classList.add("ativo");
+  } catch (error) {
+    console.error("Erro ao carregar serviços do barbeiro:", error);
+    alert("Erro ao carregar serviços do barbeiro.");
+  }
+}
+
+async function atualizarBarbeiro() {
+  const nome = document.getElementById("novoBarbeiroNome").value.trim();
+  const mensagem = document.getElementById("mensagemBarbeiro");
+  const servicos = pegarServicosSelecionadosBarbeiro();
+
+  mensagem.innerText = "";
+
+  if (!nome) {
+    mensagem.innerText = "Digite o nome do barbeiro.";
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/barbeiro/barbeiros/${barbeiroEditandoId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome,
+          barbearia_id: barbeariaId,
+          servicos,
+        }),
+      },
+    );
+
+    const resultado = await resposta.json();
+
+    if (!resultado.sucesso) {
+      mensagem.innerText = resultado.erro || "Erro ao atualizar barbeiro.";
+      return;
+    }
+
+    fecharModalBarbeiro();
+
+    await carregarBarbeiros();
+    await carregarAgendamentos(true);
+  } catch (error) {
+    console.error("Erro ao atualizar barbeiro:", error);
+    mensagem.innerText = "Erro ao conectar com o servidor.";
   }
 }
 

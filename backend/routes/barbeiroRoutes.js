@@ -28,6 +28,9 @@ const {
   uploadLogoBarbearia,
   buscarLogoBarbearia,
   gerarRelatorioAgendamentos,
+
+  editarBarbeiro,
+  buscarServicosDoBarbeiro,
 } = require("../controllers/barbeiroController");
 
 router.get("/barbeiros", listarBarbeiros);
@@ -57,5 +60,8 @@ router.post("/logo", uploadLogoBarbearia);
 router.get("/logo", buscarLogoBarbearia);
 
 router.get("/relatorios", gerarRelatorioAgendamentos);
+
+router.get("/barbeiros/:id/servicos", buscarServicosDoBarbeiro);
+router.put("/barbeiros/:id", editarBarbeiro);
 
 module.exports = router;

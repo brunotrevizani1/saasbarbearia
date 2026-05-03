@@ -48,62 +48,94 @@ const listarBarbeiros = (req, res) => {
 
 // CRIAR barbeiro
 const criarBarbeiro = (req, res) => {
-  const { nome } = req.body;
-  const barbearia_id = pegarBarbeariaId(req);
+  const { nome, barbearia_id, servicos } = req.body;
 
-  if (!barbearia_id) {
-    return res.status(400).json({ erro: "Barbearia não informada." });
+  if (!nome || !barbearia_id) {
+    return res.status(400).json({ erro: "Nome e barbearia são obrigatórios." });
   }
 
-  if (!nome || !nome.trim()) {
-    return res.status(400).json({ erro: "Informe o nome do barbeiro." });
-  }
+  const servicosSelecionados = Array.isArray(servicos) ? servicos : [];
 
-  const sql = `
-    INSERT INTO barbeiros (nome, barbearia_id, ativo)
-    VALUES (?, ?, 1)
-  `;
-
-  db.query(sql, [nome.trim(), barbearia_id], (err, result) => {
-    if (err) {
-      console.error("Erro ao criar barbeiro:", err);
+  db.getConnection((errConn, connection) => {
+    if (errConn) {
+      console.error("Erro ao conectar para criar barbeiro:", errConn);
       return res.status(500).json({ erro: "Erro ao criar barbeiro." });
     }
 
-    const barbeiro_id = result.insertId;
-
-    const configSql = `
-      INSERT INTO configuracoes_agenda (
-        hora_inicio,
-        hora_fim,
-        intervalo,
-        almoco_inicio,
-        almoco_fim,
-        bloquear_sabado,
-        bloquear_domingo,
-        barbearia_id,
-        barbeiro_id
-      )
-      VALUES ('08:00', '18:00', 30, NULL, NULL, 0, 1, ?, ?)
-    `;
-
-    db.query(configSql, [barbearia_id, barbeiro_id], (errConfig) => {
-      if (errConfig) {
-        console.error("Erro ao criar configuração do barbeiro:", errConfig);
-        return res.status(500).json({
-          erro: "Barbeiro criado, mas erro ao criar configuração da agenda.",
-        });
+    connection.beginTransaction((errTransaction) => {
+      if (errTransaction) {
+        connection.release();
+        return res.status(500).json({ erro: "Erro ao criar barbeiro." });
       }
 
-      res.json({
-        sucesso: true,
-        barbeiro: {
-          id: barbeiro_id,
-          nome: nome.trim(),
-          barbearia_id,
-          ativo: 1,
+      const sqlBarbeiro = `
+        INSERT INTO barbeiros (nome, barbearia_id, ativo)
+        VALUES (?, ?, 1)
+      `;
+
+      connection.query(
+        sqlBarbeiro,
+        [nome.trim(), barbearia_id],
+        (errBarbeiro, resultBarbeiro) => {
+          if (errBarbeiro) {
+            return connection.rollback(() => {
+              connection.release();
+              console.error("Erro ao criar barbeiro:", errBarbeiro);
+              res.status(500).json({ erro: "Erro ao criar barbeiro." });
+            });
+          }
+
+          const barbeiro_id = resultBarbeiro.insertId;
+
+          if (!servicosSelecionados.length) {
+            return connection.commit((errCommit) => {
+              connection.release();
+
+              if (errCommit) {
+                return res
+                  .status(500)
+                  .json({ erro: "Erro ao finalizar cadastro." });
+              }
+
+              res.json({ sucesso: true });
+            });
+          }
+
+          const valores = servicosSelecionados.map((servico_id) => [
+            barbearia_id,
+            barbeiro_id,
+            servico_id,
+          ]);
+
+          const sqlServicos = `
+          INSERT INTO barbeiro_servicos
+          (barbearia_id, barbeiro_id, servico_id)
+          VALUES ?
+        `;
+
+          connection.query(sqlServicos, [valores], (errServicos) => {
+            if (errServicos) {
+              return connection.rollback(() => {
+                connection.release();
+                console.error("Erro ao vincular serviços:", errServicos);
+                res.status(500).json({ erro: "Erro ao vincular serviços." });
+              });
+            }
+
+            connection.commit((errCommit) => {
+              connection.release();
+
+              if (errCommit) {
+                return res
+                  .status(500)
+                  .json({ erro: "Erro ao finalizar cadastro." });
+              }
+
+              res.json({ sucesso: true });
+            });
+          });
         },
-      });
+      );
     });
   });
 };
@@ -1137,6 +1169,147 @@ const gerarRelatorioAgendamentos = (req, res) => {
   });
 };
 
+const buscarServicosDoBarbeiro = (req, res) => {
+  const { id } = req.params;
+  const { barbearia_id } = req.query;
+
+  if (!id || !barbearia_id) {
+    return res
+      .status(400)
+      .json({ erro: "Barbeiro ou barbearia não informado." });
+  }
+
+  const sql = `
+    SELECT servico_id
+    FROM barbeiro_servicos
+    WHERE barbeiro_id = ?
+    AND barbearia_id = ?
+  `;
+
+  db.query(sql, [id, barbearia_id], (err, result) => {
+    if (err) {
+      console.error("Erro ao buscar serviços do barbeiro:", err);
+      return res.status(500).json({ erro: "Erro ao buscar serviços." });
+    }
+
+    res.json(result.map((item) => item.servico_id));
+  });
+};
+
+const editarBarbeiro = (req, res) => {
+  const { id } = req.params;
+  const { nome, barbearia_id, servicos } = req.body;
+
+  if (!id || !nome || !barbearia_id) {
+    return res.status(400).json({ erro: "Preencha o nome do barbeiro." });
+  }
+
+  const servicosSelecionados = Array.isArray(servicos) ? servicos : [];
+
+  db.getConnection((errConn, connection) => {
+    if (errConn) {
+      console.error("Erro ao conectar para editar barbeiro:", errConn);
+      return res.status(500).json({ erro: "Erro ao editar barbeiro." });
+    }
+
+    connection.beginTransaction((errTransaction) => {
+      if (errTransaction) {
+        connection.release();
+        return res.status(500).json({ erro: "Erro ao editar barbeiro." });
+      }
+
+      const sqlUpdateBarbeiro = `
+        UPDATE barbeiros
+        SET nome = ?
+        WHERE id = ?
+        AND barbearia_id = ?
+      `;
+
+      connection.query(
+        sqlUpdateBarbeiro,
+        [nome.trim(), id, barbearia_id],
+        (errUpdate) => {
+          if (errUpdate) {
+            return connection.rollback(() => {
+              connection.release();
+              console.error("Erro ao atualizar barbeiro:", errUpdate);
+              res.status(500).json({ erro: "Erro ao atualizar barbeiro." });
+            });
+          }
+
+          const sqlDeleteServicos = `
+            DELETE FROM barbeiro_servicos
+            WHERE barbeiro_id = ?
+            AND barbearia_id = ?
+          `;
+
+          connection.query(
+            sqlDeleteServicos,
+            [id, barbearia_id],
+            (errDelete) => {
+              if (errDelete) {
+                return connection.rollback(() => {
+                  connection.release();
+                  console.error("Erro ao limpar serviços:", errDelete);
+                  res.status(500).json({ erro: "Erro ao atualizar serviços." });
+                });
+              }
+
+              if (!servicosSelecionados.length) {
+                return connection.commit((errCommit) => {
+                  connection.release();
+
+                  if (errCommit) {
+                    return res
+                      .status(500)
+                      .json({ erro: "Erro ao finalizar edição." });
+                  }
+
+                  res.json({ sucesso: true });
+                });
+              }
+
+              const valores = servicosSelecionados.map((servico_id) => [
+                barbearia_id,
+                id,
+                servico_id,
+              ]);
+
+              const sqlInsertServicos = `
+              INSERT INTO barbeiro_servicos
+              (barbearia_id, barbeiro_id, servico_id)
+              VALUES ?
+            `;
+
+              connection.query(sqlInsertServicos, [valores], (errInsert) => {
+                if (errInsert) {
+                  return connection.rollback(() => {
+                    connection.release();
+                    console.error("Erro ao salvar serviços:", errInsert);
+                    res.status(500).json({ erro: "Erro ao salvar serviços." });
+                  });
+                }
+
+                connection.commit((errCommit) => {
+                  connection.release();
+
+                  if (errCommit) {
+                    return res
+                      .status(500)
+                      .json({ erro: "Erro ao finalizar edição." });
+                  }
+
+                  res.json({ sucesso: true });
+                });
+              });
+            },
+          );
+        },
+      );
+    });
+  });
+};
+
 module.exports = {
   listarBarbeiros,
   criarBarbeiro,
@@ -1164,4 +1337,7 @@ module.exports = {
   uploadLogoBarbearia,
 
   gerarRelatorioAgendamentos,
+
+  editarBarbeiro,
+  buscarServicosDoBarbeiro,
 };

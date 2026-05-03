@@ -924,30 +924,44 @@
       </main>
     </div>
 
-    <div id="modalBarbeiro" class="modal-overlay">
-      <div class="modal-card">
-        <h3>Adicionar barbeiro</h3>
+   <div id="modalBarbeiro" class="modal-overlay">
+  <div class="modal-card">
+    <h3 id="tituloModalBarbeiro">Adicionar barbeiro</h3>
 
-        <label class="campo">
-          <span>Nome do barbeiro</span>
-          <input
-            type="text"
-            id="novoBarbeiroNome"
-            placeholder="Digite o nome do barbeiro"
-          />
-        </label>
+    <label class="campo">
+      <span>Nome do barbeiro</span>
+      <input
+        type="text"
+        id="novoBarbeiroNome"
+        placeholder="Digite o nome do barbeiro"
+      />
+    </label>
 
-        <div class="modal-acoes">
-          <button class="btn-secundario" onclick="fecharModalBarbeiro()">
-            Cancelar
-          </button>
+    <div class="campo">
+      <span>Serviços que esse barbeiro realiza</span>
 
-          <button class="btn-principal" onclick="criarBarbeiro()">
-            Confirmar
-          </button>
-        </div>
+      <div id="listaServicosBarbeiroModal" class="lista-servicos-barbeiro-modal">
+        <p class="mensagem-vazia">Carregando serviços...</p>
       </div>
     </div>
+
+    <p id="mensagemBarbeiro" class="mensagem"></p>
+
+    <div class="modal-acoes">
+      <button class="btn-secundario" onclick="fecharModalBarbeiro()">
+        Cancelar
+      </button>
+
+      <button
+        id="btnSalvarBarbeiro"
+        class="btn-principal"
+        onclick="salvarBarbeiro()"
+      >
+        Criar barbeiro
+      </button>
+    </div>
+  </div>
+</div>
 
     <div id="modalProduto" class="modal-produto">
   <div class="modal-produto-card">
