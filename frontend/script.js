@@ -592,7 +592,10 @@ async function confirmar() {
   const r = await res.json();
 
   if (!r.sucesso) {
-    mensagem.innerText = r.erro || "Erro ao agendar.";
+    console.error("Erro retornado pela API:", r);
+
+    mensagem.innerText = r.detalhe || r.erro || "Erro ao agendar.";
+
     return;
   }
 

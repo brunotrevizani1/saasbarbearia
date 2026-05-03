@@ -179,9 +179,11 @@ router.post("/agendar", (req, res) => {
       db.query(insertSql, valores, (errInsert) => {
         if (errInsert) {
           console.error("Erro ao salvar agendamento:", errInsert);
+          console.error("SQL Message:", errInsert.sqlMessage);
           console.error("Valores enviados:", valores);
 
           return res.status(500).json({
+            sucesso: false,
             erro: "Erro ao salvar agendamento.",
             detalhe: errInsert.sqlMessage,
           });
