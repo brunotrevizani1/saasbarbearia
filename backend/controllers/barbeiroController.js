@@ -226,43 +226,62 @@ const deletarBarbeiro = (req, res) => {
       return;
     }
 
-    const deleteConfigSql = `
-      DELETE FROM configuracoes_agenda
+    const deleteServicosSql = `
+      DELETE FROM barbeiro_servicos
       WHERE barbeiro_id = ?
       AND barbearia_id = ?
     `;
 
-    db.query(deleteConfigSql, [id, barbearia_id], (errConfig) => {
-      if (errConfig) {
-        console.error("Erro ao remover configuração:", errConfig);
-        return res.status(500).json({ erro: "Erro ao remover configuração." });
+    db.query(deleteServicosSql, [id, barbearia_id], (errServicos) => {
+      if (errServicos) {
+        console.error("Erro ao remover serviços do barbeiro:", errServicos);
+        return res.status(500).json({
+          erro: "Erro ao remover serviços do barbeiro.",
+        });
       }
 
-      const deleteBloqueiosSql = `
-        DELETE FROM dias_bloqueados
+      const deleteConfigSql = `
+        DELETE FROM configuracoes_agenda
         WHERE barbeiro_id = ?
         AND barbearia_id = ?
       `;
 
-      db.query(deleteBloqueiosSql, [id, barbearia_id], (errBloqueios) => {
-        if (errBloqueios) {
-          console.error("Erro ao remover bloqueios:", errBloqueios);
-          return res.status(500).json({ erro: "Erro ao remover bloqueios." });
+      db.query(deleteConfigSql, [id, barbearia_id], (errConfig) => {
+        if (errConfig) {
+          console.error("Erro ao remover configuração:", errConfig);
+          return res
+            .status(500)
+            .json({ erro: "Erro ao remover configuração." });
         }
 
-        const deleteSql = `
-          DELETE FROM barbeiros
-          WHERE id = ?
+        const deleteBloqueiosSql = `
+          DELETE FROM dias_bloqueados
+          WHERE barbeiro_id = ?
           AND barbearia_id = ?
         `;
 
-        db.query(deleteSql, [id, barbearia_id], (errDelete) => {
-          if (errDelete) {
-            console.error("Erro ao deletar barbeiro:", errDelete);
-            return res.status(500).json({ erro: "Erro ao deletar barbeiro." });
+        db.query(deleteBloqueiosSql, [id, barbearia_id], (errBloqueios) => {
+          if (errBloqueios) {
+            console.error("Erro ao remover bloqueios:", errBloqueios);
+            return res.status(500).json({ erro: "Erro ao remover bloqueios." });
           }
 
-          res.json({ sucesso: true });
+          const deleteSql = `
+            DELETE FROM barbeiros
+            WHERE id = ?
+            AND barbearia_id = ?
+          `;
+
+          db.query(deleteSql, [id, barbearia_id], (errDelete) => {
+            if (errDelete) {
+              console.error("Erro ao deletar barbeiro:", errDelete);
+              return res
+                .status(500)
+                .json({ erro: "Erro ao deletar barbeiro." });
+            }
+
+            res.json({ sucesso: true });
+          });
         });
       });
     });
