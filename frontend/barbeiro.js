@@ -1700,7 +1700,6 @@ function renderizarRelatorioAgendamentos(data) {
     resumo.cancelados || 0;
 
   renderizarGraficoRelatorio(barbeiros);
-  renderizarTabelaRelatorio(barbeiros);
 }
 
 function renderizarGraficoRelatorio(barbeiros) {
@@ -1738,34 +1737,6 @@ function renderizarGraficoRelatorio(barbeiros) {
     `;
 
     grafico.appendChild(linha);
-  });
-}
-
-function renderizarTabelaRelatorio(barbeiros) {
-  const tbody = document.getElementById("tabelaRelatorioBarbeiros");
-  const vazio = document.getElementById("semDadosTabelaRelatorio");
-
-  tbody.innerHTML = "";
-
-  if (!barbeiros.length) {
-    vazio.style.display = "block";
-    return;
-  }
-
-  vazio.style.display = "none";
-
-  barbeiros.forEach((barbeiro) => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${barbeiro.barbeiro_nome}</td>
-      <td>${barbeiro.total}</td>
-      <td>${barbeiro.agendados}</td>
-      <td>${barbeiro.concluidos}</td>
-      <td>${barbeiro.cancelados}</td>
-    `;
-
-    tbody.appendChild(tr);
   });
 }
 

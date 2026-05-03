@@ -166,17 +166,6 @@ body {
   flex-wrap: wrap;
 }
 
-.eyebrow {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #2563eb;
-  background: #dbeafe;
-  padding: 6px 10px;
-  border-radius: 999px;
-  margin: 0 0 12px;
-}
-
 .topo-secao h2 {
   margin: 0 0 10px;
   font-size: 30px;
@@ -2041,17 +2030,6 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   font-weight: 600;
 }
 
-.card-relatorio-resumo.destaque {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  border-color: transparent;
-}
-
-.card-relatorio-resumo.destaque span,
-.card-relatorio-resumo.destaque small,
-.card-relatorio-resumo.destaque strong {
-  color: white;
-}
-
 .filtro-relatorio-card {
   margin-bottom: 18px;
 }
@@ -2166,42 +2144,6 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
 .mini-resumo-status strong {
   color: #0f172a;
   font-size: 26px;
-}
-
-.tabela-relatorio-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  margin-top: 16px;
-}
-
-.tabela-relatorio {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 650px;
-}
-
-.tabela-relatorio th,
-.tabela-relatorio td {
-  padding: 14px;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.tabela-relatorio th {
-  color: #334155;
-  font-size: 13px;
-  font-weight: 900;
-  background: #f8fafc;
-}
-
-.tabela-relatorio td {
-  color: #475569;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.tabela-relatorio tbody tr:hover {
-  background: #f8fafc;
 }
 
 @media (max-width: 900px) {
