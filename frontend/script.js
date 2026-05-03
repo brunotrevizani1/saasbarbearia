@@ -11,12 +11,12 @@ let servicoSelecionadoDuracao = 0;
 let mostrarProdutosCliente = false;
 
 const params = new URLSearchParams(window.location.search);
-const barbeariaId = params.get("barbearia");
+const barbeariaId = Number(params.get("barbearia"));
 
 let barbeiroSelecionado = null;
 let barbeiroSelecionadoNome = "";
 
-if (!barbeariaId) {
+if (!barbeariaId || Number.isNaN(barbeariaId)) {
   alert("Barbearia não informada.");
 }
 
