@@ -613,6 +613,18 @@ async function confirmar() {
       <span>${barbeiroSelecionadoNome}</span>
     </div>
 
+     <div class="item-resumo">
+  <svg viewBox="0 0 24 24" fill="none">
+    <path
+      d="M4 7h16M4 12h16M4 17h10"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+    />
+  </svg>
+  <span>${servicoSelecionadoNome} • R$ ${Number(servicoSelecionadoPreco).toFixed(2).replace(".", ",")}</span>
+</div>
+
     <div class="item-resumo">
       <svg viewBox="0 0 24 24" fill="none">
         <path
@@ -639,31 +651,6 @@ async function confirmar() {
       </svg>
       <span>${horaSelecionada}</span>
     </div>
-
-    <div class="item-resumo">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path
-          d="M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-      <span>${nome}</span>
-    </div>
-
-    <div class="item-resumo">
-  <svg viewBox="0 0 24 24" fill="none">
-    <path
-      d="M4 7h16M4 12h16M4 17h10"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-    />
-  </svg>
-  <span>${servicoSelecionadoNome} • R$ ${Number(servicoSelecionadoPreco).toFixed(2).replace(".", ",")}</span>
-</div>
 
     <p class="texto-sucesso">Tudo certo! Te esperamos.</p>
   `;
