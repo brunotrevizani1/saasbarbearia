@@ -240,24 +240,25 @@ router.post("/cancelar/buscar", (req, res) => {
   }
 
   const sql = `
-    SELECT 
-      agendamentos.id,
-      agendamentos.nome,
-      agendamentos.telefone,
-      agendamentos.data,
-      agendamentos.hora,
-      agendamentos.codigo,
-      agendamentos.status,
-      agendamentos.barbearia_id,
-      agendamentos.barbeiro_id,
-      barbeiros.nome AS barbeiro_nome
-    FROM agendamentos
-    LEFT JOIN barbeiros ON barbeiros.id = agendamentos.barbeiro_id
-    WHERE agendamentos.codigo = ?
-    AND agendamentos.barbearia_id = ?
-    AND agendamentos.status = 'agendado'
-    LIMIT 1
-  `;
+  SELECT 
+    agendamentos.id,
+    agendamentos.nome,
+    agendamentos.telefone,
+    agendamentos.data,
+    agendamentos.hora,
+    agendamentos.codigo,
+    agendamentos.status,
+    agendamentos.barbearia_id,
+    agendamentos.barbeiro_id,
+    agendamentos.servico_nome,
+    barbeiros.nome AS barbeiro_nome
+  FROM agendamentos
+  LEFT JOIN barbeiros ON barbeiros.id = agendamentos.barbeiro_id
+  WHERE agendamentos.codigo = ?
+  AND agendamentos.barbearia_id = ?
+  AND agendamentos.status = 'agendado'
+  LIMIT 1
+`;
 
   db.query(sql, [codigo.toUpperCase().trim(), barbearia_id], (err, result) => {
     if (err) {

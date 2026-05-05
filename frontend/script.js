@@ -803,13 +803,19 @@ async function buscarAgendamentoParaCancelar() {
         </div>
 
         <div class="item-cancelamento">
+          <span><strong>Telefone:</strong> ${agendamento.telefone}</span>
+        </div>
+
+        <div class="item-cancelamento">
           <span><strong>Barbeiro:</strong> ${
             agendamento.barbeiro_nome || "Não informado"
           }</span>
         </div>
 
         <div class="item-cancelamento">
-          <span><strong>Telefone:</strong> ${agendamento.telefone}</span>
+          <span><strong>Serviço:</strong> ${
+            agendamento.servico_nome || "Não informado"
+          }</span>
         </div>
 
         <div class="item-cancelamento">
@@ -831,10 +837,10 @@ async function buscarAgendamentoParaCancelar() {
       </div>
     `;
   } catch (error) {
+    console.error("Erro ao buscar agendamento:", error);
     mensagem.innerText = "Erro ao conectar com o servidor.";
   }
 }
-
 async function confirmarCancelamento(codigo) {
   const mensagem = document.getElementById("mensagemCancelamento");
   const info = document.getElementById("agendamentoCancelamentoInfo");
