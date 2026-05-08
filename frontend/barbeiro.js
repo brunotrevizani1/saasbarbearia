@@ -79,6 +79,80 @@ function irParaHojeAgendamentos() {
 function abrirSecao(secao) {
   const secoes = [
     "secaoDashboard",
+    "secaoAgenda",
+    "secaoEquipe",
+    "secaoServicos",
+    "secaoProdutos",
+    "secaoRelatorios",
+    "secaoConfiguracoes",
+  ];
+
+  const menus = [
+    "menuDashboard",
+    "menuAgenda",
+    "menuEquipe",
+    "menuServicos",
+    "menuProdutos",
+    "menuRelatorios",
+    "menuConfiguracoes",
+  ];
+
+  secoes.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("ativa");
+  });
+
+  menus.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("ativo");
+  });
+
+  if (secao === "dashboard") {
+    document.getElementById("secaoDashboard").classList.add("ativa");
+    document.getElementById("menuDashboard").classList.add("ativo");
+  }
+
+  if (secao === "agenda") {
+    document.getElementById("secaoAgenda").classList.add("ativa");
+    document.getElementById("menuAgenda").classList.add("ativo");
+  }
+
+  if (secao === "equipe") {
+    document.getElementById("secaoEquipe").classList.add("ativa");
+    document.getElementById("menuEquipe").classList.add("ativo");
+    carregarBarbeiros();
+  }
+
+  if (secao === "servicos") {
+    document.getElementById("secaoServicos").classList.add("ativa");
+    document.getElementById("menuServicos").classList.add("ativo");
+    carregarServicosAdmin();
+  }
+
+  if (secao === "produtos") {
+    document.getElementById("secaoProdutos").classList.add("ativa");
+    document.getElementById("menuProdutos").classList.add("ativo");
+    carregarProdutosAdmin();
+    carregarConfigProdutos();
+  }
+
+  if (secao === "relatorios") {
+    document.getElementById("secaoRelatorios").classList.add("ativa");
+    document.getElementById("menuRelatorios").classList.add("ativo");
+    iniciarRelatorios();
+  }
+
+  if (secao === "configuracoes") {
+    document.getElementById("secaoConfiguracoes").classList.add("ativa");
+    document.getElementById("menuConfiguracoes").classList.add("ativo");
+    abrirAbaConfiguracoes("logo");
+  }
+}
+
+function abrirSecao(secao) {
+  const secoes = [
+    "secaoDashboard",
+    "secaoAgenda",
     "secaoEquipe",
     "secaoServicos",
     "secaoProdutos",
@@ -89,6 +163,7 @@ function abrirSecao(secao) {
 
   const menus = [
     "menuDashboard",
+    "menuAgenda",
     "menuEquipe",
     "menuServicos",
     "menuProdutos",
@@ -112,9 +187,15 @@ function abrirSecao(secao) {
     document.getElementById("menuDashboard").classList.add("ativo");
   }
 
+  if (secao === "agenda") {
+    document.getElementById("secaoAgenda").classList.add("ativa");
+    document.getElementById("menuAgenda").classList.add("ativo");
+  }
+
   if (secao === "equipe") {
     document.getElementById("secaoEquipe").classList.add("ativa");
     document.getElementById("menuEquipe").classList.add("ativo");
+    carregarBarbeiros();
   }
 
   if (secao === "servicos") {
@@ -144,40 +225,6 @@ function abrirSecao(secao) {
   if (secao === "configuracoes") {
     document.getElementById("secaoConfiguracoes").classList.add("ativa");
     document.getElementById("menuConfiguracoes").classList.add("ativo");
-  }
-}
-
-function abrirAbaConfig(nome) {
-  const abaBloqueio = document.getElementById("abaBloqueio");
-  const abaHorario = document.getElementById("abaHorario");
-  const abaExcecao = document.getElementById("abaExcecao");
-
-  const abaBloqueioBtn = document.getElementById("abaBloqueioBtn");
-  const abaHorarioBtn = document.getElementById("abaHorarioBtn");
-  const abaExcecaoBtn = document.getElementById("abaExcecaoBtn");
-
-  abaBloqueio.classList.remove("ativa");
-  abaHorario.classList.remove("ativa");
-  abaExcecao.classList.remove("ativa");
-
-  abaBloqueioBtn.classList.remove("ativa");
-  abaHorarioBtn.classList.remove("ativa");
-  abaExcecaoBtn.classList.remove("ativa");
-
-  if (nome === "bloqueio") {
-    abaBloqueio.classList.add("ativa");
-    abaBloqueioBtn.classList.add("ativa");
-  }
-
-  if (nome === "horario") {
-    abaHorario.classList.add("ativa");
-    abaHorarioBtn.classList.add("ativa");
-  }
-
-  if (nome === "excecao") {
-    abaExcecao.classList.add("ativa");
-    abaExcecaoBtn.classList.add("ativa");
-    carregarExcecoesHorario();
   }
 }
 
@@ -506,17 +553,27 @@ async function carregarBarbeiros() {
     barbeirosAdminCache = barbeiros;
 
     const listaBarbeiros = document.getElementById("listaBarbeiros");
+    const semBarbeiros = document.getElementById("semBarbeiros");
     const selectConfig = document.getElementById("selectBarbeiroConfig");
     const filtroDashboard = document.getElementById(
       "filtroBarbeiroAgendamentos",
     );
 
     if (listaBarbeiros) listaBarbeiros.innerHTML = "";
+    if (semBarbeiros) {
+      semBarbeiros.style.display = "none";
+    }
     if (selectConfig) {
       selectConfig.innerHTML = `<option value="">Selecione um barbeiro</option>`;
     }
     if (filtroDashboard) {
       filtroDashboard.innerHTML = `<option value="">Todos os barbeiros</option>`;
+    }
+    if (!barbeiros.length) {
+      if (semBarbeiros) {
+        semBarbeiros.style.display = "block";
+      }
+      return;
     }
 
     barbeiros.forEach((barbeiro) => {
@@ -689,40 +746,37 @@ function trocarBarbeiroDashboard() {
 }
 
 function abrirAbaConfiguracoes(nome) {
-  const abaCadastrarBarbeiros = document.getElementById(
-    "abaCadastrarBarbeiros",
-  );
-  const abaTrocarSenha = document.getElementById("abaTrocarSenha");
   const abaLogo = document.getElementById("abaLogo");
+  const abaLocalizacao = document.getElementById("abaLocalizacao");
+  const abaTrocarSenha = document.getElementById("abaTrocarSenha");
 
-  const abaCadastrarBarbeirosBtn = document.getElementById(
-    "abaCadastrarBarbeirosBtn",
-  );
-  const abaTrocarSenhaBtn = document.getElementById("abaTrocarSenhaBtn");
   const abaLogoBtn = document.getElementById("abaLogoBtn");
+  const abaLocalizacaoBtn = document.getElementById("abaLocalizacaoBtn");
+  const abaTrocarSenhaBtn = document.getElementById("abaTrocarSenhaBtn");
 
-  abaCadastrarBarbeiros.classList.remove("ativa");
-  abaTrocarSenha.classList.remove("ativa");
   abaLogo.classList.remove("ativa");
+  abaLocalizacao.classList.remove("ativa");
+  abaTrocarSenha.classList.remove("ativa");
 
-  abaCadastrarBarbeirosBtn.classList.remove("ativa");
-  abaTrocarSenhaBtn.classList.remove("ativa");
   abaLogoBtn.classList.remove("ativa");
+  abaLocalizacaoBtn.classList.remove("ativa");
+  abaTrocarSenhaBtn.classList.remove("ativa");
 
-  if (nome === "barbeiros") {
-    abaCadastrarBarbeiros.classList.add("ativa");
-    abaCadastrarBarbeirosBtn.classList.add("ativa");
+  if (nome === "logo") {
+    abaLogo.classList.add("ativa");
+    abaLogoBtn.classList.add("ativa");
+    carregarLogoBarbearia();
+  }
+
+  if (nome === "localizacao") {
+    abaLocalizacao.classList.add("ativa");
+    abaLocalizacaoBtn.classList.add("ativa");
+    carregarLocalizacaoBarbearia();
   }
 
   if (nome === "senha") {
     abaTrocarSenha.classList.add("ativa");
     abaTrocarSenhaBtn.classList.add("ativa");
-  }
-
-  if (nome === "logo") {
-    abaLogo.classList.add("ativa");
-    abaLogoBtn.classList.add("ativa");
-    carregarLogoBarbearia(); // carrega preview
   }
 }
 

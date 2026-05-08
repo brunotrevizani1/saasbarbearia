@@ -1063,29 +1063,30 @@ const gerarRelatorioAgendamentos = (req, res) => {
   }
 
   const sqlPeriodo = `
-    SELECT
-      b.id AS barbeiro_id,
-      b.nome AS barbeiro_nome,
+  SELECT
+    b.id AS barbeiro_id,
+    b.nome AS barbeiro_nome,
 
-      COUNT(a.id) AS total,
+    COUNT(a.id) AS total,
 
-      COALESCE(SUM(CASE WHEN a.status = 'agendado' THEN 1 ELSE 0 END), 0) AS agendados,
-      COALESCE(SUM(CASE WHEN a.status = 'concluido' THEN 1 ELSE 0 END), 0) AS concluidos,
-      COALESCE(SUM(CASE WHEN a.status = 'cancelado' THEN 1 ELSE 0 END), 0) AS cancelados
+    COALESCE(SUM(CASE WHEN a.status = 'agendado' THEN 1 ELSE 0 END), 0) AS agendados,
+    COALESCE(SUM(CASE WHEN a.status = 'concluido' THEN 1 ELSE 0 END), 0) AS concluidos,
+    COALESCE(SUM(CASE WHEN a.status = 'cancelado' THEN 1 ELSE 0 END), 0) AS cancelados
 
-    FROM barbeiros b
+  FROM barbeiros b
 
-    LEFT JOIN agendamentos a
-      ON a.barbeiro_id = b.id
-      AND a.barbearia_id = b.barbearia_id
-      AND a.data BETWEEN ? AND ?
+  LEFT JOIN agendamentos a
+    ON a.barbeiro_id = b.id
+    AND a.barbearia_id = b.barbearia_id
+    AND a.data BETWEEN ? AND ?
 
-    WHERE b.barbearia_id = ?
-    ${filtroBarbeiroSql}
+  WHERE b.barbearia_id = ?
+  AND b.ativo = 1
+  ${filtroBarbeiroSql}
 
-    GROUP BY b.id, b.nome
-    ORDER BY total DESC, b.nome ASC
-  `;
+  GROUP BY b.id, b.nome
+  ORDER BY total DESC, b.nome ASC
+`;
 
   db.query(sqlPeriodo, paramsPeriodo, (errPeriodo, resultadoPeriodo) => {
     if (errPeriodo) {

@@ -30,9 +30,9 @@
         </button>
 
         <button
-          id="menuConfiguracoes"
+          id="menuAgenda"
           class="menu-item"
-          onclick="abrirSecao('configuracoes')"
+          onclick="abrirSecao('agenda')"
         >
           <svg viewBox="0 0 24 24" fill="none">
             <path
@@ -44,79 +44,6 @@
             />
           </svg>
           Agenda
-        </button>
-
-        <button id="menuServicos" class="menu-item" onclick="abrirSecao('servicos')">
-  <svg viewBox="0 0 24 24" fill="none">
-    <path
-      d="M4 7h16M4 12h16M4 17h10"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-    />
-    <path
-      d="M18 15l2 2 3-4"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-  </svg>
-  Serviços
-</button>
-
-        <button id="menuProdutos" class="menu-item" onclick="abrirSecao('produtos')">
-
-  <svg viewBox="0 0 24 24" fill="none">
-    <path
-      d="M6 7h12l-1 14H7L6 7Z"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M9 7a3 3 0 0 1 6 0"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-    />
-  </svg>
-  Produtos
-</button>
-
-<button id="menuRelatorios" class="menu-item" onclick="abrirSecao('relatorios')">
-  <svg viewBox="0 0 24 24" fill="none">
-    <path
-      d="M4 19V5M4 19H20M8 16V11M12 16V8M16 16V13"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-  </svg>
-  Relatórios
-</button>
-
-        <button
-          id="menuLocalizacao"
-          class="menu-item"
-          onclick="abrirSecao('localizacao')"
-        >
-          <svg viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"
-              stroke="currentColor"
-              stroke-width="1.8"
-            />
-            <circle
-              cx="12"
-              cy="10"
-              r="2.2"
-              stroke="currentColor"
-              stroke-width="1.8"
-            />
-          </svg>
-          Localização
         </button>
 
         <button
@@ -140,7 +67,100 @@
               stroke-width="1.8"
             />
             <path
-              d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+              d="M22 21v-2a4 4 0 0 0-3-3.87"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M16 3.13a4 4 0 0 1 0 7.75"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Equipe
+        </button>
+
+        <button
+          id="menuServicos"
+          class="menu-item"
+          onclick="abrirSecao('servicos')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 7h16M4 12h16M4 17h10"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <path
+              d="M18 15l2 2 3-4"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Serviços
+        </button>
+
+        <button
+          id="menuProdutos"
+          class="menu-item"
+          onclick="abrirSecao('produtos')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 7h12l-1 14H7L6 7Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M9 7a3 3 0 0 1 6 0"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          Produtos
+        </button>
+
+        <button
+          id="menuRelatorios"
+          class="menu-item"
+          onclick="abrirSecao('relatorios')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 19V5M4 19H20M8 16V11M12 16V8M16 16V13"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Relatórios
+        </button>
+
+        <button
+          id="menuConfiguracoes"
+          class="menu-item"
+          onclick="abrirSecao('configuracoes')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2.1 2.1 0 0 1-2.97 2.97l-.06-.06a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.1 1.66V21a2.1 2.1 0 0 1-4.2 0v-.09a1.8 1.8 0 0 0-1.1-1.66 1.8 1.8 0 0 0-1.98.36l-.06.06a2.1 2.1 0 0 1-2.97-2.97l.06-.06A1.8 1.8 0 0 0 3.8 15a1.8 1.8 0 0 0-1.66-1.1H2a2.1 2.1 0 0 1 0-4.2h.09A1.8 1.8 0 0 0 3.75 8.6a1.8 1.8 0 0 0-.36-1.98l-.06-.06A2.1 2.1 0 0 1 6.3 3.59l.06.06a1.8 1.8 0 0 0 1.98.36H8.4A1.8 1.8 0 0 0 9.5 2.35V2a2.1 2.1 0 0 1 4.2 0v.09a1.8 1.8 0 0 0 1.1 1.66 1.8 1.8 0 0 0 1.98-.36l.06-.06a2.1 2.1 0 0 1 2.97 2.97l-.06.06a1.8 1.8 0 0 0-.36 1.98v.06a1.8 1.8 0 0 0 1.66 1.1H22a2.1 2.1 0 0 1 0 4.2h-.09A1.8 1.8 0 0 0 19.4 15Z"
               stroke="currentColor"
               stroke-width="1.8"
               stroke-linecap="round"
@@ -149,44 +169,43 @@
           </svg>
           Configurações
         </button>
-
         <button class="menu-item sair" onclick="sair()">Sair</button>
       </aside>
 
       <main class="conteudo">
         <section id="secaoDashboard" class="secao ativa">
           <div class="painel-principal">
-          <div class="topo-dashboard">
-  <!-- ESQUERDA -->
-  <div class="lado-esquerdo">
-    <h1>Agendamentos do dia</h1>
+            <div class="topo-dashboard">
+              <!-- ESQUERDA -->
+              <div class="lado-esquerdo">
+                <h1>Agendamentos do dia</h1>
 
-    <div class="controle-dia">
-  <div class="botoes-dia">
-    <button onclick="mudarDiaAgendamentos(-1)">←</button>
-    <button onclick="irParaHojeAgendamentos()">Avançar</button>
-    <button onclick="mudarDiaAgendamentos(1)">→</button>
-  </div>
+                <div class="controle-dia">
+                  <div class="botoes-dia">
+                    <button onclick="mudarDiaAgendamentos(-1)">←</button>
+                    <button onclick="irParaHojeAgendamentos()">Avançar</button>
+                    <button onclick="mudarDiaAgendamentos(1)">→</button>
+                  </div>
 
-  <span class="tete" id="dataFiltroTexto"></span>
-</div>
-  </div>
+                  <span class="tete" id="dataFiltroTexto"></span>
+                </div>
+              </div>
 
-  <!-- DIREITA -->
-  <div class="lado-direito">
-    <div class="contador-agendamentos-dia">
-      <span>Agendamentos marcados</span>
-      <strong id="totalAgendamentosDia">8</strong>
-    </div>
+              <!-- DIREITA -->
+              <div class="lado-direito">
+                <div class="contador-agendamentos-dia">
+                  <span>Agendamentos marcados</span>
+                  <strong id="totalAgendamentosDia">8</strong>
+                </div>
 
-    <select
-  id="filtroBarbeiroAgendamentos"
-  onchange="trocarBarbeiroDashboard()"
->
-  <option value="">Todos os barbeiros</option>
-</select>
-  </div>
-</div>
+                <select
+                  id="filtroBarbeiroAgendamentos"
+                  onchange="trocarBarbeiroDashboard()"
+                >
+                  <option value="">Todos os barbeiros</option>
+                </select>
+              </div>
+            </div>
 
             <div id="listaAgendamentos" class="lista-agendamentos"></div>
             <p id="semAgendamentos" class="mensagem-vazia">
@@ -195,7 +214,7 @@
           </div>
         </section>
 
-        <section id="secaoConfiguracoes" class="secao">
+        <section id="secaoAgenda" class="secao">
           <div class="painel-principal">
             <div class="topo-secao">
               <div>
@@ -220,7 +239,7 @@
 
             <div id="areaConfiguracaoBarbeiro" class="area-config-barbeiro">
               <div class="abas-config ativa">
-                  <button
+                <button
                   id="abaHorarioBtn"
                   class="aba ativa"
                   onclick="abrirAbaConfig('horario')"
@@ -451,231 +470,203 @@
         </section>
 
         <section id="secaoServicos" class="secao">
-  <div class="painel-principal">
-    <div class="topo-secao topo-servicos-admin">
-      <div>
-        <h2>Serviços da barbearia</h2>
-        <p class="descricao-secao">
-          Cadastre os serviços que poderão ser escolhidos pelos clientes no
-          agendamento.
-        </p>
-      </div>
-
-      <button class="btn-principal btn-novo-servico" onclick="abrirModalServico()">
-        + Adicionar serviço
-      </button>
-    </div>
-
-    <div class="card-config">
-      <h3>Serviços cadastrados</h3>
-
-      <div id="listaServicosAdmin" class="lista-servicos-admin"></div>
-
-      <p id="semServicosAdmin" class="mensagem-vazia">
-        Nenhum serviço cadastrado.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section id="secaoProdutos" class="secao">
-  <div class="painel-principal">
-    <div class="topo-secao topo-produtos-admin">
-      <div>
-        <h2>Produtos da barbearia</h2>
-        <p class="descricao-secao">
-          Cadastre produtos vendidos na barbearia e controle o estoque.
-        </p>
-      </div>
-
-     <div class="acoes-produtos-admin">
-  <button
-    class="btn-consultar-reserva"
-    onclick="abrirModalConsultaReserva()"
-  >
-    <svg viewBox="0 0 24 24" fill="none">
-      <path
-        d="M21 21l-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"
-        stroke="currentColor"
-        stroke-width="1.8"
-        stroke-linecap="round"
-      />
-    </svg>
-    Consultar reserva
-  </button>
-
-  <button
-    class="btn-principal btn-novo-produto"
-    onclick="abrirModalProduto()"
-  >
-    + Adicionar produto
-  </button>
-</div>
-    </div>
-
-    <div class="card-config card-toggle-produtos">
-  <div>
-    <h3>Produtos na tela do cliente</h3>
-    <p>
-      Ative ou desative a vitrine de produtos para os clientes.
-    </p>
-  </div>
-
-  <label class="switch-produtos">
-    <input
-      type="checkbox"
-      id="toggleMostrarProdutos"
-      onchange="salvarVisibilidadeProdutos()"
-    />
-    <span></span>
-  </label>
-</div>
-
-    <div class="card-config">
-      <h3>Produtos cadastrados</h3>
-
-      <div id="listaProdutosAdmin" class="lista-produtos-admin"></div>
-
-      <p id="semProdutosAdmin" class="mensagem-vazia">
-        Nenhum produto cadastrado.
-      </p>
-    </div>
-  </div>
-</section>
-
-<section id="secaoRelatorios" class="secao">
-  <div class="painel-principal">
-    <div class="topo-secao">
-      <div>
-        <h2>Relatórios de agendamentos</h2>
-        <p class="descricao-secao">
-          Acompanhe a quantidade de agendamentos por barbeiro, dia, semana ou
-          período personalizado.
-        </p>
-      </div>
-    </div>
-
-    <div class="card-config filtro-relatorio-card">
-      <div class="filtros-relatorio">
-        <label>
-          <span>Barbeiro</span>
-          <select id="filtroRelatorioBarbeiro">
-            <option value="todos">Todos os barbeiros</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Data inicial</span>
-          <input type="date" id="relatorioDataInicio" />
-        </label>
-
-        <label>
-          <span>Data final</span>
-          <input type="date" id="relatorioDataFim" />
-        </label>
-
-        <button class="btn-principal" onclick="buscarRelatorioAgendamentos()">
-          Buscar relatório
-        </button>
-      </div>
-    </div>
-
-    <div class="area-relatorio-grid">
-      <div class="card-config">
-        <h3>Agendamentos por barbeiro</h3>
-
-        <div id="graficoRelatorioBarbeiros" class="grafico-relatorio"></div>
-
-        <p id="semDadosGraficoRelatorio" class="mensagem-vazia">
-          Nenhum agendamento encontrado no período.
-        </p>
-      </div>
-
-      <div class="card-config">
-        <h3>Resumo do período</h3>
-
-       <div class="mini-resumo-status">
-  <div>
-    <span>Concluídos</span>
-    <strong id="relatorioConcluidos">0</strong>
-  </div>
-
-  <div>
-    <span>Cancelados</span>
-    <strong id="relatorioCancelados">0</strong>
-  </div>
-
-  <div class="resumo-total-destaque">
-  <span>Total</span>
-  <strong id="relatorioTotalResumo">0</strong>
-</div>
-</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-        <section id="secaoLocalizacao" class="secao">
           <div class="painel-principal">
-            <div class="topo-secao">
+            <div class="topo-secao topo-servicos-admin">
               <div>
-                <h2>Endereço da barbearia</h2>
+                <h2>Serviços da barbearia</h2>
+                <p class="descricao-secao">
+                  Cadastre os serviços que poderão ser escolhidos pelos clientes
+                  no agendamento.
+                </p>
               </div>
+
+              <button
+                class="btn-principal btn-novo-servico"
+                onclick="abrirModalServico()"
+              >
+                + Adicionar serviço
+              </button>
             </div>
 
             <div class="card-config">
-              <label class="campo">
-                <span>Rua</span>
-                <input
-                  type="text"
-                  id="ruaBarbearia"
-                  placeholder="Nome da rua"
-                />
-              </label>
+              <h3>Serviços cadastrados</h3>
 
-              <label class="campo">
-                <span>Número</span>
-                <input type="text" id="numeroBarbearia" placeholder="Número" />
-              </label>
+              <div id="listaServicosAdmin" class="lista-servicos-admin"></div>
 
-              <label class="campo">
-                <span>Bairro</span>
-                <input type="text" id="bairroBarbearia" placeholder="Bairro" />
-              </label>
-
-              <label class="campo">
-                <span>Cidade</span>
-                <input type="text" id="cidadeBarbearia" placeholder="Cidade" />
-              </label>
-
-              <button class="btn-principal" onclick="salvarLocalizacao()">
-                Salvar localização
-              </button>
-
-              <p id="mensagemLocalizacao" class="mensagem"></p>
+              <p id="semServicosAdmin" class="mensagem-vazia">
+                Nenhum serviço cadastrado.
+              </p>
             </div>
           </div>
         </section>
 
-        <section id="secaoEquipe" class="secao">
+        <section id="secaoProdutos" class="secao">
+          <div class="painel-principal">
+            <div class="topo-secao topo-produtos-admin">
+              <div>
+                <h2>Produtos da barbearia</h2>
+                <p class="descricao-secao">
+                  Cadastre produtos vendidos na barbearia e controle o estoque.
+                </p>
+              </div>
+
+              <div class="acoes-produtos-admin">
+                <button
+                  class="btn-consultar-reserva"
+                  onclick="abrirModalConsultaReserva()"
+                >
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M21 21l-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                  Consultar reserva
+                </button>
+
+                <button
+                  class="btn-principal btn-novo-produto"
+                  onclick="abrirModalProduto()"
+                >
+                  + Adicionar produto
+                </button>
+              </div>
+            </div>
+
+            <div class="card-config card-toggle-produtos">
+              <div>
+                <h3>Produtos na tela do cliente</h3>
+                <p>Ative ou desative a vitrine de produtos para os clientes.</p>
+              </div>
+
+              <label class="switch-produtos">
+                <input
+                  type="checkbox"
+                  id="toggleMostrarProdutos"
+                  onchange="salvarVisibilidadeProdutos()"
+                />
+                <span></span>
+              </label>
+            </div>
+
+            <div class="card-config">
+              <h3>Produtos cadastrados</h3>
+
+              <div id="listaProdutosAdmin" class="lista-produtos-admin"></div>
+
+              <p id="semProdutosAdmin" class="mensagem-vazia">
+                Nenhum produto cadastrado.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="secaoRelatorios" class="secao">
+          <div class="painel-principal">
+            <div class="topo-secao">
+              <div>
+                <h2>Relatórios de agendamentos</h2>
+                <p class="descricao-secao">
+                  Acompanhe a quantidade de agendamentos por barbeiro, dia,
+                  semana ou período personalizado.
+                </p>
+              </div>
+            </div>
+
+            <div class="card-config filtro-relatorio-card">
+              <div class="filtros-relatorio">
+                <label>
+                  <span>Barbeiro</span>
+                  <select id="filtroRelatorioBarbeiro">
+                    <option value="todos">Todos os barbeiros</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Data inicial</span>
+                  <input type="date" id="relatorioDataInicio" />
+                </label>
+
+                <label>
+                  <span>Data final</span>
+                  <input type="date" id="relatorioDataFim" />
+                </label>
+
+                <button
+                  class="btn-principal"
+                  onclick="buscarRelatorioAgendamentos()"
+                >
+                  Buscar relatório
+                </button>
+              </div>
+            </div>
+
+            <div class="area-relatorio-grid">
+              <div class="card-config">
+                <h3>Agendamentos por barbeiro</h3>
+
+                <div
+                  id="graficoRelatorioBarbeiros"
+                  class="grafico-relatorio"
+                ></div>
+
+                <p id="semDadosGraficoRelatorio" class="mensagem-vazia">
+                  Nenhum agendamento encontrado no período.
+                </p>
+              </div>
+
+              <div class="card-config">
+                <h3>Resumo do período</h3>
+
+                <div class="mini-resumo-status">
+                  <div>
+                    <span>Concluídos</span>
+                    <strong id="relatorioConcluidos">0</strong>
+                  </div>
+
+                  <div>
+                    <span>Cancelados</span>
+                    <strong id="relatorioCancelados">0</strong>
+                  </div>
+
+                  <div class="resumo-total-destaque">
+                    <span>Total</span>
+                    <strong id="relatorioTotalResumo">0</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="secaoConfiguracoes" class="secao">
           <div class="painel-principal">
             <div class="topo-secao">
               <div>
                 <h2>Configurações da barbearia</h2>
                 <p class="descricao-secao">
-                  Gerencie barbeiros, senha de acesso e outras opções do
-                  sistema.
+                  Gerencie a logo, localização e senha de acesso da barbearia.
                 </p>
               </div>
             </div>
 
             <div class="abas-config">
               <button
-                id="abaCadastrarBarbeirosBtn"
+                id="abaLogoBtn"
                 class="aba ativa"
-                onclick="abrirAbaConfiguracoes('barbeiros')"
+                onclick="abrirAbaConfiguracoes('logo')"
               >
-                Cadastrar barbeiros
+                Logo da barbearia
+              </button>
+
+              <button
+                id="abaLocalizacaoBtn"
+                class="aba"
+                onclick="abrirAbaConfiguracoes('localizacao')"
+              >
+                Localização
               </button>
 
               <button
@@ -685,48 +676,125 @@
               >
                 Trocar senha
               </button>
-
-              <button
-                id="abaLogoBtn"
-                class="aba"
-                onclick="abrirAbaConfiguracoes('logo')"
-              >
-                Logo da barbearia
-              </button>
             </div>
 
-            <div
-              id="abaCadastrarBarbeiros"
-              class="conteudo-configuracoes ativa"
-            >
-              <div class="bloco-config">
-                <div class="topo-lista-equipe">
-                  <h3>Barbeiros cadastrados</h3>
+            <div id="abaLogo" class="conteudo-configuracoes ativa">
+              <div class="linha-logo-preview">
+                <div class="card-config card-logo-upload">
+                  <div class="topo-logo-card">
+                    <h3>Logo da barbearia</h3>
+
+                    <button
+                      class="btn-preview-cliente"
+                      onclick="togglePreviewCliente()"
+                    >
+                      <svg class="icone-olho" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="3"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                        />
+                      </svg>
+                      <span>Ver preview</span>
+                    </button>
+                  </div>
+
+                  <p class="descricao-secao">
+                    Adicione a logo da sua barbearia para aparecer na tela do
+                    cliente.
+                  </p>
+
+                  <label for="inputLogo" class="area-preview-logo">
+                    <img id="previewLogo" src="" alt="Logo da barbearia" />
+
+                    <div id="placeholderLogo" class="placeholder-logo">
+                      <span>+</span>
+                      <small>Clique para escolher</small>
+                    </div>
+                  </label>
+
+                  <input type="file" id="inputLogo" accept="image/*" hidden />
 
                   <button
-                    class="btn-add-barbeiro"
-                    onclick="abrirModalBarbeiro()"
-                    aria-label="Adicionar barbeiro"
+                    class="btn-principal btn-salvar-logo"
+                    onclick="salvarLogo()"
                   >
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M19 8v6M16 11h6"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                      />
-                    </svg>
+                    Salvar logo
                   </button>
+
+                  <p id="mensagemLogo" class="mensagem mensagem-logo"></p>
                 </div>
 
-                <div id="listaBarbeiros" class="lista-barbeiros"></div>
+                <div id="previewClienteBox" class="preview-cliente-box">
+                  <div class="celular-preview">
+                    <div class="celular-botao-lateral esquerda"></div>
+                    <div class="celular-botao-lateral direita"></div>
+                    <div class="celular-notch"></div>
+
+                    <iframe
+                      id="iframePreviewCliente"
+                      class="iframe-preview-cliente"
+                      title="Preview cliente"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="abaLocalizacao" class="conteudo-configuracoes">
+              <div class="card-config">
+                <h3>Localização da barbearia</h3>
+
+                <label class="campo">
+                  <span>Rua</span>
+                  <input
+                    type="text"
+                    id="ruaBarbearia"
+                    placeholder="Nome da rua"
+                  />
+                </label>
+
+                <label class="campo">
+                  <span>Número</span>
+                  <input
+                    type="text"
+                    id="numeroBarbearia"
+                    placeholder="Número"
+                  />
+                </label>
+
+                <label class="campo">
+                  <span>Bairro</span>
+                  <input
+                    type="text"
+                    id="bairroBarbearia"
+                    placeholder="Bairro"
+                  />
+                </label>
+
+                <label class="campo">
+                  <span>Cidade</span>
+                  <input
+                    type="text"
+                    id="cidadeBarbearia"
+                    placeholder="Cidade"
+                  />
+                </label>
+
+                <button class="btn-principal" onclick="salvarLocalizacao()">
+                  Salvar localização
+                </button>
+
+                <p id="mensagemLocalizacao" class="mensagem"></p>
               </div>
             </div>
 
@@ -852,281 +920,281 @@
                 <p id="mensagemSenha" class="mensagem"></p>
               </div>
             </div>
-         <div id="abaLogo" class="conteudo-configuracoes">
-  <div class="linha-logo-preview">
-    <div class="card-config card-logo-upload">
-      <div class="topo-logo-card">
-        <h3>Logo da barbearia</h3>
+          </div>
+        </section>
 
-        <button class="btn-preview-cliente" onclick="togglePreviewCliente()">
-  <svg class="icone-olho" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <circle
-      cx="12"
-      cy="12"
-      r="3"
-      stroke="currentColor"
-      stroke-width="1.8"
-    />
-  </svg>
-  <span>Ver preview</span>
-</button>
-      </div>
-
-      <p class="descricao-secao">
-        Adicione a logo da sua barbearia para aparecer na tela do cliente.
-      </p>
-
-      <label for="inputLogo" class="area-preview-logo">
-        <img id="previewLogo" src="" alt="Logo da barbearia" />
-
-        <div id="placeholderLogo" class="placeholder-logo">
-          <span>+</span>
-          <small>Clique para escolher</small>
-        </div>
-      </label>
-
-      <input type="file" id="inputLogo" accept="image/*" hidden />
-
-      <button class="btn-principal btn-salvar-logo" onclick="salvarLogo()">
-        Salvar logo
-      </button>
-
-      <p id="mensagemLogo" class="mensagem mensagem-logo"></p>
-    </div>
-
-    <div id="previewClienteBox" class="preview-cliente-box">
-      <div class="celular-preview">
-        <div class="celular-botao-lateral esquerda"></div>
-        <div class="celular-botao-lateral direita"></div>
-        <div class="celular-notch"></div>
-
-        <iframe
-          id="iframePreviewCliente"
-          class="iframe-preview-cliente"
-          title="Preview cliente"
-        ></iframe>
-      </div>
-    </div>
-  </div>
-</div>
-                </div>
+        <section id="secaoEquipe" class="secao">
+          <div class="painel-principal">
+            <div class="topo-secao">
+              <div>
+                <h2>Equipe</h2>
+                <p class="descricao-secao">
+                  Cadastre e gerencie os barbeiros da barbearia e os serviços
+                  que cada um realiza.
+                </p>
               </div>
+
+              <button class="btn-principal" onclick="abrirModalBarbeiro()">
+                + Adicionar barbeiro
+              </button>
+            </div>
+
+            <div class="card-config">
+              <h3>Barbeiros cadastrados</h3>
+
+              <div id="listaBarbeiros" class="lista-barbeiros"></div>
+
+              <p id="semBarbeiros" class="mensagem-vazia">
+                Nenhum barbeiro cadastrado.
+              </p>
             </div>
           </div>
         </section>
       </main>
     </div>
 
-   <div id="modalBarbeiro" class="modal-overlay">
-  <div class="modal-card">
-    <h3 id="tituloModalBarbeiro">Adicionar barbeiro</h3>
+    <div id="modalBarbeiro" class="modal-overlay">
+      <div class="modal-card">
+        <h3 id="tituloModalBarbeiro">Adicionar barbeiro</h3>
 
-    <label class="campo">
-      <span>Nome do barbeiro</span>
-      <input
-        type="text"
-        id="novoBarbeiroNome"
-        placeholder="Digite o nome do barbeiro"
-      />
-    </label>
+        <label class="campo">
+          <span>Nome do barbeiro</span>
+          <input
+            type="text"
+            id="novoBarbeiroNome"
+            placeholder="Digite o nome do barbeiro"
+          />
+        </label>
 
-    <div class="campo">
-      <span>Serviços que esse barbeiro realiza</span>
+        <div class="campo">
+          <span>Serviços que esse barbeiro realiza</span>
 
-      <div id="listaServicosBarbeiroModal" class="lista-servicos-barbeiro-modal">
-        <p class="mensagem-vazia">Carregando serviços...</p>
+          <div
+            id="listaServicosBarbeiroModal"
+            class="lista-servicos-barbeiro-modal"
+          >
+            <p class="mensagem-vazia">Carregando serviços...</p>
+          </div>
+        </div>
+
+        <p id="mensagemBarbeiro" class="mensagem"></p>
+
+        <div class="modal-acoes">
+          <button class="btn-secundario" onclick="fecharModalBarbeiro()">
+            Cancelar
+          </button>
+
+          <button
+            id="btnSalvarBarbeiro"
+            class="btn-principal"
+            onclick="salvarBarbeiro()"
+          >
+            Criar barbeiro
+          </button>
+        </div>
       </div>
     </div>
-
-    <p id="mensagemBarbeiro" class="mensagem"></p>
-
-    <div class="modal-acoes">
-      <button class="btn-secundario" onclick="fecharModalBarbeiro()">
-        Cancelar
-      </button>
-
-      <button
-        id="btnSalvarBarbeiro"
-        class="btn-principal"
-        onclick="salvarBarbeiro()"
-      >
-        Criar barbeiro
-      </button>
-    </div>
-  </div>
-</div>
 
     <div id="modalProduto" class="modal-produto">
-  <div class="modal-produto-card">
-    <div class="modal-produto-topo">
-      <h3 id="tituloModalProduto">Novo produto</h3>
-      <button onclick="fecharModalProduto()">×</button>
-    </div>
+      <div class="modal-produto-card">
+        <div class="modal-produto-topo">
+          <h3 id="tituloModalProduto">Novo produto</h3>
+          <button onclick="fecharModalProduto()">×</button>
+        </div>
 
-    <label class="campo">
-      <span>Título</span>
-      <input type="text" id="produtoTitulo" placeholder="Ex: Pomada modeladora" />
-    </label>
-
-    <label class="campo">
-      <span>Descrição</span>
-      <textarea id="produtoDescricao" placeholder="Descrição do produto"></textarea>
-    </label>
-
-    <div class="linha-form-produto">
-      <label class="campo">
-        <span>Valor</span>
-        <input type="number" id="produtoValor" placeholder="29.90" step="0.01" />
-      </label>
-
-      <label class="campo">
-        <span>Estoque</span>
-        <input type="number" id="produtoEstoque" placeholder="10" />
-      </label>
-    </div>
-
-    <div class="campo" id="areaFotosProduto">
-  <span>Fotos do produto (máximo 3)</span>
-
-      <div class="grid-upload-produto">
-        <label class="upload-produto-box">
-          <input type="file" class="input-foto-produto" accept="image/*" hidden />
-          <img />
-          <span>+</span>
-          <small>Foto 1</small>
+        <label class="campo">
+          <span>Título</span>
+          <input
+            type="text"
+            id="produtoTitulo"
+            placeholder="Ex: Pomada modeladora"
+          />
         </label>
 
-        <label class="upload-produto-box">
-          <input type="file" class="input-foto-produto" accept="image/*" hidden />
-          <img />
-          <span>+</span>
-          <small>Foto 2</small>
+        <label class="campo">
+          <span>Descrição</span>
+          <textarea
+            id="produtoDescricao"
+            placeholder="Descrição do produto"
+          ></textarea>
         </label>
 
-        <label class="upload-produto-box">
-          <input type="file" class="input-foto-produto" accept="image/*" hidden />
-          <img />
-          <span>+</span>
-          <small>Foto 3</small>
-        </label>
+        <div class="linha-form-produto">
+          <label class="campo">
+            <span>Valor</span>
+            <input
+              type="number"
+              id="produtoValor"
+              placeholder="29.90"
+              step="0.01"
+            />
+          </label>
+
+          <label class="campo">
+            <span>Estoque</span>
+            <input type="number" id="produtoEstoque" placeholder="10" />
+          </label>
+        </div>
+
+        <div class="campo" id="areaFotosProduto">
+          <span>Fotos do produto (máximo 3)</span>
+
+          <div class="grid-upload-produto">
+            <label class="upload-produto-box">
+              <input
+                type="file"
+                class="input-foto-produto"
+                accept="image/*"
+                hidden
+              />
+              <img />
+              <span>+</span>
+              <small>Foto 1</small>
+            </label>
+
+            <label class="upload-produto-box">
+              <input
+                type="file"
+                class="input-foto-produto"
+                accept="image/*"
+                hidden
+              />
+              <img />
+              <span>+</span>
+              <small>Foto 2</small>
+            </label>
+
+            <label class="upload-produto-box">
+              <input
+                type="file"
+                class="input-foto-produto"
+                accept="image/*"
+                hidden
+              />
+              <img />
+              <span>+</span>
+              <small>Foto 3</small>
+            </label>
+          </div>
+        </div>
+
+        <button
+          class="btn-principal"
+          onclick="salvarProduto()"
+          id="btnSalvarProduto"
+        >
+          Salvar produto
+        </button>
+
+        <p id="mensagemProduto" class="mensagem"></p>
       </div>
     </div>
 
-    <button class="btn-principal" onclick="salvarProduto()" id="btnSalvarProduto">
-  Salvar produto
-</button>
+    <div id="modalConsultaReserva" class="modal-consulta-reserva">
+      <div class="modal-consulta-card">
+        <div class="modal-consulta-topo">
+          <div>
+            <h3>Consultar reserva</h3>
+            <p>
+              Digite o código informado pelo cliente para validar a retirada.
+            </p>
+          </div>
 
-    <p id="mensagemProduto" class="mensagem"></p>
-  </div>
-</div>
+          <button onclick="fecharModalConsultaReserva()">×</button>
+        </div>
 
-<div id="modalConsultaReserva" class="modal-consulta-reserva">
-  <div class="modal-consulta-card">
-    <div class="modal-consulta-topo">
-      <div>
-        <h3>Consultar reserva</h3>
-        <p>Digite o código informado pelo cliente para validar a retirada.</p>
+        <div class="busca-reserva-box">
+          <label class="campo">
+            <span>Código da reserva</span>
+            <input
+              type="text"
+              id="inputCodigoReservaProduto"
+              placeholder="Ex: A7K92Q"
+              maxlength="10"
+            />
+          </label>
+
+          <button class="btn-buscar-reserva" onclick="buscarReservaProduto()">
+            Buscar reserva
+          </button>
+        </div>
+
+        <p id="mensagemConsultaReserva" class="mensagem-consulta-reserva"></p>
+
+        <div
+          id="resultadoReservaProduto"
+          class="resultado-reserva-produto"
+        ></div>
       </div>
-
-      <button onclick="fecharModalConsultaReserva()">×</button>
     </div>
 
-    <div class="busca-reserva-box">
-      <label class="campo">
-        <span>Código da reserva</span>
-        <input
-          type="text"
-          id="inputCodigoReservaProduto"
-          placeholder="Ex: A7K92Q"
-          maxlength="10"
-        />
-      </label>
+    <div id="modalServico" class="modal-servico">
+      <div class="modal-servico-card">
+        <div class="modal-servico-topo">
+          <h3 id="tituloModalServico">Novo serviço</h3>
 
-      <button class="btn-buscar-reserva" onclick="buscarReservaProduto()">
-        Buscar reserva
-      </button>
+          <button onclick="fecharModalServico()">×</button>
+        </div>
+
+        <label class="campo">
+          <span>Nome do serviço</span>
+          <input
+            type="text"
+            id="servicoNome"
+            placeholder="Ex: Corte masculino"
+          />
+        </label>
+
+        <label class="campo">
+          <span>Descrição</span>
+          <textarea
+            id="servicoDescricao"
+            placeholder="Ex: Corte completo com acabamento"
+          ></textarea>
+        </label>
+
+        <div class="linha-form-servico">
+          <label class="campo">
+            <span>Preço</span>
+            <input
+              type="number"
+              id="servicoPreco"
+              placeholder="35.00"
+              step="0.01"
+            />
+          </label>
+
+          <label class="campo">
+            <span>Duração</span>
+            <select id="servicoDuracao">
+              <option value="">Selecione</option>
+              <option value="15">15 minutos</option>
+              <option value="20">20 minutos</option>
+              <option value="30">30 minutos</option>
+              <option value="40">40 minutos</option>
+              <option value="45">45 minutos</option>
+              <option value="50">50 minutos</option>
+              <option value="60">1 hora</option>
+              <option value="75">1h15</option>
+              <option value="90">1h30</option>
+              <option value="120">2 horas</option>
+              <option value="150">2h30</option>
+              <option value="180">3 horas</option>
+            </select>
+          </label>
+        </div>
+
+        <button
+          class="btn-principal"
+          id="btnSalvarServico"
+          onclick="salvarServico()"
+        >
+          Salvar serviço
+        </button>
+
+        <p id="mensagemServico" class="mensagem"></p>
+      </div>
     </div>
-
-    <p id="mensagemConsultaReserva" class="mensagem-consulta-reserva"></p>
-
-    <div id="resultadoReservaProduto" class="resultado-reserva-produto"></div>
-  </div>
-</div>
-
-<div id="modalServico" class="modal-servico">
-  <div class="modal-servico-card">
-    <div class="modal-servico-topo">
-      <h3 id="tituloModalServico">Novo serviço</h3>
-
-      <button onclick="fecharModalServico()">×</button>
-    </div>
-
-    <label class="campo">
-      <span>Nome do serviço</span>
-      <input
-        type="text"
-        id="servicoNome"
-        placeholder="Ex: Corte masculino"
-      />
-    </label>
-
-    <label class="campo">
-      <span>Descrição</span>
-      <textarea
-        id="servicoDescricao"
-        placeholder="Ex: Corte completo com acabamento"
-      ></textarea>
-    </label>
-
-    <div class="linha-form-servico">
-      <label class="campo">
-        <span>Preço</span>
-        <input
-          type="number"
-          id="servicoPreco"
-          placeholder="35.00"
-          step="0.01"
-        />
-      </label>
-
-      <label class="campo">
-        <span>Duração</span>
-        <select id="servicoDuracao">
-          <option value="">Selecione</option>
-          <option value="15">15 minutos</option>
-          <option value="20">20 minutos</option>
-          <option value="30">30 minutos</option>
-          <option value="40">40 minutos</option>
-          <option value="45">45 minutos</option>
-          <option value="50">50 minutos</option>
-          <option value="60">1 hora</option>
-          <option value="75">1h15</option>
-          <option value="90">1h30</option>
-          <option value="120">2 horas</option>
-          <option value="150">2h30</option>
-          <option value="180">3 horas</option>
-        </select>
-      </label>
-    </div>
-
-    <button
-      class="btn-principal"
-      id="btnSalvarServico"
-      onclick="salvarServico()"
-    >
-      Salvar serviço
-    </button>
-
-    <p id="mensagemServico" class="mensagem"></p>
-  </div>
-</div>
 
     <script src="barbeiro.js"></script>
   </body>
