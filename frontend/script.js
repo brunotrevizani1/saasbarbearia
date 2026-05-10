@@ -9,6 +9,8 @@ let servicoSelecionadoNome = "";
 let servicoSelecionadoPreco = 0;
 let servicoSelecionadoDuracao = 0;
 let mostrarProdutosCliente = false;
+let enderecoBarbeariaApps = "";
+let telaAntesDaLocalizacao = "tela-barbeiro";
 
 const params = new URLSearchParams(window.location.search);
 const barbeariaId = Number(params.get("barbearia"));
@@ -685,6 +687,12 @@ async function carregarLogoCliente() {
 /* LOCALIZAÇÃO */
 
 async function abrirTelaLocalizacao() {
+  const telaAtiva = document.querySelector(".tela-ativa");
+
+  if (telaAtiva && telaAtiva.id !== "tela-localizacao") {
+    telaAntesDaLocalizacao = telaAtiva.id;
+  }
+
   try {
     const res = await fetch(
       `${API_URL}/api/barbeiro/localizacao?barbearia_id=${barbeariaId}`,
@@ -692,12 +700,16 @@ async function abrirTelaLocalizacao() {
 
     const c = await res.json();
 
-    if (!c.rua && !c.numero && !c.bairro && !c.cidade) {
+    enderecoBarbeariaApps = [c.rua, c.numero, c.bairro, c.cidade]
+      .filter((parte) => parte && parte.toString().trim() !== "")
+      .join(", ");
+
+    if (!enderecoBarbeariaApps) {
       document.getElementById("textoLocalizacao").innerText =
         "Localização ainda não informada.";
     } else {
       document.getElementById("textoLocalizacao").innerText =
-        `${c.rua || ""}, ${c.numero || ""} - ${c.bairro || ""} - ${c.cidade || ""}`;
+        enderecoBarbeariaApps;
     }
 
     trocarTela("tela-localizacao");
@@ -710,22 +722,7 @@ async function abrirTelaLocalizacao() {
 }
 
 function voltarDaLocalizacao() {
-  if (dataSelecionada) {
-    trocarTela("tela-data");
-    return;
-  }
-
-  if (servicoSelecionado) {
-    trocarTela("tela-data");
-    return;
-  }
-
-  if (barbeiroSelecionado) {
-    trocarTela("tela-servicos");
-    return;
-  }
-
-  trocarTela("tela-barbeiro");
+  trocarTela(telaAntesDaLocalizacao || "tela-barbeiro");
 }
 
 /* CANCELAMENTO */
@@ -1316,28 +1313,25 @@ function horarioTemEspacoLivre(horario, duracaoServico, agendamentosDia) {
 }
 
 function abrirUber() {
-  const rua = document.getElementById("ruaLocalizacao")?.innerText || "";
-  const numero = document.getElementById("numeroLocalizacao")?.innerText || "";
-  const bairro = document.getElementById("bairroLocalizacao")?.innerText || "";
-  const cidade = document.getElementById("cidadeLocalizacao")?.innerText || "";
+  if (!enderecoBarbeariaApps) {
+    alert("Endereço da barbearia não encontrado.");
+    return;
+  }
 
-  const endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
+  const enderecoFormatado = encodeURIComponent(enderecoBarbeariaApps);
 
-  const enderecoFormatado = encodeURIComponent(endereco);
-
-  const linkUber = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${enderecoFormatado}`;
+  const linkUber = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${enderecoFormatado}&dropoff[nickname]=Barbearia`;
 
   window.open(linkUber, "_blank");
 }
 
 function abrirGoogleMaps() {
-  const rua = document.getElementById("ruaLocalizacao")?.innerText || "";
-  const numero = document.getElementById("numeroLocalizacao")?.innerText || "";
-  const bairro = document.getElementById("bairroLocalizacao")?.innerText || "";
-  const cidade = document.getElementById("cidadeLocalizacao")?.innerText || "";
+  if (!enderecoBarbeariaApps) {
+    alert("Endereço da barbearia não encontrado.");
+    return;
+  }
 
-  const endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
-  const enderecoFormatado = encodeURIComponent(endereco);
+  const enderecoFormatado = encodeURIComponent(enderecoBarbeariaApps);
 
   const linkMaps = `https://www.google.com/maps/dir/?api=1&destination=${enderecoFormatado}&travelmode=driving`;
 
