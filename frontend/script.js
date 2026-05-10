@@ -1319,12 +1319,16 @@ function abrirUber() {
   }
 
   const enderecoFormatado = encodeURIComponent(enderecoBarbeariaApps);
+  const nomeDestino = encodeURIComponent("Barbearia");
 
-  const linkUber = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${enderecoFormatado}&dropoff[nickname]=Barbearia`;
+  const linkUber = `uber://?action=setPickup&pickup=my_location&dropoff[formatted_address]=${enderecoFormatado}&dropoff[nickname]=${nomeDestino}`;
 
-  window.open(linkUber, "_blank");
+  window.location.href = linkUber;
+
+  setTimeout(() => {
+    window.location.href = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${enderecoFormatado}&dropoff[nickname]=${nomeDestino}`;
+  }, 800);
 }
-
 function abrirGoogleMaps() {
   if (!enderecoBarbeariaApps) {
     alert("Endereço da barbearia não encontrado.");
