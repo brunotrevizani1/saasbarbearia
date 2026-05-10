@@ -1315,6 +1315,35 @@ function horarioTemEspacoLivre(horario, duracaoServico, agendamentosDia) {
   });
 }
 
+function abrirUber() {
+  const rua = document.getElementById("ruaLocalizacao")?.innerText || "";
+  const numero = document.getElementById("numeroLocalizacao")?.innerText || "";
+  const bairro = document.getElementById("bairroLocalizacao")?.innerText || "";
+  const cidade = document.getElementById("cidadeLocalizacao")?.innerText || "";
+
+  const endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
+
+  const enderecoFormatado = encodeURIComponent(endereco);
+
+  const linkUber = `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${enderecoFormatado}`;
+
+  window.open(linkUber, "_blank");
+}
+
+function abrirGoogleMaps() {
+  const rua = document.getElementById("ruaLocalizacao")?.innerText || "";
+  const numero = document.getElementById("numeroLocalizacao")?.innerText || "";
+  const bairro = document.getElementById("bairroLocalizacao")?.innerText || "";
+  const cidade = document.getElementById("cidadeLocalizacao")?.innerText || "";
+
+  const endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
+  const enderecoFormatado = encodeURIComponent(endereco);
+
+  const linkMaps = `https://www.google.com/maps/dir/?api=1&destination=${enderecoFormatado}&travelmode=driving`;
+
+  window.open(linkMaps, "_blank");
+}
+
 carregarBarbeirosCliente();
 trocarTela("tela-barbeiro");
 carregarLogoCliente();

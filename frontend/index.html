@@ -56,6 +56,7 @@
             style="display: none"
           />
 
+          <p class="etapa-agendamento">Etapa 1 de 6</p>
           <h1>Escolha o barbeiro</h1>
 
           <div id="listaBarbeirosCliente" class="lista-barbeiros-cliente"></div>
@@ -66,6 +67,7 @@
         </div>
 
         <div id="tela-servicos">
+          <p class="etapa-agendamento">Etapa 2 de 6</p>
           <h1>Escolha o serviço</h1>
 
           <div id="barbeiroServicoInfo" class="barbeiro-selecionado-info"></div>
@@ -82,6 +84,7 @@
         </div>
 
         <div id="tela-data">
+          <p class="etapa-agendamento">Etapa 3 de 6</p>
           <h1>Escolha o dia</h1>
 
           <div
@@ -113,6 +116,7 @@
         </div>
 
         <div id="tela-horarios">
+          <p class="etapa-agendamento">Etapa 4 de 6</p>
           <h1>Horários disponíveis</h1>
 
           <div id="listaHorarios"></div>
@@ -125,6 +129,7 @@
         </div>
 
         <div id="tela-confirmar">
+          <p class="etapa-agendamento">Etapa 5 de 6</p>
           <h1>Confirmar agendamento</h1>
 
           <input type="text" id="nome" placeholder="Seu nome" />
@@ -140,6 +145,7 @@
         </div>
 
         <div id="tela-sucesso">
+          <p class="etapa-agendamento etapa-final">Etapa 6 de 6</p>
           <h1>Agendamento confirmado!</h1>
 
           <div id="resumo"></div>
@@ -158,6 +164,14 @@
 
           <button class="btn-voltar" onclick="voltarDaLocalizacao()">
             Voltar
+          </button>
+
+          <button class="btn-maps" onclick="abrirGoogleMaps()">
+            Como chegar pelo Maps
+          </button>
+
+          <button class="btn-uber" onclick="abrirUber()">
+            Chamar Uber até a barbearia
           </button>
         </div>
 
