@@ -110,11 +110,13 @@ function abrirSecao(secao) {
   if (secao === "dashboard") {
     document.getElementById("secaoDashboard").classList.add("ativa");
     document.getElementById("menuDashboard").classList.add("ativo");
+    carregarAgendamentos(true);
   }
 
   if (secao === "agenda") {
     document.getElementById("secaoAgenda").classList.add("ativa");
     document.getElementById("menuAgenda").classList.add("ativo");
+    abrirAbaConfig("horario");
   }
 
   if (secao === "equipe") {
@@ -149,82 +151,37 @@ function abrirSecao(secao) {
   }
 }
 
-function abrirSecao(secao) {
-  const secoes = [
-    "secaoDashboard",
-    "secaoAgenda",
-    "secaoEquipe",
-    "secaoServicos",
-    "secaoProdutos",
-    "secaoLocalizacao",
-    "secaoRelatorios",
-    "secaoConfiguracoes",
-  ];
+function abrirAbaConfig(nome) {
+  const abas = ["abaHorario", "abaExcecao", "abaBloqueio"];
 
-  const menus = [
-    "menuDashboard",
-    "menuAgenda",
-    "menuEquipe",
-    "menuServicos",
-    "menuProdutos",
-    "menuRelatorios",
-    "menuLocalizacao",
-    "menuConfiguracoes",
-  ];
+  const botoes = ["abaHorarioBtn", "abaExcecaoBtn", "abaBloqueioBtn"];
 
-  secoes.forEach((id) => {
+  abas.forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.classList.remove("ativa");
   });
 
-  menus.forEach((id) => {
+  botoes.forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.classList.remove("ativo");
+    if (el) el.classList.remove("ativa");
   });
 
-  if (secao === "dashboard") {
-    document.getElementById("secaoDashboard").classList.add("ativa");
-    document.getElementById("menuDashboard").classList.add("ativo");
+  if (nome === "horario") {
+    document.getElementById("abaHorario").classList.add("ativa");
+    document.getElementById("abaHorarioBtn").classList.add("ativa");
+    carregarConfiguracaoAgenda();
   }
 
-  if (secao === "agenda") {
-    document.getElementById("secaoAgenda").classList.add("ativa");
-    document.getElementById("menuAgenda").classList.add("ativo");
+  if (nome === "excecao") {
+    document.getElementById("abaExcecao").classList.add("ativa");
+    document.getElementById("abaExcecaoBtn").classList.add("ativa");
+    carregarExcecoesHorario();
   }
 
-  if (secao === "equipe") {
-    document.getElementById("secaoEquipe").classList.add("ativa");
-    document.getElementById("menuEquipe").classList.add("ativo");
-    carregarBarbeiros();
-  }
-
-  if (secao === "servicos") {
-    document.getElementById("secaoServicos").classList.add("ativa");
-    document.getElementById("menuServicos").classList.add("ativo");
-    carregarServicosAdmin();
-  }
-
-  if (secao === "produtos") {
-    document.getElementById("secaoProdutos").classList.add("ativa");
-    document.getElementById("menuProdutos").classList.add("ativo");
-    carregarProdutosAdmin();
-    carregarConfigProdutos();
-  }
-
-  if (secao === "relatorios") {
-    document.getElementById("secaoRelatorios").classList.add("ativa");
-    document.getElementById("menuRelatorios").classList.add("ativo");
-    iniciarRelatorios();
-  }
-
-  if (secao === "localizacao") {
-    document.getElementById("secaoLocalizacao").classList.add("ativa");
-    document.getElementById("menuLocalizacao").classList.add("ativo");
-  }
-
-  if (secao === "configuracoes") {
-    document.getElementById("secaoConfiguracoes").classList.add("ativa");
-    document.getElementById("menuConfiguracoes").classList.add("ativo");
+  if (nome === "bloqueio") {
+    document.getElementById("abaBloqueio").classList.add("ativa");
+    document.getElementById("abaBloqueioBtn").classList.add("ativa");
+    carregarDiasBloqueados();
   }
 }
 
@@ -306,7 +263,6 @@ async function carregarExcecoesHorario() {
         <div class="info-bloqueio">
           <strong>${formatarData(excecao.data)}</strong>
           <span>${textoTipo}</span>
-          ${excecao.motivo ? `<small>${excecao.motivo}</small>` : ""}
         </div>
 
         <button class="btn-desbloquear" onclick="deletarExcecaoHorario(${excecao.id})">
@@ -328,7 +284,7 @@ async function salvarExcecaoHorario() {
   const tipo = document.getElementById("tipoExcecao").value;
   const hora_inicio = document.getElementById("horaInicioExcecao").value;
   const hora_fim = document.getElementById("horaFimExcecao").value;
-  const motivo = document.getElementById("motivoExcecao").value.trim();
+  const motivo = "";
 
   const mensagem = document.getElementById("mensagemExcecao");
   mensagem.innerText = "";
@@ -374,7 +330,6 @@ async function salvarExcecaoHorario() {
       document.getElementById("tipoExcecao").value = "";
       document.getElementById("horaInicioExcecao").value = "";
       document.getElementById("horaFimExcecao").value = "";
-      document.getElementById("motivoExcecao").value = "";
       mostrarCamposExcecao();
 
       await carregarExcecoesHorario();
@@ -1773,6 +1728,9 @@ async function buscarRelatorioAgendamentos() {
 function renderizarRelatorioAgendamentos(data) {
   const resumo = data.resumo;
   const barbeiros = data.barbeiros || [];
+
+  document.getElementById("relatorioEmAberto").innerText =
+    resumo.agendados || 0;
 
   document.getElementById("relatorioConcluidos").innerText =
     resumo.concluidos || 0;

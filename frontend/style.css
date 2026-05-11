@@ -1268,3 +1268,15 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   transform: translateY(-1px);
   filter: brightness(0.96);
 }
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(39%) sepia(91%) saturate(2024%) hue-rotate(209deg)
+    brightness(97%) contrast(96%);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(39%) sepia(91%) saturate(2024%) hue-rotate(209deg)
+    brightness(97%) contrast(96%);
+  cursor: pointer;
+}

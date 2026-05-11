@@ -1105,39 +1105,48 @@ const gerarRelatorioAgendamentos = (req, res) => {
     let filtroResumoBarbeiro = "";
 
     if (usarFiltroBarbeiro) {
-      filtroResumoBarbeiro = " AND barbeiro_id = ? ";
+      filtroResumoBarbeiro = " AND a.barbeiro_id = ? ";
       paramsResumoHoje.push(barbeiro_id);
       paramsResumoSemana.push(barbeiro_id);
       paramsResumoPeriodo.push(barbeiro_id);
     }
 
     const sqlResumoHoje = `
-      SELECT COUNT(*) AS total
-      FROM agendamentos
-      WHERE barbearia_id = ?
-      AND data = ?
-      ${filtroResumoBarbeiro}
-    `;
+  SELECT COUNT(*) AS total
+  FROM agendamentos a
+  INNER JOIN barbeiros b ON b.id = a.barbeiro_id
+    AND b.barbearia_id = a.barbearia_id
+    AND b.ativo = 1
+  WHERE a.barbearia_id = ?
+  AND a.data = ?
+  ${filtroResumoBarbeiro}
+`;
 
     const sqlResumoSemana = `
-      SELECT COUNT(*) AS total
-      FROM agendamentos
-      WHERE barbearia_id = ?
-      AND data BETWEEN ? AND ?
-      ${filtroResumoBarbeiro}
-    `;
+  SELECT COUNT(*) AS total
+  FROM agendamentos a
+  INNER JOIN barbeiros b ON b.id = a.barbeiro_id
+    AND b.barbearia_id = a.barbearia_id
+    AND b.ativo = 1
+  WHERE a.barbearia_id = ?
+  AND a.data BETWEEN ? AND ?
+  ${filtroResumoBarbeiro}
+`;
 
     const sqlResumoPeriodo = `
-      SELECT
-        COUNT(*) AS total,
-        COALESCE(SUM(CASE WHEN status = 'agendado' THEN 1 ELSE 0 END), 0) AS agendados,
-        COALESCE(SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END), 0) AS concluidos,
-        COALESCE(SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END), 0) AS cancelados
-      FROM agendamentos
-      WHERE barbearia_id = ?
-      AND data BETWEEN ? AND ?
-      ${filtroResumoBarbeiro}
-    `;
+  SELECT
+    COUNT(*) AS total,
+    COALESCE(SUM(CASE WHEN a.status = 'agendado' THEN 1 ELSE 0 END), 0) AS agendados,
+    COALESCE(SUM(CASE WHEN a.status = 'concluido' THEN 1 ELSE 0 END), 0) AS concluidos,
+    COALESCE(SUM(CASE WHEN a.status = 'cancelado' THEN 1 ELSE 0 END), 0) AS cancelados
+  FROM agendamentos a
+  INNER JOIN barbeiros b ON b.id = a.barbeiro_id
+    AND b.barbearia_id = a.barbearia_id
+    AND b.ativo = 1
+  WHERE a.barbearia_id = ?
+  AND a.data BETWEEN ? AND ?
+  ${filtroResumoBarbeiro}
+`;
 
     db.query(sqlResumoHoje, paramsResumoHoje, (errHoje, resultadoHoje) => {
       if (errHoje) {

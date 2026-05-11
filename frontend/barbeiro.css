@@ -1061,7 +1061,7 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   position: relative;
   overflow: hidden;
   transition: 0.25s ease;
-  margin: 24px 0 18px;
+  margin: 24px auto 18px;
 }
 
 .area-preview-logo:hover {
@@ -1169,8 +1169,14 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   pointer-events: none;
 }
 
+.btn-salvar-logo {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+}
+
 .mensagem-logo {
-  text-align: left;
+  text-align: center;
 }
 
 @media (max-width: 1100px) {
@@ -1680,6 +1686,15 @@ input[type="password"]::-webkit-credentials-auto-fill-button {
   border: 1px solid #e2e8f0;
   padding: 16px;
   border-radius: 20px;
+}
+
+.busca-reserva-box .campo {
+  margin-bottom: 0;
+}
+
+.busca-reserva-box .btn-buscar-reserva {
+  height: 50px;
+  align-self: end;
 }
 
 .btn-buscar-reserva {
@@ -2454,5 +2469,17 @@ select:active {
   background-size: 14px !important;
 
   padding-right: 44px !important;
+  cursor: pointer;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(39%) sepia(91%) saturate(2024%) hue-rotate(209deg)
+    brightness(97%) contrast(96%);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(39%) sepia(91%) saturate(2024%) hue-rotate(209deg)
+    brightness(97%) contrast(96%);
   cursor: pointer;
 }

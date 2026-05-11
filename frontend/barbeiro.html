@@ -383,15 +383,6 @@
                     </label>
                   </div>
 
-                  <label class="campo">
-                    <span>Motivo</span>
-                    <input
-                      type="text"
-                      id="motivoExcecao"
-                      placeholder="Opcional"
-                    />
-                  </label>
-
                   <button
                     class="btn-principal"
                     onclick="salvarExcecaoHorario()"
@@ -621,6 +612,11 @@
                 <h3>Resumo do período</h3>
 
                 <div class="mini-resumo-status">
+                  <div>
+                    <span>Em aberto</span>
+                    <strong id="relatorioEmAberto">0</strong>
+                  </div>
+
                   <div>
                     <span>Concluídos</span>
                     <strong id="relatorioConcluidos">0</strong>
