@@ -2483,3 +2483,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     brightness(97%) contrast(96%);
   cursor: pointer;
 }
+
+.botoes-dia {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.texto-avancar-dia {
+  color: #2f6aeb;
+  font-weight: 630;
+  font-size: 14px;
+  padding: 8px 4px;
+  cursor: default;
+  user-select: none;
+}
