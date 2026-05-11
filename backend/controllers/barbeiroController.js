@@ -1199,6 +1199,328 @@ const gerarRelatorioAgendamentos = (req, res) => {
   });
 };
 
+const gerarFinanceiro = (req, res) => {
+  const { barbearia_id, barbeiro_id, data_inicio, data_fim, tipo } = req.query;
+
+  if (!barbearia_id || !data_inicio || !data_fim) {
+    return res.status(400).json({
+      erro: "Barbearia, data inicial e data final são obrigatórios.",
+    });
+  }
+
+  const usarFiltroBarbeiro = barbeiro_id && barbeiro_id !== "todos";
+  const tipoFiltro = tipo || "todos";
+
+  const incluirServicos = tipoFiltro === "todos" || tipoFiltro === "servicos";
+  const incluirProdutos = tipoFiltro === "todos" || tipoFiltro === "produtos";
+
+  let filtroServicoBarbeiro = "";
+  let filtroGraficoBarbeiro = "";
+
+  const paramsServicos = [barbearia_id, data_inicio, data_fim];
+  const paramsGrafico = [barbearia_id, data_inicio, data_fim];
+
+  if (usarFiltroBarbeiro) {
+    filtroServicoBarbeiro = " AND a.barbeiro_id = ? ";
+    filtroGraficoBarbeiro = " AND b.id = ? ";
+    paramsServicos.push(barbeiro_id);
+    paramsGrafico.push(barbeiro_id);
+  }
+
+  const sqlResumoServicos = incluirServicos
+    ? `
+      SELECT
+        COALESCE(SUM(CASE WHEN a.status = 'concluido' THEN a.servico_preco ELSE 0 END), 0) AS servicos_concluidos,
+        COALESCE(SUM(CASE WHEN a.status = 'agendado' THEN a.servico_preco ELSE 0 END), 0) AS servicos_em_aberto,
+        COUNT(CASE WHEN a.status = 'concluido' THEN 1 END) AS qtd_servicos_concluidos,
+        COUNT(CASE WHEN a.status = 'agendado' THEN 1 END) AS qtd_servicos_em_aberto
+      FROM agendamentos a
+      INNER JOIN barbeiros b ON b.id = a.barbeiro_id
+        AND b.barbearia_id = a.barbearia_id
+        AND b.ativo = 1
+      WHERE a.barbearia_id = ?
+      AND a.data BETWEEN ? AND ?
+      ${filtroServicoBarbeiro}
+    `
+    : `
+      SELECT
+        0 AS servicos_concluidos,
+        0 AS servicos_em_aberto,
+        0 AS qtd_servicos_concluidos,
+        0 AS qtd_servicos_em_aberto
+    `;
+
+  const paramsProdutos = [barbearia_id, data_inicio, data_fim];
+
+  const sqlResumoProdutos = incluirProdutos
+    ? `
+      SELECT
+        COALESCE(SUM(CASE WHEN rp.status = 'retirado' THEN p.valor * rp.quantidade ELSE 0 END), 0) AS produtos_retirados,
+        COALESCE(SUM(CASE WHEN rp.status = 'reservado' THEN p.valor * rp.quantidade ELSE 0 END), 0) AS produtos_reservados,
+        COUNT(CASE WHEN rp.status = 'retirado' THEN 1 END) AS qtd_produtos_retirados,
+        COUNT(CASE WHEN rp.status = 'reservado' THEN 1 END) AS qtd_produtos_reservados
+      FROM reservas_produtos rp
+      INNER JOIN produtos p ON p.id = rp.produto_id
+        AND p.barbearia_id = rp.barbearia_id
+      WHERE rp.barbearia_id = ?
+      AND DATE(rp.criado_em) BETWEEN ? AND ?
+    `
+    : `
+      SELECT
+        0 AS produtos_retirados,
+        0 AS produtos_reservados,
+        0 AS qtd_produtos_retirados,
+        0 AS qtd_produtos_reservados
+    `;
+
+  const sqlGraficoBarbeiros = incluirServicos
+    ? `
+      SELECT
+        b.id AS barbeiro_id,
+        b.nome AS barbeiro_nome,
+        COALESCE(SUM(CASE WHEN a.status = 'concluido' THEN a.servico_preco ELSE 0 END), 0) AS total
+      FROM barbeiros b
+      LEFT JOIN agendamentos a ON a.barbeiro_id = b.id
+        AND a.barbearia_id = b.barbearia_id
+        AND a.data BETWEEN ? AND ?
+      WHERE b.barbearia_id = ?
+      AND b.ativo = 1
+      ${filtroGraficoBarbeiro}
+      GROUP BY b.id, b.nome
+      HAVING total > 0
+      ORDER BY total DESC, b.nome ASC
+    `
+    : `
+      SELECT
+        NULL AS barbeiro_id,
+        NULL AS barbeiro_nome,
+        0 AS total
+      WHERE 1 = 0
+    `;
+
+  const paramsProdutosVendidos = [barbearia_id, data_inicio, data_fim];
+
+  const sqlProdutosVendidos = incluirProdutos
+    ? `
+      SELECT
+        p.id AS produto_id,
+        p.titulo,
+        SUM(rp.quantidade) AS quantidade,
+        COALESCE(SUM(p.valor * rp.quantidade), 0) AS total
+      FROM reservas_produtos rp
+      INNER JOIN produtos p ON p.id = rp.produto_id
+        AND p.barbearia_id = rp.barbearia_id
+      WHERE rp.barbearia_id = ?
+      AND rp.status = 'retirado'
+      AND DATE(rp.criado_em) BETWEEN ? AND ?
+      GROUP BY p.id, p.titulo
+      ORDER BY total DESC, p.titulo ASC
+    `
+    : `
+      SELECT
+        NULL AS produto_id,
+        NULL AS titulo,
+        0 AS quantidade,
+        0 AS total
+      WHERE 1 = 0
+    `;
+
+  const paramsExtrato = [];
+
+  let sqlExtratoPartes = [];
+
+  if (incluirServicos) {
+    let filtroExtratoBarbeiro = "";
+
+    paramsExtrato.push(barbearia_id, data_inicio, data_fim);
+
+    if (usarFiltroBarbeiro) {
+      filtroExtratoBarbeiro = " AND a.barbeiro_id = ? ";
+      paramsExtrato.push(barbeiro_id);
+    }
+
+    sqlExtratoPartes.push(`
+      SELECT
+        a.data AS data_movimento,
+        a.hora AS hora_movimento,
+        'servico' AS tipo,
+        a.servico_nome AS descricao,
+        a.nome AS cliente,
+        b.nome AS barbeiro_nome,
+        a.status AS status,
+        a.servico_preco AS valor
+      FROM agendamentos a
+      INNER JOIN barbeiros b ON b.id = a.barbeiro_id
+        AND b.barbearia_id = a.barbearia_id
+        AND b.ativo = 1
+      WHERE a.barbearia_id = ?
+      AND a.data BETWEEN ? AND ?
+      AND a.status IN ('agendado', 'concluido', 'cancelado')
+      ${filtroExtratoBarbeiro}
+    `);
+  }
+
+  if (incluirProdutos) {
+    paramsExtrato.push(barbearia_id, data_inicio, data_fim);
+
+    sqlExtratoPartes.push(`
+      SELECT
+        DATE(rp.criado_em) AS data_movimento,
+        TIME(rp.criado_em) AS hora_movimento,
+        'produto' AS tipo,
+        p.titulo AS descricao,
+        rp.nome_cliente AS cliente,
+        'Produto' AS barbeiro_nome,
+        rp.status AS status,
+        p.valor * rp.quantidade AS valor
+      FROM reservas_produtos rp
+      INNER JOIN produtos p ON p.id = rp.produto_id
+        AND p.barbearia_id = rp.barbearia_id
+      WHERE rp.barbearia_id = ?
+      AND DATE(rp.criado_em) BETWEEN ? AND ?
+      AND rp.status IN ('reservado', 'retirado', 'cancelado')
+    `);
+  }
+
+  const sqlExtrato = sqlExtratoPartes.length
+    ? `
+      ${sqlExtratoPartes.join(" UNION ALL ")}
+      ORDER BY data_movimento DESC, hora_movimento DESC
+      LIMIT 80
+    `
+    : `
+      SELECT
+        NULL AS data_movimento,
+        NULL AS hora_movimento,
+        NULL AS tipo,
+        NULL AS descricao,
+        NULL AS cliente,
+        NULL AS barbeiro_nome,
+        NULL AS status,
+        0 AS valor
+      WHERE 1 = 0
+    `;
+
+  db.query(
+    sqlResumoServicos,
+    incluirServicos ? paramsServicos : [],
+    (errServicos, resultServicos) => {
+      if (errServicos) {
+        console.error("Erro ao gerar financeiro de serviços:", errServicos);
+        return res.status(500).json({
+          erro: "Erro ao gerar financeiro de serviços.",
+        });
+      }
+
+      db.query(
+        sqlResumoProdutos,
+        incluirProdutos ? paramsProdutos : [],
+        (errProdutos, resultProdutos) => {
+          if (errProdutos) {
+            console.error("Erro ao gerar financeiro de produtos:", errProdutos);
+            return res.status(500).json({
+              erro: "Erro ao gerar financeiro de produtos.",
+            });
+          }
+
+          db.query(
+            sqlGraficoBarbeiros,
+            incluirServicos ? paramsGrafico : [],
+            (errGrafico, resultGrafico) => {
+              if (errGrafico) {
+                console.error("Erro ao gerar gráfico financeiro:", errGrafico);
+                return res.status(500).json({
+                  erro: "Erro ao gerar gráfico financeiro.",
+                });
+              }
+
+              db.query(
+                sqlProdutosVendidos,
+                incluirProdutos ? paramsProdutosVendidos : [],
+                (errProdutosVendidos, resultProdutosVendidos) => {
+                  if (errProdutosVendidos) {
+                    console.error(
+                      "Erro ao listar produtos vendidos:",
+                      errProdutosVendidos,
+                    );
+                    return res.status(500).json({
+                      erro: "Erro ao listar produtos vendidos.",
+                    });
+                  }
+
+                  db.query(
+                    sqlExtrato,
+                    paramsExtrato,
+                    (errExtrato, resultExtrato) => {
+                      if (errExtrato) {
+                        console.error(
+                          "Erro ao gerar extrato financeiro:",
+                          errExtrato,
+                        );
+                        return res.status(500).json({
+                          erro: "Erro ao gerar extrato financeiro.",
+                        });
+                      }
+
+                      const servicos = resultServicos[0] || {};
+                      const produtos = resultProdutos[0] || {};
+
+                      const servicosConcluidos = Number(
+                        servicos.servicos_concluidos || 0,
+                      );
+                      const servicosEmAberto = Number(
+                        servicos.servicos_em_aberto || 0,
+                      );
+                      const produtosRetirados = Number(
+                        produtos.produtos_retirados || 0,
+                      );
+                      const produtosReservados = Number(
+                        produtos.produtos_reservados || 0,
+                      );
+
+                      const faturamentoReal =
+                        servicosConcluidos + produtosRetirados;
+                      const receitaPrevista =
+                        servicosEmAberto + produtosReservados;
+
+                      res.json({
+                        sucesso: true,
+                        resumo: {
+                          faturamento_real: faturamentoReal,
+                          receita_prevista: receitaPrevista,
+                          servicos_concluidos: servicosConcluidos,
+                          servicos_em_aberto: servicosEmAberto,
+                          produtos_retirados: produtosRetirados,
+                          produtos_reservados: produtosReservados,
+                          qtd_servicos_concluidos: Number(
+                            servicos.qtd_servicos_concluidos || 0,
+                          ),
+                          qtd_servicos_em_aberto: Number(
+                            servicos.qtd_servicos_em_aberto || 0,
+                          ),
+                          qtd_produtos_retirados: Number(
+                            produtos.qtd_produtos_retirados || 0,
+                          ),
+                          qtd_produtos_reservados: Number(
+                            produtos.qtd_produtos_reservados || 0,
+                          ),
+                        },
+                        barbeiros: resultGrafico,
+                        produtos: resultProdutosVendidos,
+                        extrato: resultExtrato,
+                      });
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      );
+    },
+  );
+};
+
 const buscarServicosDoBarbeiro = (req, res) => {
   const { id } = req.params;
   const { barbearia_id } = req.query;
@@ -1367,6 +1689,7 @@ module.exports = {
   uploadLogoBarbearia,
 
   gerarRelatorioAgendamentos,
+  gerarFinanceiro,
 
   editarBarbeiro,
   buscarServicosDoBarbeiro,

@@ -130,6 +130,29 @@
         </button>
 
         <button
+          id="menuFinanceiro"
+          class="menu-item"
+          onclick="abrirSecao('financeiro')"
+        >
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 7h16M4 12h16M4 17h10"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <path
+              d="M17 15.5c0 1.1-.9 2-2.8 2H12m0 0v1.5m0-1.5H9.5M12 9v1.5m0 0h2.2c1.9 0 2.8.9 2.8 2s-.9 2-2.8 2H12m0-4H9.5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Financeiro
+        </button>
+
+        <button
           id="menuRelatorios"
           class="menu-item"
           onclick="abrirSecao('relatorios')"
@@ -549,6 +572,127 @@
 
               <p id="semProdutosAdmin" class="mensagem-vazia">
                 Nenhum produto cadastrado.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="secaoFinanceiro" class="secao">
+          <div class="painel-principal">
+            <div class="topo-secao">
+              <div>
+                <h2>Financeiro</h2>
+                <p class="descricao-secao">
+                  Acompanhe o faturamento real, a receita prevista e a origem
+                  dos valores da barbearia.
+                </p>
+              </div>
+            </div>
+
+            <div class="card-config filtro-financeiro-card">
+              <div class="filtros-financeiro">
+                <label>
+                  <span>Barbeiro</span>
+                  <select id="financeiroFiltroBarbeiro">
+                    <option value="todos">Todos os barbeiros</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Tipo</span>
+                  <select id="financeiroFiltroTipo">
+                    <option value="todos">Serviços e produtos</option>
+                    <option value="servicos">Somente serviços</option>
+                    <option value="produtos">Somente produtos</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Data inicial</span>
+                  <input type="date" id="financeiroDataInicio" />
+                </label>
+
+                <label>
+                  <span>Data final</span>
+                  <input type="date" id="financeiroDataFim" />
+                </label>
+
+                <button class="btn-principal" onclick="buscarFinanceiro()">
+                  Buscar financeiro
+                </button>
+              </div>
+            </div>
+
+            <div class="cards-financeiro">
+              <div class="card-financeiro destaque">
+                <span>Faturamento real</span>
+                <strong id="financeiroFaturamentoReal">R$ 0,00</strong>
+                <small>Serviços concluídos + produtos retirados</small>
+              </div>
+
+              <div class="card-financeiro">
+                <span>Serviços concluídos</span>
+                <strong id="financeiroServicosConcluidos">R$ 0,00</strong>
+                <small id="financeiroQtdServicosConcluidos">0 serviços</small>
+              </div>
+
+              <div class="card-financeiro">
+                <span>Produtos retirados</span>
+                <strong id="financeiroProdutosRetirados">R$ 0,00</strong>
+                <small id="financeiroQtdProdutosRetirados">0 produtos</small>
+              </div>
+
+              <div class="card-financeiro previsto">
+                <span>Receita prevista</span>
+                <strong id="financeiroReceitaPrevista">R$ 0,00</strong>
+                <small>Agendamentos em aberto + produtos reservados</small>
+              </div>
+            </div>
+
+            <div class="area-financeiro-grid">
+              <div class="card-config">
+                <h3>Faturamento por barbeiro</h3>
+
+                <div
+                  id="graficoFinanceiroBarbeiros"
+                  class="grafico-financeiro"
+                ></div>
+
+                <p id="semDadosGraficoFinanceiro" class="mensagem-vazia">
+                  Nenhum faturamento de serviços concluídos encontrado no
+                  período.
+                </p>
+              </div>
+
+              <div class="card-config">
+                <h3>Resumo de produtos</h3>
+
+                <div
+                  id="listaProdutosFinanceiro"
+                  class="lista-produtos-financeiro"
+                ></div>
+
+                <p id="semProdutosFinanceiro" class="mensagem-vazia">
+                  Nenhum produto retirado no período.
+                </p>
+              </div>
+            </div>
+
+            <div class="card-config">
+              <div class="topo-extrato-financeiro">
+                <div>
+                  <h3>Extrato financeiro</h3>
+                  <p>Últimas movimentações do período selecionado.</p>
+                </div>
+              </div>
+
+              <div
+                id="listaExtratoFinanceiro"
+                class="lista-extrato-financeiro"
+              ></div>
+
+              <p id="semExtratoFinanceiro" class="mensagem-vazia">
+                Nenhuma movimentação encontrada.
               </p>
             </div>
           </div>

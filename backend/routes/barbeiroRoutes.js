@@ -27,6 +27,7 @@ const {
   uploadLogoBarbearia,
   buscarLogoBarbearia,
   gerarRelatorioAgendamentos,
+  gerarFinanceiro,
 
   editarBarbeiro,
   buscarServicosDoBarbeiro,
@@ -60,5 +61,6 @@ router.post("/logo", uploadLogoBarbearia);
 router.get("/logo", buscarLogoBarbearia);
 
 router.get("/relatorios", gerarRelatorioAgendamentos);
+router.get("/financeiro", gerarFinanceiro);
 
 module.exports = router;

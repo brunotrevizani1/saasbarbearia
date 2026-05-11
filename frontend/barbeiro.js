@@ -83,6 +83,7 @@ function abrirSecao(secao) {
     "secaoEquipe",
     "secaoServicos",
     "secaoProdutos",
+    "secaoFinanceiro",
     "secaoRelatorios",
     "secaoConfiguracoes",
   ];
@@ -93,6 +94,7 @@ function abrirSecao(secao) {
     "menuEquipe",
     "menuServicos",
     "menuProdutos",
+    "menuFinanceiro",
     "menuRelatorios",
     "menuConfiguracoes",
   ];
@@ -136,6 +138,12 @@ function abrirSecao(secao) {
     document.getElementById("menuProdutos").classList.add("ativo");
     carregarProdutosAdmin();
     carregarConfigProdutos();
+  }
+
+  if (secao === "financeiro") {
+    document.getElementById("secaoFinanceiro").classList.add("ativa");
+    document.getElementById("menuFinanceiro").classList.add("ativo");
+    iniciarFinanceiro();
   }
 
   if (secao === "relatorios") {
@@ -1617,6 +1625,7 @@ async function buscarReservaProduto() {
 }
 
 let relatoriosIniciados = false;
+let financeiroIniciado = false;
 
 function formatarDataRelatorio(data) {
   const ano = data.getFullYear();
@@ -1645,6 +1654,279 @@ function pegarFimSemanaRelatorio() {
   fim.setDate(inicio.getDate() + 6);
 
   return fim;
+}
+
+function formatarMoeda(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function formatarDataFinanceiroTexto(dataString) {
+  if (!dataString) return "-";
+
+  const dataLimpa = dataString.toString().slice(0, 10);
+  const [ano, mes, dia] = dataLimpa.split("-");
+
+  if (!ano || !mes || !dia) return "-";
+
+  return `${dia}/${mes}/${ano}`;
+}
+
+function formatarStatusFinanceiro(status) {
+  const mapa = {
+    agendado: "Em aberto",
+    concluido: "Concluído",
+    cancelado: "Cancelado",
+    reservado: "Reservado",
+    retirado: "Retirado",
+  };
+
+  return mapa[status] || status || "-";
+}
+
+function classeStatusFinanceiro(status) {
+  const mapa = {
+    agendado: "em-aberto",
+    concluido: "concluido",
+    cancelado: "cancelado",
+    reservado: "reservado",
+    retirado: "retirado",
+  };
+
+  return mapa[status] || "padrao";
+}
+
+function pegarInicioMesFinanceiro() {
+  const hoje = new Date();
+  return new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+}
+
+async function iniciarFinanceiro() {
+  if (!financeiroIniciado) {
+    const hoje = new Date();
+    const inicioMes = pegarInicioMesFinanceiro();
+
+    document.getElementById("financeiroDataInicio").value =
+      formatarDataRelatorio(inicioMes);
+
+    document.getElementById("financeiroDataFim").value =
+      formatarDataRelatorio(hoje);
+
+    await carregarBarbeirosFinanceiro();
+
+    financeiroIniciado = true;
+  }
+
+  await buscarFinanceiro();
+}
+
+async function carregarBarbeirosFinanceiro() {
+  const select = document.getElementById("financeiroFiltroBarbeiro");
+
+  if (!select) return;
+
+  select.innerHTML = `<option value="todos">Todos os barbeiros</option>`;
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/barbeiros?barbearia_id=${barbeariaId}`,
+    );
+
+    const barbeiros = await resposta.json();
+
+    barbeiros.forEach((barbeiro) => {
+      const option = document.createElement("option");
+      option.value = barbeiro.id;
+      option.innerText = barbeiro.nome;
+
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar barbeiros no financeiro:", error);
+  }
+}
+
+async function buscarFinanceiro() {
+  const barbeiroId = document.getElementById("financeiroFiltroBarbeiro").value;
+  const tipo = document.getElementById("financeiroFiltroTipo").value;
+  const dataInicio = document.getElementById("financeiroDataInicio").value;
+  const dataFim = document.getElementById("financeiroDataFim").value;
+
+  if (!dataInicio || !dataFim) {
+    alert("Informe a data inicial e final.");
+    return;
+  }
+
+  try {
+    const resposta = await fetch(
+      `${API_URL}/api/barbeiro/financeiro?barbearia_id=${barbeariaId}&barbeiro_id=${barbeiroId}&tipo=${tipo}&data_inicio=${dataInicio}&data_fim=${dataFim}`,
+    );
+
+    const data = await resposta.json();
+
+    if (!data.sucesso) {
+      alert(data.erro || "Erro ao buscar financeiro.");
+      return;
+    }
+
+    renderizarFinanceiro(data);
+  } catch (error) {
+    console.error("Erro ao buscar financeiro:", error);
+    alert("Erro ao conectar com o servidor.");
+  }
+}
+
+function renderizarFinanceiro(data) {
+  const resumo = data.resumo || {};
+
+  document.getElementById("financeiroFaturamentoReal").innerText =
+    formatarMoeda(resumo.faturamento_real);
+
+  document.getElementById("financeiroServicosConcluidos").innerText =
+    formatarMoeda(resumo.servicos_concluidos);
+
+  document.getElementById("financeiroProdutosRetirados").innerText =
+    formatarMoeda(resumo.produtos_retirados);
+
+  document.getElementById("financeiroReceitaPrevista").innerText =
+    formatarMoeda(resumo.receita_prevista);
+
+  document.getElementById("financeiroQtdServicosConcluidos").innerText = `${
+    resumo.qtd_servicos_concluidos || 0
+  } serviços concluídos`;
+
+  document.getElementById("financeiroQtdProdutosRetirados").innerText = `${
+    resumo.qtd_produtos_retirados || 0
+  } produtos retirados`;
+
+  renderizarGraficoFinanceiro(data.barbeiros || []);
+  renderizarProdutosFinanceiro(data.produtos || []);
+  renderizarExtratoFinanceiro(data.extrato || []);
+}
+
+function renderizarGraficoFinanceiro(barbeiros) {
+  const grafico = document.getElementById("graficoFinanceiroBarbeiros");
+  const vazio = document.getElementById("semDadosGraficoFinanceiro");
+
+  grafico.innerHTML = "";
+
+  const lista = barbeiros.filter((b) => Number(b.total) > 0);
+  const maiorValor = Math.max(...lista.map((b) => Number(b.total)), 0);
+
+  if (!lista.length || maiorValor === 0) {
+    vazio.style.display = "block";
+    return;
+  }
+
+  vazio.style.display = "none";
+
+  lista.forEach((barbeiro) => {
+    const total = Number(barbeiro.total);
+    const largura = maiorValor > 0 ? (total / maiorValor) * 100 : 0;
+
+    const linha = document.createElement("div");
+    linha.className = "linha-grafico-financeiro";
+
+    linha.innerHTML = `
+      <div class="nome-grafico-financeiro">
+        ${barbeiro.barbeiro_nome}
+      </div>
+
+      <div class="barra-grafico-financeiro">
+        <div style="width: ${largura}%"></div>
+      </div>
+
+      <strong>${formatarMoeda(total)}</strong>
+    `;
+
+    grafico.appendChild(linha);
+  });
+}
+
+function renderizarProdutosFinanceiro(produtos) {
+  const lista = document.getElementById("listaProdutosFinanceiro");
+  const vazio = document.getElementById("semProdutosFinanceiro");
+
+  lista.innerHTML = "";
+
+  const produtosValidos = produtos.filter(
+    (produto) => Number(produto.total) > 0,
+  );
+
+  if (!produtosValidos.length) {
+    vazio.style.display = "block";
+    return;
+  }
+
+  vazio.style.display = "none";
+
+  produtosValidos.forEach((produto) => {
+    const item = document.createElement("div");
+    item.className = "item-produto-financeiro";
+
+    item.innerHTML = `
+      <div>
+        <strong>${produto.titulo}</strong>
+        <span>${produto.quantidade} unidade(s) retirada(s)</span>
+      </div>
+
+      <b>${formatarMoeda(produto.total)}</b>
+    `;
+
+    lista.appendChild(item);
+  });
+}
+
+function renderizarExtratoFinanceiro(extrato) {
+  const lista = document.getElementById("listaExtratoFinanceiro");
+  const vazio = document.getElementById("semExtratoFinanceiro");
+
+  lista.innerHTML = "";
+
+  if (!extrato.length) {
+    vazio.style.display = "block";
+    return;
+  }
+
+  vazio.style.display = "none";
+
+  extrato.forEach((item) => {
+    const linha = document.createElement("div");
+    linha.className = "linha-extrato-financeiro";
+
+    const tipoTexto = item.tipo === "produto" ? "Produto" : "Serviço";
+    const statusClasse = classeStatusFinanceiro(item.status);
+    const statusTexto = formatarStatusFinanceiro(item.status);
+
+    linha.innerHTML = `
+      <div class="extrato-info-principal">
+        <span class="badge-tipo-financeiro ${item.tipo}">
+          ${tipoTexto}
+        </span>
+
+        <div>
+          <strong>${item.descricao || "-"}</strong>
+          <small>
+            ${formatarDataFinanceiroTexto(item.data_movimento)}
+            • ${item.cliente || "Cliente não informado"}
+            • ${item.barbeiro_nome || "-"}
+          </small>
+        </div>
+      </div>
+
+      <div class="extrato-info-valor">
+        <span class="badge-status-financeiro ${statusClasse}">
+          ${statusTexto}
+        </span>
+
+        <strong>${formatarMoeda(item.valor)}</strong>
+      </div>
+    `;
+
+    lista.appendChild(linha);
+  });
 }
 
 async function iniciarRelatorios() {
